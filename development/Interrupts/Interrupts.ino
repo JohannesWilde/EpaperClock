@@ -10,6 +10,7 @@ static volatile bool externalInterrupt = false;
 ISR (TIMER2_COMPA_vect) 
 {
   // Timer 2 has reached its comparison value
+    PINB |= (1 << PINB5); // only toggle D13 = PORTB5 for oscilloscope measurement
 }
 
 // Interrupt Service Routine (ISR)
@@ -55,11 +56,11 @@ void loop ()
     delay(500);
   }
   else
-  {
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(500);                       // wait for a second
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-    delay(500);                       // wait for a second
+  {    
+//    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//    delay(500);                       // wait for a second
+//    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+//    delay(500);                       // wait for a second
   }
   
 }
