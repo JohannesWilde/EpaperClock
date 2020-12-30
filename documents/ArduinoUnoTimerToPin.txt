@@ -1,0 +1,17 @@
+
+TIMER0 is used for the timing of the Arduino [millis(), micros() - see C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino\wiring.c].
+
+TIMER0 - 8-bit
+TIMER1 - 16-bit
+TIMER2 - 8-bit [can be externally triggered]
+
+Arduino Atmega328p 	Timer
+
+3		d3			TIMER2B,
+
+5		d5			TIMER0B,
+6		d6			TIMER0A,
+
+9		b1			TIMER1A,
+10		b2			TIMER1B,
+11		b3			TIMER2A,
