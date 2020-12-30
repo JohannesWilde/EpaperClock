@@ -50,17 +50,17 @@ void loop ()
   if (externalInterrupt)
   {
     externalInterrupt = false;
-    pinMode(keepAlivePin, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(500);                       // wait for a second
-    pinMode(keepAlivePin, INPUT);
-    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    delay(500);   
   }
   else
   {    
-//    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-//    delay(500);                       // wait for a second
-//    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-//    delay(500);                       // wait for a second
+      pinMode(keepAlivePin, OUTPUT);
+      delay(500);                       // wait for a second
+      pinMode(keepAlivePin, INPUT);
+      delay(500);                    // wait for a second
   }
   
 }
