@@ -3,9 +3,6 @@
  * Please use the Arduino IDE for compiling EpaperClock.ino [this file will not be used].
  * */
 
-
-#include <Arduino.h>
-
 // forward declarations
 void setup();
 void loop();
