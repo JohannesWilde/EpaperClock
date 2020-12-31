@@ -19,6 +19,10 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\"
 	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\variants\\standard\\"
+	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src\\"
+	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\SPI\\src\\"
+	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\EEPROM\\src\\"
+	PRIVATE "c:\\Users\\User\\Documents\\Arduino\\libraries\\DS3231\\"
     )
 	
 target_compile_definitions(${PROJECT_NAME}
