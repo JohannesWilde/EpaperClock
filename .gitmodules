@@ -1,0 +1,3 @@
+[submodule "EpaperClock/ArduinoDrivers"]
+	path = EpaperClock/ArduinoDrivers
+	url = ssh://git@dwarfy:2289/arduino/ArduinoDrivers.git
