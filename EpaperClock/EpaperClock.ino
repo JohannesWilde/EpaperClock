@@ -1,3 +1,12 @@
+// this is only for the QtCreator to find the correct highlighting - this is already defined somewhere before
+#ifndef __AVR_ATmega328P__
+#define __AVR_ATmega328P__
+#endif
+
+#include "ArduinoDrivers/arduinoUno.hpp"
+
+typedef ArduinoUno arduinoUno;
+
 
 // the setup function runs once when you press reset or power the board
 void setup()
