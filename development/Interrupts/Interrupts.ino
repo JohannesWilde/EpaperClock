@@ -44,6 +44,13 @@ void setup ()
   TCCR2B = 0b00000111; // FOC2A, FOC2B, 0, 0, WGM22, CS22, CS21, CS20: 1024 prescaler
   OCR2A = 49; // Output compare register [49 * 1024 @ 1MHz = 50176us]
   TIMSK2 = 0b00000010; // 0, 0, 0, 0, 0, OCIE2B, OCIE2A, TOIE2: Output Compare Match Interrupt Enable Timer2 A
+
+  // disable ADC conversions -> analogRead non-usable
+  ADCSRA = 0b00010000; // ADC Control and Status Register A: ADEN, ADSC, ADATE, ADIF, ADIE, ADPS2, ADPS1, ADPS0: ADC disable, ADIF cleared, ADC interrupts disabled
+  
+  // disable Analog Comparator -> everything regarding analog measurements non-usable
+  ACSR = 0b10010000; // Analog Comparator Control and Statur Register: ACD, ACBG, ACO, ACI, ACIE, ACIC, ACIS1, ACIS0: AC disabled, ACI cleared, AC interrupts disabled
+  
   sei();
   
   set_sleep_mode (SLEEP_MODE_PWR_SAVE);
