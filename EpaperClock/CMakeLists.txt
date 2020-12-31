@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.19)
 # This is a dummy project, as to have convenient code highlighting in the QtCreator IDE.
 # This won't actually compile with it as of now.
 # For compilation use the Arduino IDE [necessary adaptations are referenced in README.md].
-project(QtDummyForHighlighting)
+project(EpaperClockDummy)
 
 
 # For correct highlighting in QtCreator check Preferences->Environment->MIME Types->text/x-c++src to include "*.ino" in Patterns.
@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
    
 target_include_directories(${PROJECT_NAME}
     PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\"
+	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\variants\\standard\\"
     )
 	
 target_compile_definitions(${PROJECT_NAME}
