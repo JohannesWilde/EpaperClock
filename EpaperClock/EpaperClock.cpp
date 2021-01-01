@@ -5,10 +5,9 @@
 #include <DS3231.h>
 
 #include "ArduinoDrivers/arduinoUno.hpp"
+#include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
-typedef ArduinoUno arduinoUno;
-
-uint8_t constexpr keepAlivePin = 2;
+static PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> powerbankKeepAlive;
 
 
 // the setup function runs once when you press reset or power the board
@@ -16,18 +15,11 @@ void setup()
 {
     // initialize digital pin LED_BUILTIN as an output.
     pinMode(LED_BUILTIN, OUTPUT);
-
-    digitalWrite(keepAlivePin, LOW);   // turn the LED on (HIGH is the voltage level)
-    pinMode(keepAlivePin, INPUT);
 	
     while (true)
     {
-        digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-        pinMode(keepAlivePin, OUTPUT);
-        delay(50);                       // wait for a second
-        digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-        pinMode(keepAlivePin, INPUT);
-        delay(5000-50);                       // wait for a second
+        powerbankKeepAlive.update();
+        delay(50);
     }
 }
 
