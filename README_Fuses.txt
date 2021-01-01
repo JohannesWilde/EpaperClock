@@ -64,13 +64,13 @@ unoOneMhz.upload.maximum_data_size=2048
 unoOneMhz.upload.speed=115200
 
 # keep the original fuses [16MHz], as to not unintendetly render the programming arduino unprogrammable [the bootloader here expects 16MHz!].
-unoOneMhz.bootloader.tool=avrdude
-unoOneMhz.bootloader.low_fuses=0xFF
-unoOneMhz.bootloader.high_fuses=0xDE
-unoOneMhz.bootloader.extended_fuses=0xFD
-unoOneMhz.bootloader.unlock_bits=0x3F
-unoOneMhz.bootloader.lock_bits=0x0F
-unoOneMhz.bootloader.file=optiboot/optiboot_atmega328.hex
+# unoOneMhz.bootloader.tool=avrdude
+# unoOneMhz.bootloader.low_fuses=0xFF
+# unoOneMhz.bootloader.high_fuses=0xDE
+# unoOneMhz.bootloader.extended_fuses=0xFD
+# unoOneMhz.bootloader.unlock_bits=0x3F
+# unoOneMhz.bootloader.lock_bits=0x0F
+# unoOneMhz.bootloader.file=optiboot/optiboot_atmega328.hex
 
 unoOneMhz.build.mcu=atmega328p
 unoOneMhz.build.f_cpu=1000000L
