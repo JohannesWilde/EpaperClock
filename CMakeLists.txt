@@ -13,7 +13,7 @@ project(EpaperClockDummy)
 # For correct highlighting in QtCreator check Preferences->Environment->MIME Types->text/x-c++src to include "*.ino" in Patterns.
 add_executable(${PROJECT_NAME}
     main.cpp
-    EpaperClock/EpaperClock.ino
+    EpaperClock/EpaperClock.cpp
     )
    
 target_include_directories(${PROJECT_NAME}
