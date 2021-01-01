@@ -1,8 +1,10 @@
+// ----------------------------------------------------------------------------------------------------
 
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 
 #include <Arduino.h>
+#include <Wire.h>
 
 #include <DS3231.h>
 
@@ -10,17 +12,32 @@
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
+// ----------------------------------------------------------------------------------------------------
+
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> PowerbankKeepAlive0;
 
+static DS3231 realTimeClock;
+
+// ----------------------------------------------------------------------------------------------------
+
+// Interrupt Service Routine for when Timer2 matches OCR2A.
 ISR (TIMER2_COMPA_vect)
 {
     PowerbankKeepAlive0::update();
 }
 
+/**
+ * @brief powerDown puts the microcontroller in SLEEP_MODE_PWR_SAVE.
+ * Please note that Timer0 won't run while sleeping, thus millis()
+ * will be effectively stopped. Therefore do not rely on differences
+ * of millis() before and after a call to powerDown()!
+ */
 void powerDown()
 {
     sleep_mode (); // here the device is actually put to sleep!!
 }
+
+// ----------------------------------------------------------------------------------------------------
 
 // the setup function runs once when you press reset or power the board
 void setup()
@@ -43,10 +60,19 @@ void setup()
 
     sei(); // enable interrupts
 
-    set_sleep_mode (SLEEP_MODE_PWR_SAVE);
+    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+
+
+    realTimeClock.setClockMode(/*h12*/ false); // @Todo: store this in EEPROM or assume DS3231 saves this?
+
+    // ----------------------------------------------------------------------------------------------------
 
     while (true)
     {
+
+
+
+
         powerDown();
     }
 }
