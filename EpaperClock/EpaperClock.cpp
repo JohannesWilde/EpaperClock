@@ -7,6 +7,7 @@
 #include <DS3231.h>
 
 #include "ArduinoDrivers/arduinoUno.hpp"
+#include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> PowerbankKeepAlive0;
@@ -24,7 +25,7 @@ void powerDown()
 // the setup function runs once when you press reset or power the board
 void setup()
 {
-    PowerbankKeepAlive0::initialize();
+    DriverDeInitializer<PowerbankKeepAlive0> driverDeInitializerPowerbankKeepAlive0;
 
     cli(); // disable interrupts
 
@@ -48,9 +49,6 @@ void setup()
     {
         powerDown();
     }
-
-
-    PowerbankKeepAlive0::deinitialize();
 }
 
 
