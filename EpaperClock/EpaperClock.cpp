@@ -8,6 +8,8 @@
 #include <DS3231.h>
 
 #include "src/WaveshareEpaper/epd2in7.h"
+#include "src/WaveshareEpaper/epdpaint.h"
+#include "src/WaveshareEpaper/imagedata.h"
 
 #include "ArduinoDrivers/arduinoUno.hpp"
 #include "ArduinoDrivers/buttonTimed.hpp"
@@ -39,19 +41,42 @@ void showOnInternalLed(uint8_t const currentShowtime, uint8_t const totalShowtim
 
 // ----------------------------------------------------------------------------------------------------
 
+namespace ePaperInterface
+{
+    int constexpr Success = 0;
+    int constexpr Colored = 0;
+    int constexpr Uncolored = 1;
+}
+
+
+enum DisplayMode
+{
+    ModeClock,
+    _ModesCount // number of modes - not a mode itself
+};
+
+enum DisplayUpdateMode
+{
+    IsUpdated,
+    RequiresFullUpdate,
+    RequiresPartialUpdate,
+};
+
+// ----------------------------------------------------------------------------------------------------
+
 ButtonTimedProperties::Duration_t constexpr keyPressDurationShort = 1; // currently in 50ms steps [-> Timer2 interrupts]
 ButtonTimedProperties::Duration_t constexpr keyPressDurationLong = 20;
 
-typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> PowerbankKeepAlive0;
+typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 19> PowerbankKeepAlive0;
 
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
+/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key2;
+/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key2;
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
+/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
+/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
 
 typedef ButtonTimedCache</*ButtonTimed*/ Key1> CachedKey1;
 typedef ButtonTimedCache</*ButtonTimed*/ Key2> CachedKey2;
@@ -61,6 +86,18 @@ typedef ButtonTimedCache</*ButtonTimed*/ Key4> CachedKey4;
 static DS3231 realTimeClock;
 
 static Epd ePaperDisplay;
+/**
+    Due to not enough RAM in Arduino UNO, a full frame buffer is not
+    possible.
+    Therefore a smaller image buffer is allocated and you have to
+    update the display partially.
+    1 byte = 8 pixels, therefore you have to set 8*N pixels at a time.
+*/
+static unsigned char frameBuffer[1024];
+Paint paintFrame(/*image*/ frameBuffer, /*width*/ 176, /*height*/ 24); // width should be a multiple of 8
+
+static DisplayMode displayMode;
+static DisplayUpdateMode displayUpdateMode;
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -95,6 +132,14 @@ void powerOff()
 {
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_mode (); // here the device is actually put to sleep!!
+}
+
+void returnFailure()
+{
+    cli(); // disable interrupts
+    // long-pressing powerbank button turns it off for me
+    PowerbankKeepAlive0::Pin::setType(AvrInputOutput::PinType::OutputLow);
+    powerOff();
 }
 
 
@@ -135,7 +180,16 @@ void setup()
     set_sleep_mode(SLEEP_MODE_PWR_SAVE);
 
 
+    if (ePaperInterface::Success != ePaperDisplay.Init())
+    {
+        returnFailure();
+    }
+    ePaperDisplay.ClearFrame();
+
 //    realTimeClock.setClockMode(/*h12*/ false); // @Todo: store this in EEPROM or assume DS3231 saves this?
+
+    displayMode = DisplayMode::ModeClock;
+    displayUpdateMode = DisplayUpdateMode::RequiresFullUpdate;
 
     ArduinoUno::BUILTIN_LED::setType(AvrInputOutput::PinType::OutputLow);
 
@@ -156,6 +210,33 @@ void setup()
         CachedKey3::update();
         CachedKey4::update();
         sei(); // enable interrupts
+
+
+        switch (displayMode)
+        {
+        case DisplayMode::ModeClock:
+        {
+
+            if (DisplayUpdateMode::RequiresFullUpdate == displayUpdateMode)
+            {
+                paintFrame.Clear(ePaperInterface::Colored);
+                paintFrame.DrawStringAt(20, 5, "Hello world!", &Font16, ePaperInterface::Uncolored);
+                ePaperDisplay.TransmitPartialData(paintFrame.GetImage(),
+                                                  0, 64,
+                                                  paintFrame.GetWidth(), paintFrame.GetHeight());
+                ePaperDisplay.DisplayFrame();
+
+                displayUpdateMode = DisplayUpdateMode::IsUpdated;
+            }
+
+            break;
+        }
+        case DisplayMode::_ModesCount:
+        {
+            returnFailure();
+            break;
+        }
+        }
 
 
         powerDown();
@@ -184,8 +265,8 @@ void setup()
 
 void loop() 
 {
-	// this shall not be reached - if however, then reset here.
+    // this shall not be reached - if however, then reset here.
     void(* resetFunc) (void) = 0; // declare reset function at address 0
-	resetFunc(); //call reset  
+    resetFunc(); //call reset
 }
 
