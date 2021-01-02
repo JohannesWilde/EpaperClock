@@ -129,30 +129,17 @@ void setup()
     while (true)
     {
         cli(); // disable interrupts
-        // update locally cashed keys
+        // update locally cashed keys - please note, that the cashing
+        // currently does not remember all things happened between two
+        // update() calls. Instead it corrects the long/short/tooShort
+        // info with the most recent info, as well as the isDown/isUp.
+        // This however means that whole button presses will be lost, in
+        // case this while-iteration takes too long.
         CachedKey1::update();
         CachedKey2::update();
         CachedKey3::update();
         CachedKey4::update();
         sei(); // enable interrupts
-
-        uint8_t constexpr totalShowtime = 10;
-        if (CachedKey1::releasedAfterShort())
-        {
-            showOnInternalLed(2, totalShowtime);
-        }
-        else if (CachedKey2::releasedAfterShort())
-        {
-            showOnInternalLed(4, totalShowtime);
-        }
-        else if (CachedKey3::releasedAfterShort())
-        {
-            showOnInternalLed(6, totalShowtime);
-        }
-        else if (CachedKey4::releasedAfterShort())
-        {
-            showOnInternalLed(8, totalShowtime);
-        }
 
 
         powerDown();
