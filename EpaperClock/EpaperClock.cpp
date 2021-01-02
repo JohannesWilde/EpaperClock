@@ -4,7 +4,6 @@
 #include <avr/interrupt.h>
 
 #include <Arduino.h>
-#include <Wire.h>
 
 #include <DS3231.h>
 
