@@ -9,12 +9,17 @@
 #include <DS3231.h>
 
 #include "ArduinoDrivers/arduinoUno.hpp"
+#include "ArduinoDrivers/button.hpp"
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
 // ----------------------------------------------------------------------------------------------------
 
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> PowerbankKeepAlive0;
+typedef Button</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key1;
+typedef Button</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key2;
+typedef Button</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key3;
+typedef Button</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key4;
 
 static DS3231 realTimeClock;
 
@@ -24,6 +29,10 @@ static DS3231 realTimeClock;
 ISR (TIMER2_COMPA_vect)
 {
     PowerbankKeepAlive0::update();
+    Key1::update();
+    Key2::update();
+    Key3::update();
+    Key4::update();
 }
 
 /**
@@ -43,6 +52,10 @@ void powerDown()
 void setup()
 {
     DriverDeInitializer<PowerbankKeepAlive0> driverDeInitializerPowerbankKeepAlive0;
+    DriverDeInitializer<Key1> driverDeInitializerKey1;
+    DriverDeInitializer<Key2> driverDeInitializerKey2;
+    DriverDeInitializer<Key3> driverDeInitializerKey3;
+    DriverDeInitializer<Key4> driverDeInitializerKey4;
 
     cli(); // disable interrupts
 
@@ -69,9 +82,9 @@ void setup()
 
     while (true)
     {
-
-
-
+        cli(); // disable interrupts
+        // update local key-cashes
+        sei(); // enable interrupts
 
         powerDown();
     }
