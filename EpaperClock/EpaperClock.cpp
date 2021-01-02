@@ -81,6 +81,8 @@ void powerDown()
     sleep_mode (); // here the device is actually put to sleep!!
 }
 
+
+
 // ----------------------------------------------------------------------------------------------------
 
 // the setup function runs once when you press reset or power the board
@@ -134,13 +136,40 @@ void setup()
         CachedKey4::update();
         sei(); // enable interrupts
 
+        uint8_t constexpr totalShowtime = 10;
+        if (CachedKey4::pressedAfterShort())
+        {
+            showOnInternalLed(2, totalShowtime);
+        }
+        if (CachedKey4::pressedAfterLong())
+        {
+            showOnInternalLed(3, totalShowtime);
+        }
+        else if (CachedKey4::isDownShort())
+        {
+            showOnInternalLed(4, totalShowtime);
+        }
+        else if (CachedKey4::isDownLong())
+        {
+            showOnInternalLed(5, totalShowtime);
+        }
+        else if (CachedKey4::releasedAfterLong())
+        {
+            showOnInternalLed(6, totalShowtime);
+        }
+        else if (CachedKey4::releasedAfterShort())
+        {
+            showOnInternalLed(7, totalShowtime);
+        }
+        else if (CachedKey4::isUp())
+        {
+            showOnInternalLed(8, totalShowtime);
+        }
 
 
         powerDown();
     }
 }
-
-
 
 
 
