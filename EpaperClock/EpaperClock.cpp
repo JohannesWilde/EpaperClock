@@ -10,6 +10,7 @@
 
 #include "ArduinoDrivers/arduinoUno.hpp"
 #include "ArduinoDrivers/buttonTimed.hpp"
+#include "ArduinoDrivers/buttonTimedCache.hpp"
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
@@ -19,6 +20,7 @@ ButtonTimedProperties::Duration_t constexpr keyPressDurationShort = 1; // curren
 ButtonTimedProperties::Duration_t constexpr keyPressDurationLong = 20;
 
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> PowerbankKeepAlive0;
+
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
@@ -27,6 +29,11 @@ typedef ButtonTimed</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
 typedef ButtonTimed</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
+
+typedef ButtonTimedCache</*ButtonTimed*/ Key1> CachedKey1;
+typedef ButtonTimedCache</*ButtonTimed*/ Key2> CachedKey2;
+typedef ButtonTimedCache</*ButtonTimed*/ Key3> CachedKey3;
+typedef ButtonTimedCache</*ButtonTimed*/ Key4> CachedKey4;
 
 static DS3231 realTimeClock;
 
@@ -59,10 +66,16 @@ void powerDown()
 void setup()
 {
     DriverDeInitializer<PowerbankKeepAlive0> driverDeInitializerPowerbankKeepAlive0;
+
     DriverDeInitializer<Key1> driverDeInitializerKey1;
     DriverDeInitializer<Key2> driverDeInitializerKey2;
     DriverDeInitializer<Key3> driverDeInitializerKey3;
     DriverDeInitializer<Key4> driverDeInitializerKey4;
+
+    DriverDeInitializer<CachedKey1> driverDeInitializerCachedKey1;
+    DriverDeInitializer<CachedKey2> driverDeInitializerCachedKey2;
+    DriverDeInitializer<CachedKey3> driverDeInitializerCachedKey3;
+    DriverDeInitializer<CachedKey4> driverDeInitializerCachedKey4;
 
     cli(); // disable interrupts
 
@@ -90,8 +103,14 @@ void setup()
     while (true)
     {
         cli(); // disable interrupts
-        // update local key-cashes
+        // update locally cashed keys
+        CachedKey1::update();
+        CachedKey2::update();
+        CachedKey3::update();
+        CachedKey4::update();
         sei(); // enable interrupts
+
+
 
         powerDown();
     }
