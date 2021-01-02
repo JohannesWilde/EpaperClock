@@ -13,6 +13,28 @@
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
+
+// ----------------------------------------------------------------------------------------------------
+
+// for debugging purposes
+void showOnInternalLed(uint8_t const currentShowtime, uint8_t const totalShowtime)
+{
+    uint16_t constexpr halfPeriodTimeMs = 250;
+
+    uint8_t currentNotShowTime = totalShowtime - currentShowtime;
+
+    for (uint8_t index = 0; index < currentShowtime; ++index)
+    {
+        ArduinoUno::BUILTIN_LED::setPort();
+        delay(halfPeriodTimeMs);
+        ArduinoUno::BUILTIN_LED::clearPort();
+        delay(halfPeriodTimeMs);
+    }
+
+    // wait rest
+    delay((halfPeriodTimeMs * 2) * currentNotShowTime);
+}
+
 // ----------------------------------------------------------------------------------------------------
 
 ButtonTimedProperties::Duration_t constexpr keyPressDurationShort = 1; // currently in 50ms steps [-> Timer2 interrupts]
@@ -96,6 +118,9 @@ void setup()
 
 
     realTimeClock.setClockMode(/*h12*/ false); // @Todo: store this in EEPROM or assume DS3231 saves this?
+
+    ArduinoUno::BUILTIN_LED::setType(AvrInputOutput::PinType::OutputLow);
+
 
     // ----------------------------------------------------------------------------------------------------
 
