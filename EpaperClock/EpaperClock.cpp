@@ -137,31 +137,19 @@ void setup()
         sei(); // enable interrupts
 
         uint8_t constexpr totalShowtime = 10;
-        if (CachedKey4::pressedAfterShort())
+        if (CachedKey1::releasedAfterShort())
         {
             showOnInternalLed(2, totalShowtime);
         }
-        if (CachedKey4::pressedAfterLong())
-        {
-            showOnInternalLed(3, totalShowtime);
-        }
-        else if (CachedKey4::isDownShort())
+        else if (CachedKey2::releasedAfterShort())
         {
             showOnInternalLed(4, totalShowtime);
         }
-        else if (CachedKey4::isDownLong())
-        {
-            showOnInternalLed(5, totalShowtime);
-        }
-        else if (CachedKey4::releasedAfterLong())
+        else if (CachedKey3::releasedAfterShort())
         {
             showOnInternalLed(6, totalShowtime);
         }
         else if (CachedKey4::releasedAfterShort())
-        {
-            showOnInternalLed(7, totalShowtime);
-        }
-        else if (CachedKey4::isUp())
         {
             showOnInternalLed(8, totalShowtime);
         }
