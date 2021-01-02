@@ -9,17 +9,24 @@
 #include <DS3231.h>
 
 #include "ArduinoDrivers/arduinoUno.hpp"
-#include "ArduinoDrivers/button.hpp"
+#include "ArduinoDrivers/buttonTimed.hpp"
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 
 // ----------------------------------------------------------------------------------------------------
 
+ButtonTimedProperties::Duration_t constexpr keyPressDurationShort = 1; // currently in 50ms steps [-> Timer2 interrupts]
+ButtonTimedProperties::Duration_t constexpr keyPressDurationLong = 20;
+
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 199> PowerbankKeepAlive0;
-typedef Button</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key1;
-typedef Button</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key2;
-typedef Button</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key3;
-typedef Button</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true> Key4;
+typedef ButtonTimed</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
+typedef ButtonTimed</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key2;
+typedef ButtonTimed</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
+typedef ButtonTimed</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
 
 static DS3231 realTimeClock;
 
