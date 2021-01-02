@@ -117,7 +117,7 @@ void setup()
     set_sleep_mode(SLEEP_MODE_PWR_SAVE);
 
 
-    realTimeClock.setClockMode(/*h12*/ false); // @Todo: store this in EEPROM or assume DS3231 saves this?
+//    realTimeClock.setClockMode(/*h12*/ false); // @Todo: store this in EEPROM or assume DS3231 saves this?
 
     ArduinoUno::BUILTIN_LED::setType(AvrInputOutput::PinType::OutputLow);
 
