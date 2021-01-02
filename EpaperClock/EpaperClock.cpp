@@ -7,6 +7,8 @@
 
 #include <DS3231.h>
 
+#include "src/WaveshareEpaper/epd2in7.h"
+
 #include "ArduinoDrivers/arduinoUno.hpp"
 #include "ArduinoDrivers/buttonTimed.hpp"
 #include "ArduinoDrivers/buttonTimedCache.hpp"
@@ -58,6 +60,8 @@ typedef ButtonTimedCache</*ButtonTimed*/ Key4> CachedKey4;
 
 static DS3231 realTimeClock;
 
+static Epd ePaperDisplay;
+
 // ----------------------------------------------------------------------------------------------------
 
 // Interrupt Service Routine for when Timer2 matches OCR2A.
@@ -78,6 +82,18 @@ ISR (TIMER2_COMPA_vect)
  */
 void powerDown()
 {
+    sleep_mode (); // here the device is actually put to sleep!!
+}
+
+/**
+ * @brief powerOff puts the microcontroller in SLEEP_MODE_PWR_DOWN.
+ * This is only supposed to be used in error cases, as in this
+ * mode nothing can wake up the microcontroller apart from a
+ * reset [Timer2 is stopped as well -> no interrupts anymore].
+ */
+void powerOff()
+{
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_mode (); // here the device is actually put to sleep!!
 }
 
