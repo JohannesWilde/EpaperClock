@@ -45,7 +45,7 @@ void setup() {
       Serial.println(clock.getSecond(), DEC);
   }
   
-  // you wan't to get the current time with one command?
+  // you want to get the current time with one command?
   DateTime now = myRTC.now();
 }
 
