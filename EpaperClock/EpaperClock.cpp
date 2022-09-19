@@ -20,6 +20,9 @@
 
 // ----------------------------------------------------------------------------------------------------
 
+// One will have to connect D1 to the Keep-Alive Test LED for this to have any visuable effect.
+typedef ArduinoUno::D1 DEBUG_LED;
+
 // for debugging purposes
 void showOnInternalLed(uint8_t const currentShowtime, uint8_t const totalShowtime)
 {
@@ -29,9 +32,9 @@ void showOnInternalLed(uint8_t const currentShowtime, uint8_t const totalShowtim
 
     for (uint8_t index = 0; index < currentShowtime; ++index)
     {
-        ArduinoUno::BUILTIN_LED::setPort();
+        DEBUG_LED::setType(AvrInputOutput::PinType::OutputLow);
         delay(halfPeriodTimeMs);
-        ArduinoUno::BUILTIN_LED::clearPort();
+        DEBUG_LED::setType(AvrInputOutput::PinType::Input);
         delay(halfPeriodTimeMs);
     }
 
@@ -179,19 +182,17 @@ void setup()
 
     set_sleep_mode(SLEEP_MODE_PWR_SAVE);
 
-
+//    paintFrame.SetRotate(ROTATE_270);
     if (ePaperInterface::Success != ePaperDisplay.Init())
     {
         returnFailure();
     }
     ePaperDisplay.ClearFrame();
 
-//    realTimeClock.setClockMode(/*h12*/ false); // @Todo: store this in EEPROM or assume DS3231 saves this?
+//    realTimeClock.setClockMode(/*h12*/ false); // Set to 24-hour clock mode. @Todo: store this in EEPROM or assume DS3231 saves this?
 
     displayMode = DisplayMode::ModeClock;
     displayUpdateMode = DisplayUpdateMode::RequiresFullUpdate;
-
-    ArduinoUno::BUILTIN_LED::setType(AvrInputOutput::PinType::OutputLow);
 
 
     // ----------------------------------------------------------------------------------------------------
