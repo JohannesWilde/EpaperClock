@@ -14,16 +14,19 @@ project(EpaperClockDummy)
 add_executable(${PROJECT_NAME}
     main.cpp
     EpaperClock/EpaperClock.cpp
-    )
-   
+)
+
+# For configurability the following two environment variables are now required to be defined:
+#   - ARDUINO_INSTALLATION_DIRECTORY        [e.g. C:\Users\...\AppData\Local\Arduino15\packages\arduino]
+#   - ARDUINO_USER_LIBRARIES_DIRECTORY      [e.g. C:\Users\...\Documents\Arduino\libraries]
 target_include_directories(${PROJECT_NAME}
-    PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\"
-	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\variants\\standard\\"
-	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src\\"
-	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\SPI\\src\\"
-	PRIVATE "c:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\EEPROM\\src\\"
-	PRIVATE "c:\\Users\\User\\Documents\\Arduino\\libraries\\DS3231\\"
-    )
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/cores/arduino"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/variants/standard"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/libraries/Wire/src"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/libraries/SPI/src"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/libraries/EEPROM/src"
+    PRIVATE "$ENV{ARDUINO_USER_LIBRARIES_DIRECTORY}/DS3231"
+)
 	
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE __AVR_ATmega328P__
