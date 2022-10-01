@@ -52,13 +52,15 @@ namespace ePaperInterface
 }
 
 
-enum DisplayMode
+enum class DisplayMode
 {
-    ModeClock,
+    Clock,
+    Settings,
+    Standby,
     _ModesCount // number of modes - not a mode itself
 };
 
-enum DisplayUpdateMode
+enum class DisplayUpdateMode
 {
     IsUpdated,
     RequiresFullUpdate,
@@ -191,7 +193,7 @@ void setup()
 
 //    realTimeClock.setClockMode(/*h12*/ false); // Set to 24-hour clock mode. @Todo: store this in EEPROM or assume DS3231 saves this?
 
-    displayMode = DisplayMode::ModeClock;
+    displayMode = DisplayMode::Clock;
     displayUpdateMode = DisplayUpdateMode::RequiresFullUpdate;
 
 
@@ -215,7 +217,7 @@ void setup()
 
         switch (displayMode)
         {
-        case DisplayMode::ModeClock:
+        case DisplayMode::Clock:
         {
 
             if (DisplayUpdateMode::RequiresFullUpdate == displayUpdateMode)
@@ -230,6 +232,14 @@ void setup()
                 displayUpdateMode = DisplayUpdateMode::IsUpdated;
             }
 
+            break;
+        }
+        case DisplayMode::Settings:
+        {
+            break;
+        }
+        case DisplayMode::Standby:
+        {
             break;
         }
         case DisplayMode::_ModesCount:
