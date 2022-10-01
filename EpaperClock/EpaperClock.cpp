@@ -60,13 +60,6 @@ enum class DisplayMode
     _ModesCount // number of modes - not a mode itself
 };
 
-enum class DisplayUpdateMode
-{
-    IsUpdated,
-    RequiresFullUpdate,
-    RequiresPartialUpdate,
-};
-
 // ----------------------------------------------------------------------------------------------------
 
 ButtonTimedProperties::Duration_t constexpr keyPressDurationShort = 1; // currently in 50ms steps [-> Timer2 interrupts]
@@ -102,7 +95,8 @@ static unsigned char frameBuffer[1024];
 Paint paintFrame(/*image*/ frameBuffer, /*width*/ 176, /*height*/ 24); // width should be a multiple of 8
 
 static DisplayMode displayMode;
-static DisplayUpdateMode displayUpdateMode;
+static DisplayMode previousDisplayMode = DisplayMode::_ModesCount; // invalid
+static DateTime previousNow;
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -190,11 +184,11 @@ void setup()
         returnFailure();
     }
     ePaperDisplay.ClearFrame();
+    ePaperDisplay.DisplayFrame();
 
 //    realTimeClock.setClockMode(/*h12*/ false); // Set to 24-hour clock mode. @Todo: store this in EEPROM or assume DS3231 saves this?
 
     displayMode = DisplayMode::Clock;
-    displayUpdateMode = DisplayUpdateMode::RequiresFullUpdate;
 
 
     // ----------------------------------------------------------------------------------------------------
@@ -219,27 +213,40 @@ void setup()
         {
         case DisplayMode::Clock:
         {
+            DateTime const now = RTClib::now();
 
-            if (DisplayUpdateMode::RequiresFullUpdate == displayUpdateMode)
+            if (now.second() != previousNow.second())
             {
+                static char const digits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+                char nowString[] = "HH:MM:SS";
+
+                nowString[0] = digits[now.hour() / 10];
+                nowString[1] = digits[now.hour() % 10];
+                nowString[3] = digits[now.minute() / 10];
+                nowString[4] = digits[now.minute() % 10];
+                nowString[6] = digits[now.second() / 10];
+                nowString[7] = digits[now.second() % 10];
+
                 paintFrame.Clear(ePaperInterface::Colored);
-                paintFrame.DrawStringAt(20, 5, "Hello world!", &Font16, ePaperInterface::Uncolored);
+                paintFrame.DrawStringAt(20, 5, nowString, &Font16, ePaperInterface::Uncolored);
                 ePaperDisplay.TransmitPartialData(paintFrame.GetImage(),
                                                   0, 64,
                                                   paintFrame.GetWidth(), paintFrame.GetHeight());
                 ePaperDisplay.DisplayFrame();
-
-                displayUpdateMode = DisplayUpdateMode::IsUpdated;
             }
 
+            previousNow = now;
+            previousDisplayMode = DisplayMode::Clock;
             break;
         }
         case DisplayMode::Settings:
         {
+            previousDisplayMode = DisplayMode::Settings;
             break;
         }
         case DisplayMode::Standby:
         {
+            previousDisplayMode = DisplayMode::Standby;
             break;
         }
         case DisplayMode::_ModesCount:
@@ -248,7 +255,6 @@ void setup()
             break;
         }
         }
-
 
         powerDown();
     }
