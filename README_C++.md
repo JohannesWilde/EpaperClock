@@ -6,11 +6,15 @@ I the following line in the following file:
 
 c:\Users\User\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.5\platform.txt
 
+````{verbatim}
 compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto
+````
 
 to
 
+````{verbatim}
 compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -std=gnu++17 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto
+````
 
 i.e. simply replaced gnu++11 with gnu++17.
 

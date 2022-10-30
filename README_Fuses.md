@@ -8,9 +8,9 @@ Under Linux use avrdude directly.
 
 Setup the fuses for the Atmega328P as follows [0 - programmed, 1 - unprogrammed, big-endian Bit-order]:
 
-[https://www.engbedded.com/fusecalc/]
+[see [https://www.engbedded.com/fusecalc/](https://www.engbedded.com/fusecalc/)]
 
-
+````{verbatim}
 avrdude.exe -P COM5 -b 19200 -c avrisp -p atmega328p -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h
 
 # 1MHz, no bootloader, no EEPROM-erase, no brown-out-detection
@@ -19,16 +19,19 @@ avrdude.exe -P COM5 -b 19200 -c avrisp -p atmega328p -U lfuse:w:0x62:m -U hfuse:
 l: 62
 h: d7
 e: 07
+````
 
 
 
 Arduino Uno defaults [16MHz, bootloader, EEPROM-erase, brown-out-detection 2.7V]:
 
+````{verbatim}
 avrdude.exe -P COM5 -b 19200 -c avrisp -p ATtiny85 -U lfuse:w:0xff:m -U hfuse:w:0xde:m -U efuse:w:0x05:m
 
 l: ff
 h: de
 e: 05
+````
 
 
 
@@ -44,6 +47,7 @@ c:\Users\User\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.5\boards
 This lets one compile code for an atmega328p at 1MHz. Please note however, that the programming of the fuses has to be done manually.
 
 
+````{verbatim}
 ##############################################################
 ################ custom addition by J.W. #####################
 
@@ -83,3 +87,4 @@ unoOneMhz.build.variant=standard
 
 ################ custom addition by J.W. #####################
 ##############################################################
+````
