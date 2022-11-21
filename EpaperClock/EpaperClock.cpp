@@ -57,6 +57,7 @@ enum class DisplayMode
     Clock,
     Settings,
     Standby,
+    DisplayTesting,
     _ModesCount // number of modes - not a mode itself
 };
 
@@ -188,7 +189,7 @@ void setup()
 
 //    realTimeClock.setClockMode(/*h12*/ false); // Set to 24-hour clock mode. @Todo: store this in EEPROM or assume DS3231 saves this?
 
-    displayMode = DisplayMode::Clock;
+    displayMode = DisplayMode::DisplayTesting;
 
 
     // ----------------------------------------------------------------------------------------------------
@@ -207,7 +208,6 @@ void setup()
         CachedKey3::update();
         CachedKey4::update();
         sei(); // enable interrupts
-
 
         switch (displayMode)
         {
@@ -247,6 +247,72 @@ void setup()
         case DisplayMode::Standby:
         {
             previousDisplayMode = DisplayMode::Standby;
+            break;
+        }
+        case DisplayMode::DisplayTesting:
+        {
+            if (previousDisplayMode != DisplayMode::DisplayTesting)
+            {
+                // setup once
+
+                // first two-thirds white
+                paintFrame.Clear(ePaperInterface::Uncolored);
+                int linesFilled = 0;
+                int linesToFill = 176;
+                while (linesFilled < linesToFill)
+                {
+                    int const linesToFillRemaining = (linesToFill - linesFilled);
+                    int const linesToFillNow = (linesToFillRemaining < paintFrame.GetHeight()) ? linesToFillRemaining : paintFrame.GetHeight(); // std::min()
+                    ePaperDisplay.TransmitPartialData(paintFrame.GetImage(),
+                                                      0, linesFilled,
+                                                      paintFrame.GetWidth(), linesToFillNow);
+                    linesFilled += linesToFillNow;
+                }
+
+                // right third black
+                paintFrame.Clear(ePaperInterface::Colored);
+                linesToFill = 264;
+                while (linesFilled < linesToFill)
+                {
+                    int const linesToFillRemaining = (linesToFill - linesFilled);
+                    int const linesToFillNow = (linesToFillRemaining < paintFrame.GetHeight()) ? linesToFillRemaining : paintFrame.GetHeight(); // std::min()
+                    ePaperDisplay.TransmitPartialData(paintFrame.GetImage(),
+                                                      0, linesFilled,
+                                                      paintFrame.GetWidth(), linesToFillNow);
+                    linesFilled += linesToFillNow;
+                }
+            }
+
+            DateTime const now = RTClib::now();
+
+            if ((2 < (now.second() - previousNow.second())) || (2 < ((60 + now.second()) - previousNow.second())))
+            {
+                // toggle center third in color
+                static bool colored = true;
+                colored = !colored;
+                int const color = color ? ePaperInterface::Colored : ePaperInterface::Uncolored;
+
+                paintFrame.Clear(color);
+                int linesFilled = 88;
+                int linesToFill = 176;
+                while (linesFilled < linesToFill)
+                {
+                    int const linesToFillRemaining = (linesToFill - linesFilled);
+                    int const linesToFillNow = (linesToFillRemaining < paintFrame.GetHeight()) ? linesToFillRemaining : paintFrame.GetHeight(); // std::min()
+                    ePaperDisplay.TransmitPartialData(paintFrame.GetImage(),
+                                                      0, linesFilled,
+                                                      paintFrame.GetWidth(), linesToFillNow);
+                    linesFilled += linesToFillNow;
+                }
+
+                DEBUG_LED::setType(AvrInputOutput::PinType::OutputLow);
+                ePaperDisplay.DisplayFrame();
+                DEBUG_LED::setType(AvrInputOutput::PinType::Input);
+
+                previousNow = now;
+            }
+
+            previousDisplayMode = DisplayMode::DisplayTesting;
             break;
         }
         case DisplayMode::_ModesCount:
