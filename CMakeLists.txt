@@ -20,11 +20,11 @@ add_executable(${PROJECT_NAME}
 #   - ARDUINO_INSTALLATION_DIRECTORY        [e.g. C:\Users\...\AppData\Local\Arduino15\packages\arduino]
 #   - ARDUINO_USER_LIBRARIES_DIRECTORY      [e.g. C:\Users\...\Documents\Arduino\libraries]
 target_include_directories(${PROJECT_NAME}
-    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/cores/arduino"
-    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/variants/standard"
-    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/libraries/Wire/src"
-    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/libraries/SPI/src"
-    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.5/libraries/EEPROM/src"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.6/cores/arduino"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.6/variants/standard"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.6/libraries/Wire/src"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.6/libraries/SPI/src"
+    PRIVATE "$ENV{ARDUINO_INSTALLATION_DIRECTORY}/hardware/avr/1.8.6/libraries/EEPROM/src"
     PRIVATE "$ENV{ARDUINO_USER_LIBRARIES_DIRECTORY}/DS3231"
 )
 	

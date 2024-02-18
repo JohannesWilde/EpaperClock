@@ -42,7 +42,7 @@ e: 05
 
 I added the following to this file:
 
-c:\Users\User\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.5\boards.txt
+c:\Users\User\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\boards.txt
 
 This lets one compile code for an atmega328p at 1MHz. Please note however, that the programming of the fuses has to be done manually.
 
