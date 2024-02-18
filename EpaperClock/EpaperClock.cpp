@@ -12,10 +12,11 @@
 #include "src/WaveshareEpaper/imagedata.h"
 
 #include "ArduinoDrivers/arduinoUno.hpp"
+#include "ArduinoDrivers/button.hpp"
 #include "ArduinoDrivers/buttonTimed.hpp"
-#include "ArduinoDrivers/buttonTimedCache.hpp"
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
+#include "ArduinoDrivers/simplePinAvr.hpp"
 
 
 // ----------------------------------------------------------------------------------------------------
@@ -68,19 +69,18 @@ ButtonTimedProperties::Duration_t constexpr keyPressDurationLong = 20;
 
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 19> PowerbankKeepAlive0;
 
-typedef ButtonTimed</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
-typedef ButtonTimed</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key2;
-typedef ButtonTimed</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
-typedef ButtonTimed</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinState::Low, /*PullupEnabled*/ true,
-/*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
-
-typedef ButtonTimedCache</*ButtonTimed*/ Key1> CachedKey1;
-typedef ButtonTimedCache</*ButtonTimed*/ Key2> CachedKey2;
-typedef ButtonTimedCache</*ButtonTimed*/ Key3> CachedKey3;
-typedef ButtonTimedCache</*ButtonTimed*/ Key4> CachedKey4;
+typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+                           /*DownState*/ SimplePin::State::Zero>,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
+typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+                           /*DownState*/ SimplePin::State::Zero>,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key2;
+typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+                           /*DownState*/ SimplePin::State::Zero>,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
+typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+                           /*DownState*/ SimplePin::State::Zero>,
+                    /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
 
 static DS3231 realTimeClock;
 
@@ -156,11 +156,6 @@ void setup()
     DriverDeInitializer<Key3> driverDeInitializerKey3;
     DriverDeInitializer<Key4> driverDeInitializerKey4;
 
-    DriverDeInitializer<CachedKey1> driverDeInitializerCachedKey1;
-    DriverDeInitializer<CachedKey2> driverDeInitializerCachedKey2;
-    DriverDeInitializer<CachedKey3> driverDeInitializerCachedKey3;
-    DriverDeInitializer<CachedKey4> driverDeInitializerCachedKey4;
-
     cli(); // disable interrupts
 
     // this reconfigures TIMER2 - thus PWM [analogWrite] will not work as expected on Pins 3 and 11
@@ -203,10 +198,10 @@ void setup()
         // info with the most recent info, as well as the isDown/isUp.
         // This however means that whole button presses will be lost, in
         // case this while-iteration takes too long.
-        CachedKey1::update();
-        CachedKey2::update();
-        CachedKey3::update();
-        CachedKey4::update();
+        Key1::update();
+        Key2::update();
+        Key3::update();
+        Key4::update();
         sei(); // enable interrupts
 
         switch (displayMode)
