@@ -1,6 +1,6 @@
 [submodule "EpaperClock/ArduinoDrivers"]
 	path = EpaperClock/ArduinoDrivers
-	url = ssh://git@dwarfy:2289/arduino/ArduinoDrivers.git
+	url = ../ArduinoDrivers.git
 [submodule "EpaperClock/src/WaveshareEpaper"]
 	path = EpaperClock/src/WaveshareEpaper
-	url = ssh://git@dwarfy:2289/arduino/libraries/WaveshareEpaper.git
+	url = ../libraries/WaveshareEpaper.git
