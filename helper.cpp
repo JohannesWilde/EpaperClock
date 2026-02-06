@@ -77,33 +77,44 @@ static constexpr int relativeOffsetSegmentBase = widthSevenSegment / 2 + innerSp
 // constexpr int  = ;
 // constexpr int  = ;
 
-static Renderer2dButton const button{Coordinates2d::Position(0, 0),
-                                     Coordinates2d::Dimension(lengthButtons, lengthButtons),
-                                     /*outsideColor*/ Colors::black,
-                                     (lengthButtons - lengthButtonsInternal) / 2,
-                                     /*insideColor*/ Colors::white};
+static Renderer2dButton const buttonSquare{Coordinates2d::Position(0, 0),
+                                           Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                           /*outsideColor*/ Colors::black,
+                                           (lengthButtons - lengthButtonsInternal) / 2,
+                                           /*insideColor*/ Colors::white};
+
+static Renderer2dTriangle const buttonTriangleUp{Coordinates2d::Position(0,                   lengthButtons),
+                                                 Coordinates2d::Position(lengthButtons / 2,   0),
+                                                 Coordinates2d::Position(lengthButtons,       lengthButtons),
+                                                 /*color*/ Colors::black};
+
+static Renderer2dTriangle const buttonTriangleDown{Coordinates2d::Position(0,                   0),
+                                                   Coordinates2d::Position(lengthButtons / 2,   lengthButtons),
+                                                   Coordinates2d::Position(lengthButtons,       0),
+                                                   /*color*/ Colors::black};
+
+static Renderer2dTriangle const buttonTriangleLeft{Coordinates2d::Position(lengthButtons,       0),
+                                                   Coordinates2d::Position(0,                   lengthButtons / 2),
+                                                   Coordinates2d::Position(0,                   lengthButtons),
+                                                   /*color*/ Colors::black};
+
+static Renderer2dTriangle const buttonTriangleRight{Coordinates2d::Position(0,                   0),
+                                                    Coordinates2d::Position(0,                   lengthButtons),
+                                                    Coordinates2d::Position(lengthButtons,       lengthButtons / 2),
+                                                    /*color*/ Colors::black};
 
 
 // The further at the front of the vecotr, the further at the front in the rendered image.
 static std::vector<std::shared_ptr<Renderer2d>> renderers{
     // on/off
-    std::make_shared<Renderer2dRelative>(&button, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown)),
+    std::make_shared<Renderer2dRelative>(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown)),
     // settings
-    std::make_shared<Renderer2dRelative>(&button, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons)),
-    // std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons),
-    //                                      Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons + lengthButtons),
-    //                                      Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + ySpacingButtons + lengthButtons / 2),
-    //                                      /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons)),
+    // std::make_shared<Renderer2dRelative>(&buttonTriangleRight, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons)),
     // up
-    std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons + lengthButtons),
-                                         Coordinates2d::Position(xOffsetButtonDown + lengthButtons / 2, yOffsetButtonDown + 2 * ySpacingButtons),
-                                         Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + 2 * ySpacingButtons + lengthButtons),
-                                         /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&buttonTriangleUp, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons)),
     // down
-    std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons),
-                                         Coordinates2d::Position(xOffsetButtonDown + lengthButtons / 2, yOffsetButtonDown + 3 * ySpacingButtons + lengthButtons),
-                                         Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + 3 * ySpacingButtons),
-                                         /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons)),
 
     // segment
     // todo: relative position class, combining class
