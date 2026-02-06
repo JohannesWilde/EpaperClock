@@ -64,8 +64,8 @@ class Renderer2dAxesAlignedRectangle : public Renderer2d
 
 public:
     Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner0,
-                      Coordinates2d::Position const corner1,
-                      Renderer2d::Color const color)
+                                   Coordinates2d::Position const corner1,
+                                   Renderer2d::Color const color)
         : color_(color)
     {
         sortMinMaxTo_(corner0.x, corner1.x, &smallestCoordinate_.x, &biggestCoordinate_.x);
@@ -73,12 +73,19 @@ public:
     }
 
     Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner,
-                      Coordinates2d::Dimension const dimension)
+                                   Coordinates2d::Dimension const dimension,
+                                   Renderer2d::Color const color)
         : smallestCoordinate_(corner)
         , biggestCoordinate_(corner + Coordinates2d::Distance(dimension.getX(), dimension.getY()))
+        , color_(color)
     {
         // intentionally empty
     }
+
+    Renderer2dAxesAlignedRectangle(Renderer2dAxesAlignedRectangle const & other) = default;
+    Renderer2dAxesAlignedRectangle(Renderer2dAxesAlignedRectangle && other) = default;
+    Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle const & other) = default;
+    Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle && other) = default;
 
     ValidityAndColor evaluate(int x, int y) const override;
 
@@ -101,8 +108,6 @@ private:
 // private:
 
 // };
-
-
 
 
 #endif // RENDERER_2D_HPP
