@@ -3,6 +3,8 @@
 
 #include "coordinates2d.hpp"
 
+#include <array>
+
 
 class Renderer2d
 {
@@ -34,7 +36,7 @@ public:
         Color color;
     };
 
-    virtual ValidityAndColor evaluate(int x, int y) const = 0;
+    virtual ValidityAndColor evaluate(Coordinates2d::Position const & position) const = 0;
 
 protected:
     Renderer2d() = default;
@@ -87,7 +89,7 @@ public:
     Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle const & other) = default;
     Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle && other) = default;
 
-    ValidityAndColor evaluate(int x, int y) const override;
+    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
 
 private:
 
@@ -99,15 +101,40 @@ private:
 };
 
 
-// class Render2dTriangle : public Renderer2d
-// {
-// public:
+class Renderer2dTriangle : public Renderer2d
+{
+public:
+    Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
+                       Renderer2d::Color const color)
+        : corners_(corners)
+        , color_(color)
+    {
+        // intentionally empty
+    }
 
-//     ValidityAndColor evaluate(int x, int y) const override;
+    Renderer2dTriangle(Coordinates2d::Position const & corner0,
+                       Coordinates2d::Position const & corner1,
+                       Coordinates2d::Position const & corner2,
+                       Renderer2d::Color const color)
+        : corners_{corner0, corner1, corner2, }
+        , color_(color)
+    {
+        // intentionally empty
+    }
 
-// private:
+    Renderer2dTriangle(Renderer2dTriangle const & other) = default;
+    Renderer2dTriangle(Renderer2dTriangle && other) = default;
+    Renderer2dTriangle & operator=(Renderer2dTriangle const & other) = default;
+    Renderer2dTriangle & operator=(Renderer2dTriangle && other) = default;
 
-// };
+    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+
+private:
+
+    std::array<Coordinates2d::Position, 3> corners_;
+    Renderer2d::Color color_;
+
+};
 
 
 #endif // RENDERER_2D_HPP

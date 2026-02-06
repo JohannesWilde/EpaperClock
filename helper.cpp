@@ -39,6 +39,12 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(0, 0), Coordinates2d::Dimension(3, 5), /*color*/ 2),
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(61, 32), Coordinates2d::Dimension(3, 5), /*color*/ 128),
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(14, 4),
+                                             Coordinates2d::Position(19, 9),
+                                             Coordinates2d::Position(8, 6),
+                                             /*color*/ 164),
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(8, 2), Coordinates2d::Position(19, 2), /*color*/ 0),
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(6, 4), Coordinates2d::Position(6, 9), /*color*/ 0),
     };
 
 
@@ -51,7 +57,7 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
             for (std::shared_ptr<Renderer2d> const & renderer : renderers)
             {
                 assert(static_cast<bool>(renderer));
-                Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(x, y);
+                Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(Coordinates2d::Position(x, y));
                 if (renderResult.valid)
                 {
                     image_.setPixelColor(x, y, QColor(renderResult.color, renderResult.color, renderResult.color));
