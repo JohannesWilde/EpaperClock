@@ -9,6 +9,8 @@
 #include <QPen>
 #include <QWidget>
 
+#include <vector>
+
 //! [0]
 class Helper
 {
@@ -25,7 +27,11 @@ private:
     QPen circlePen;
     QPen textPen;
 
-    QImage image_;
+    int const imageWidth_;
+    int const imageHeight_;
+    std::vector<QRgb> imageData_;
+    QImage const image_;
+
 };
 //! [0]
 

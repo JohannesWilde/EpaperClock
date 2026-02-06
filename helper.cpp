@@ -12,15 +12,21 @@
 #include <memory>
 #include <vector>
 
+// #include <chrono>
+// #include <iostream>
+
 
 Helper::Helper()
-    : image_(264, 176, QImage::Format::Format_RGB32)
+    : imageWidth_(264)
+    , imageHeight_(176)
+    , imageData_(imageWidth_ * imageHeight_)
+    , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(1.0, QColor(0xa6, 0xce, 0x39));
 
-    background = QBrush(Qt::white);
+    background = QBrush(QColor(45, 83, 129));
     circleBrush = QBrush(gradient);
     circlePen = QPen(Qt::black);
     circlePen.setWidth(1);
@@ -34,6 +40,9 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
+
+    constexpr int spareSpaceOutside = 4;
+
     // The further at the front of the vecotr, the further at the front in the rendered image.
     std::vector<std::shared_ptr<Renderer2d>> renderers{
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(0, 0), Coordinates2d::Dimension(3, 5), /*color*/ 2),
@@ -41,26 +50,40 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
         std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(14, 4),
                                              Coordinates2d::Position(19, 9),
-                                             Coordinates2d::Position(8, 6),
+                                             Coordinates2d::Position(19, 9),
                                              /*color*/ 164),
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(8, 2), Coordinates2d::Position(19, 2), /*color*/ 0),
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(6, 4), Coordinates2d::Position(6, 9), /*color*/ 0),
+
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(spareSpaceOutside, spareSpaceOutside),
+                                                         Coordinates2d::Dimension(image_.width() - 2 * spareSpaceOutside, image_.height() - 2 * spareSpaceOutside), /*color*/ 255),
     };
 
 
-    image_.fill(background.color());
+    for (QRgb & value : imageData_)
+    {
+        value = background.color().rgba();
+    }
+
+    // std::chrono::steady_clock::time_point const startY = std::chrono::steady_clock::now();
 
     for (int y = 0; image_.height() > y; ++y)
     {
+        // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
+
         for (int x = 0; image_.width() > x; ++x)
         {
+            // std::chrono::steady_clock::time_point const startR = std::chrono::steady_clock::now();
+
+            Coordinates2d::Position const position(x, y);
+
             for (std::shared_ptr<Renderer2d> const & renderer : renderers)
             {
                 assert(static_cast<bool>(renderer));
-                Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(Coordinates2d::Position(x, y));
+                Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(position);
                 if (renderResult.valid)
                 {
-                    image_.setPixelColor(x, y, QColor(renderResult.color, renderResult.color, renderResult.color));
+                    imageData_[y * imageWidth_ + x] = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
                     break; // Don't look at further renderers.
                 }
                 else
@@ -68,8 +91,19 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
                     // intentionally empty
                 }
             }
+
+
+            // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
+            // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
         }
+
+        // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
+        // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
     }
+
+    // std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
+    // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
+
 
     painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
                        image_,
@@ -77,7 +111,4 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
 
 
     painter->translate(viewport.width() / 2, viewport.height() / 2);
-
-
-
 }
