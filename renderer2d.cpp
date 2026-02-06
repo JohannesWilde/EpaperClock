@@ -21,7 +21,7 @@ constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
                                 int const x)
 {
     assert(0 != deltaLine.x);
-    assert(constexpr_abs(deltaLine.y) < constexpr_abs(std::numeric_limits<int>::max() / (x - linePoint0.x))); // todo: handle int-overflow
+    assert((x == linePoint0.x) || (constexpr_abs(deltaLine.y) < constexpr_abs(std::numeric_limits<int>::max() / (x - linePoint0.x)))); // todo: handle int-overflow
 
     int const deltaScaled = deltaLine.y * (x - linePoint0.x);
 
