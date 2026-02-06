@@ -3,6 +3,7 @@
 
 #include "helper.h"
 #include "renderer2d.hpp"
+#include "renderer2dextended.hpp"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -18,6 +19,16 @@
 
 namespace // anonymous
 {
+
+class Colors
+{
+private:
+    Colors() = delete;
+public:
+    static constexpr Renderer2d::Color black = 0;
+    static constexpr Renderer2d::Color white = 255;
+};
+
 
 static constexpr int displayWidth = 264;
 static constexpr int displayHeight = 176;
@@ -66,23 +77,19 @@ static constexpr int relativeOffsetSegmentBase = widthSevenSegment / 2 + innerSp
 // constexpr int  = ;
 // constexpr int  = ;
 
+static Renderer2dButton const button{Coordinates2d::Position(0, 0),
+                                     Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                     /*outsideColor*/ Colors::black,
+                                     (lengthButtons - lengthButtonsInternal) / 2,
+                                     /*insideColor*/ Colors::white};
+
 
 // The further at the front of the vecotr, the further at the front in the rendered image.
 static std::vector<std::shared_ptr<Renderer2d>> renderers{
     // on/off
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDownInternal, yOffsetButtonDownInternal),
-                                                     Coordinates2d::Dimension(lengthButtonsInternal, lengthButtonsInternal),
-                                                     /*color*/ 255),
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown),
-                                                     Coordinates2d::Dimension(lengthButtons, lengthButtons),
-                                                     /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&button, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown)),
     // settings
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDownInternal, yOffsetButtonDownInternal + ySpacingButtons),
-                                                     Coordinates2d::Dimension(lengthButtonsInternal, lengthButtonsInternal),
-                                                     /*color*/ 255),
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons),
-                                                     Coordinates2d::Dimension(lengthButtons, lengthButtons),
-                                                     /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&button, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons)),
     // std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons),
     //                                      Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons + lengthButtons),
     //                                      Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + ySpacingButtons + lengthButtons / 2),
