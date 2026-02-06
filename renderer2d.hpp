@@ -3,6 +3,7 @@
 
 #include "coordinates2d.hpp"
 
+#include <cassert>
 #include <array>
 
 
@@ -133,6 +134,83 @@ private:
 
     std::array<Coordinates2d::Position, 3> corners_;
     Renderer2d::Color color_;
+
+};
+
+
+class Renderer2dRelative : public Renderer2d
+{
+public:
+
+    Renderer2dRelative(Renderer2d const * other,
+                       Coordinates2d::Position const & virtualOrigin)
+        : renderer_(other)
+        , offset_(-1 * virtualOrigin.x, -1 * virtualOrigin.y)
+    {
+        assert(nullptr != other);
+    }
+
+    Renderer2dRelative(Renderer2dRelative const & other) = default;
+    Renderer2dRelative(Renderer2dRelative && other) = default;
+    Renderer2dRelative & operator=(Renderer2dRelative const & other) = default;
+    Renderer2dRelative & operator=(Renderer2dRelative && other) = default;
+
+    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+
+private:
+
+    Renderer2d const * renderer_;
+    Coordinates2d::Distance offset_;
+
+};
+
+
+template<size_t count>
+class Renderer2dAccumulated : public Renderer2d
+{
+public:
+
+    // None of the provided renderers must be nullptr.
+    template<typename... Args>
+    Renderer2dAccumulated(Args&&... others)
+        : renderers_(others...)
+    {
+#ifndef NDEBUG
+        for (Renderer2d const * const renderer : renderers_)
+        {
+            assert(nullptr != renderer);
+        }
+#endif // NDEBUG
+    }
+
+    Renderer2dAccumulated(Renderer2dAccumulated const & other) = default;
+    Renderer2dAccumulated(Renderer2dAccumulated && other) = default;
+    Renderer2dAccumulated & operator=(Renderer2dAccumulated const & other) = default;
+    Renderer2dAccumulated & operator=(Renderer2dAccumulated && other) = default;
+
+    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override
+    {
+        Renderer2d::ValidityAndColor renderResult;
+
+        for (Renderer2d const * const renderer : renderers_)
+        {
+            renderResult = renderer->evaluate(position);
+            if (renderResult.valid)
+            {
+                break; // Don't look at further renderers.
+            }
+            else
+            {
+                // intentionally empty
+            }
+        }
+
+        return renderResult;
+    }
+
+private:
+
+    std::array<Renderer2d const *, count> renderers_;
 
 };
 

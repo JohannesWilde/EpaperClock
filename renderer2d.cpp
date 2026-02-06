@@ -170,3 +170,9 @@ Renderer2d::ValidityAndColor Renderer2dTriangle::evaluate(Coordinates2d::Positio
 
     return result;
 }
+
+Renderer2d::ValidityAndColor Renderer2dRelative::evaluate(Coordinates2d::Position const & position) const
+{
+    Coordinates2d::Position const shiftedPosition = position + offset_;
+    return renderer_->evaluate(shiftedPosition);
+}
