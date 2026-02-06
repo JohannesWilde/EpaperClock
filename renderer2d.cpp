@@ -176,3 +176,20 @@ Renderer2d::ValidityAndColor Renderer2dRelative::evaluate(Coordinates2d::Positio
     Coordinates2d::Position const shiftedPosition = position + offset_;
     return renderer_->evaluate(shiftedPosition);
 }
+
+
+Renderer2d::ValidityAndColor Renderer2dEnabled::evaluate(Coordinates2d::Position const & position) const
+{
+    Renderer2d::ValidityAndColor renderResult;
+
+    if (enabled_)
+    {
+        renderResult = renderer_->evaluate(position);
+    }
+    else
+    {
+        // renderResult.valid = false;
+    }
+
+    return renderResult;
+}

@@ -215,4 +215,31 @@ private:
 };
 
 
+class Renderer2dEnabled : public Renderer2d
+{
+public:
+
+    Renderer2dEnabled(Renderer2d const * other,
+                      bool const enabled = true)
+        : renderer_(other)
+        , enabled_(enabled)
+    {
+        // intentionally empty
+    }
+
+    Renderer2dEnabled(Renderer2dEnabled const & other) = default;
+    Renderer2dEnabled(Renderer2dEnabled && other) = default;
+    Renderer2dEnabled & operator=(Renderer2dEnabled const & other) = default;
+    Renderer2dEnabled & operator=(Renderer2dEnabled && other) = default;
+
+    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+
+private:
+
+    Renderer2d const * renderer_;
+    bool enabled_;
+
+};
+
+
 #endif // RENDERER_2D_HPP
