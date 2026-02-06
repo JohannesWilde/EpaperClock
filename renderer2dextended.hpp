@@ -22,7 +22,8 @@ public:
                                                    constexpr_abs(outsideCorner1.y - outsideCorner0.y) - 2 * offsetInside),
                           insideColor)
     {
-        assert(constexpr_abs(outsideCorner0.x - outsideCorner1.x) / 2 > offsetInside);
+        assert(constexpr_abs(outsideCorner0.x - outsideCorner1.x) / 2 >= offsetInside);
+        assert(constexpr_abs(outsideCorner0.y - outsideCorner1.y) / 2 >= offsetInside);
     }
 
     Renderer2dButton(Coordinates2d::Position const outsideCorner,
