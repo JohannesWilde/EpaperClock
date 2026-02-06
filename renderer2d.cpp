@@ -1,10 +1,19 @@
 #include "renderer2d.hpp"
 
 #include <cassert>
-
+#ifndef NDEBUG
+#include <limits>
+#endif // NDEBUG
 
 namespace // anonymous
 {
+
+// cmath's std::abs is only constexpr as of C++23. But even selection C++23 did not work with my current MSVC.
+constexpr int constexpr_abs(int const value)
+{
+    assert(std::numeric_limits<int>::min() != value);
+    return (0 > value) ? (-1 * value) : value;
+}
 
 // deltaLine.x must not be 0.
 constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
@@ -12,6 +21,7 @@ constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
                                 int const x)
 {
     assert(0 != deltaLine.x);
+    assert(constexpr_abs(deltaLine.y) < constexpr_abs(std::numeric_limits<int>::max() / (x - linePoint0.x))); // todo: handle int-overflow
 
     int const deltaScaled = deltaLine.y * (x - linePoint0.x);
 
@@ -20,14 +30,14 @@ constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
     if (((deltaScaled > 0) && (deltaLine.x > 0)) ||
         ((deltaScaled < 0) && (deltaLine.x < 0)))
     {
-        deltaRound = deltaScaled + (deltaLine.x / 2);
+        deltaRound = deltaScaled + (deltaLine.x / 2); // todo: handle int-overflow
     }
     else
     {
-        deltaRound = deltaScaled - (deltaLine.x / 2);
+        deltaRound = deltaScaled - (deltaLine.x / 2); // todo: handle int-overflow
     }
 
-    return deltaRound / deltaLine.x + linePoint0.y;
+    return deltaRound / deltaLine.x + linePoint0.y; // todo: handle int-overflow
 }
 
 bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
@@ -51,9 +61,8 @@ bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
         int const sideYReference = extraInterpolateY(linePoint0, deltaLine, sidePoint.x);
         int const checkYReference = extraInterpolateY(linePoint0, deltaLine, checkPoint.x);
 
-        // todo: handle int-overflow
-        deltaSide = sidePoint.y - sideYReference;
-        deltaCheck = checkPoint.y - checkYReference;
+        deltaSide = sidePoint.y - sideYReference; // todo: handle int-overflow
+        deltaCheck = checkPoint.y - checkYReference; // todo: handle int-overflow
     }
 
     bool result = false;
