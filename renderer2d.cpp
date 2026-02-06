@@ -1,14 +1,33 @@
 #include "renderer2d.hpp"
 
+#include <cassert>
+
 
 namespace // anonymous
 {
 
+// deltaLine.x must not be 0.
 constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
                                 Coordinates2d::Distance const & deltaLine,
                                 int const x)
 {
-    return (deltaLine.y * (x - linePoint0.x) /*todo: +/- .5 deltaLine.x */) / deltaLine.x + linePoint0.y;
+    assert(0 != deltaLine.x);
+
+    int const deltaScaled = deltaLine.y * (x - linePoint0.x);
+
+    // Round away from 0.
+    int deltaRound = 0;
+    if (((deltaScaled > 0) && (deltaLine.x > 0)) ||
+        ((deltaScaled < 0) && (deltaLine.x < 0)))
+    {
+        deltaRound = deltaScaled + (deltaLine.x / 2);
+    }
+    else
+    {
+        deltaRound = deltaScaled - (deltaLine.x / 2);
+    }
+
+    return deltaRound / deltaLine.x + linePoint0.y;
 }
 
 bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
