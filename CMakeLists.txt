@@ -11,10 +11,12 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL OpenGLWidgets Widgets)
 qt_standard_project_setup()
 
 qt_add_executable(${PROJECT_NAME}
+    coordinates2d.cpp coordinates2d.hpp
     glwidget.cpp glwidget.h
     helper.cpp helper.h
     main.cpp
     window.cpp window.h
+    renderer2d.hpp renderer2d.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
