@@ -12,7 +12,7 @@ GLWidget::GLWidget(Helper *helper, QWidget *parent)
     : QOpenGLWidget(parent), helper(helper)
 {
     setAutoFillBackground(false);
-    setMinimumSize(20, 20);
+    setMinimumSize(264, 176);
 }
 //! [0]
 
