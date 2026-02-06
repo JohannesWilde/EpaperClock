@@ -40,26 +40,83 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
-
+    constexpr int displayWidth = 264;
+    constexpr int displayHeight = 176;
     constexpr int spareSpaceOutside = 4;
+    constexpr int lengthButtons = 10;
+    constexpr int lengthButtonsInternal = 6;
+    constexpr int horizontalOffsetButtonsClock = 15;
+    constexpr int lengthElementSelection = lengthButtons;
+    constexpr int widthSevenSegment = 20;
+    constexpr int lengthSevenSegmentSquare = 50;
+    constexpr int lengthSevenSegmentTriangle = 10;
+    constexpr int innerSpacingSevenSegmentElements = 3;
+    constexpr int horizontalLengthInterSegment = 10;
+    constexpr int lengthSegmentDots = 20;
+    // constexpr int  = ;
+
+    // (0, 0) is at top left.
+    // x [first index - width] goes to the right. y [second index - height] goes down.
+
+    constexpr int numberOfButtons = 4;
+    constexpr int visibleX = (displayWidth - 2 * spareSpaceOutside);
+    constexpr int visibleY = (displayHeight - 2 * spareSpaceOutside);
+    constexpr int ySpacingButtons = (displayHeight - 2 * spareSpaceOutside) / numberOfButtons;
+    constexpr int xOffsetButtonDown = spareSpaceOutside;
+    constexpr int yOffsetButtonDown = spareSpaceOutside + ySpacingButtons / 2 - lengthButtons / 2;
+    constexpr int offsetButtonDownInternal = (lengthButtons - lengthButtonsInternal) / 2;
+    constexpr int xOffsetButtonDownInternal = xOffsetButtonDown + offsetButtonDownInternal;
+    constexpr int yOffsetButtonDownInternal = yOffsetButtonDown + offsetButtonDownInternal;
+
 
     // The further at the front of the vecotr, the further at the front in the rendered image.
     std::vector<std::shared_ptr<Renderer2d>> renderers{
-        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(0, 0), Coordinates2d::Dimension(3, 5), /*color*/ 2),
-        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(61, 32), Coordinates2d::Dimension(3, 5), /*color*/ 128),
-        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
-        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(14, 4),
-                                             Coordinates2d::Position(19, 9),
-                                             Coordinates2d::Position(19, 9),
-                                             /*color*/ 164),
-        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(8, 2), Coordinates2d::Position(19, 2), /*color*/ 0),
-        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(6, 4), Coordinates2d::Position(6, 9), /*color*/ 0),
+        // on/off
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDownInternal, yOffsetButtonDownInternal),
+                                                         Coordinates2d::Dimension(lengthButtonsInternal, lengthButtonsInternal),
+                                                         /*color*/ 255),
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown),
+                                                         Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                                         /*color*/ 0),
+        // settings
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDownInternal, yOffsetButtonDownInternal + ySpacingButtons),
+                                                         Coordinates2d::Dimension(lengthButtonsInternal, lengthButtonsInternal),
+                                                         /*color*/ 255),
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons),
+                                                         Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                                         /*color*/ 0),
+        // std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons),
+        //                                      Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons + lengthButtons),
+        //                                      Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + ySpacingButtons + lengthButtons / 2),
+        //                                      /*color*/ 0),
+        // up
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons + lengthButtons),
+                                             Coordinates2d::Position(xOffsetButtonDown + lengthButtons / 2, yOffsetButtonDown + 2 * ySpacingButtons),
+                                             Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + 2 * ySpacingButtons + lengthButtons),
+                                             /*color*/ 0),
+        // down
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons),
+                                             Coordinates2d::Position(xOffsetButtonDown + lengthButtons / 2, yOffsetButtonDown + 3 * ySpacingButtons + lengthButtons),
+                                             Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + 3 * ySpacingButtons),
+                                             /*color*/ 0),
+
+
+
+
+        // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(61, 32), Coordinates2d::Dimension(3, 5), /*color*/ 128),
+        // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
+        // std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(14, 4),
+        //                                      Coordinates2d::Position(19, 9),
+        //                                      Coordinates2d::Position(19, 9),
+        //                                      /*color*/ 164),
+        // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(8, 2), Coordinates2d::Position(19, 2), /*color*/ 0),
+        // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(6, 4), Coordinates2d::Position(6, 9), /*color*/ 0),
 
         std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(spareSpaceOutside, spareSpaceOutside),
                                                          Coordinates2d::Dimension(image_.width() - 2 * spareSpaceOutside, image_.height() - 2 * spareSpaceOutside), /*color*/ 255),
     };
 
-    // std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
     std::fill(imageData_.begin(), imageData_.end(), background.color().rgba());
 
@@ -100,9 +157,9 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
         // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
     }
 
-    // std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
     // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
-    // std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
+    std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
 
     painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
                        image_,
