@@ -127,6 +127,14 @@ static Renderer2dTriangle const sevenSegmentTriangleRight{Coordinates2d::Positio
                                                           Coordinates2d::Position(lengthSevenSegmentTriangle,   widthSevenSegment / 2),
                                                           /*color*/ Colors::black};
 
+static Renderer2dAxesAlignedRectangle const sevenSegmentXSquare{Coordinates2d::Position(0, 0),
+                                                                Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
+                                                                /*color*/ 0};
+
+static Renderer2dAxesAlignedRectangle const sevenSegmentYSquare{Coordinates2d::Position(0, 0),
+                                                                Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
+                                                                /*color*/ 0};
+
 
 // The further at the front of the vecotr, the further at the front in the rendered image.
 static std::vector<std::shared_ptr<Renderer2d>> renderers{
@@ -143,15 +151,11 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     // segment
     // todo: relative position class, combining class
     std::make_shared<Renderer2dRelative>(&sevenSegmentTriangleUp, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + relativeOffsetSegmentBase)),
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle),
-                                                     Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
-                                                     /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&sevenSegmentYSquare, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle)),
     std::make_shared<Renderer2dRelative>(&sevenSegmentTriangleDown, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle + lengthYSevenSegmentSquare)),
 
     std::make_shared<Renderer2dRelative>(&sevenSegmentTriangleLeft, Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase, yOffsetSegment)),
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle, yOffsetSegment),
-                                                     Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
-                                                     /*color*/ 0),
+    std::make_shared<Renderer2dRelative>(&sevenSegmentXSquare, Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle, yOffsetSegment)),
     std::make_shared<Renderer2dRelative>(&sevenSegmentTriangleRight, Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle + lengthXSevenSegmentSquare, yOffsetSegment)),
 
 
