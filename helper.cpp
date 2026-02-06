@@ -43,13 +43,16 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     constexpr int displayWidth = 264;
     constexpr int displayHeight = 176;
     constexpr int spareSpaceOutside = 4;
-    constexpr int lengthButtons = 10;
+    constexpr int lengthButtons = 12;
     constexpr int lengthButtonsInternal = 6;
     constexpr int horizontalOffsetButtonsClock = 15;
-    constexpr int lengthElementSelection = lengthButtons;
-    constexpr int widthSevenSegment = 20;
-    constexpr int lengthSevenSegmentSquare = 50;
-    constexpr int lengthSevenSegmentTriangle = 10;
+    constexpr int xOffsetElementSelection = 0;
+    constexpr int yOffsetElementSelection = 2;
+    constexpr int lengthElementSelection = 10;
+    constexpr int widthSevenSegment = 10;
+    constexpr int lengthXSevenSegmentSquare = 30;
+    constexpr int lengthYSevenSegmentSquare = 40;
+    constexpr int lengthSevenSegmentTriangle = 5;
     constexpr int innerSpacingSevenSegmentElements = 3;
     constexpr int horizontalLengthInterSegment = 10;
     constexpr int lengthSegmentDots = 20;
@@ -58,15 +61,31 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     // (0, 0) is at top left.
     // x [first index - width] goes to the right. y [second index - height] goes down.
 
-    constexpr int numberOfButtons = 4;
     constexpr int visibleX = (displayWidth - 2 * spareSpaceOutside);
     constexpr int visibleY = (displayHeight - 2 * spareSpaceOutside);
+
+    constexpr int numberOfButtons = 4;
     constexpr int ySpacingButtons = (displayHeight - 2 * spareSpaceOutside) / numberOfButtons;
     constexpr int xOffsetButtonDown = spareSpaceOutside;
     constexpr int yOffsetButtonDown = spareSpaceOutside + ySpacingButtons / 2 - lengthButtons / 2;
     constexpr int offsetButtonDownInternal = (lengthButtons - lengthButtonsInternal) / 2;
     constexpr int xOffsetButtonDownInternal = xOffsetButtonDown + offsetButtonDownInternal;
     constexpr int yOffsetButtonDownInternal = yOffsetButtonDown + offsetButtonDownInternal;
+
+    constexpr int xLengthSevenSegments = lengthXSevenSegmentSquare + 2 * lengthSevenSegmentTriangle + widthSevenSegment + 2 * innerSpacingSevenSegmentElements;
+    constexpr int yLengthSevenSegments = 2 * lengthYSevenSegmentSquare + 4 * lengthSevenSegmentTriangle + widthSevenSegment + 4 * innerSpacingSevenSegmentElements;
+    constexpr int xSpacingSevenSegments = xLengthSevenSegments + horizontalLengthInterSegment;
+    constexpr int xOffsetSegment0 = xOffsetButtonDown + lengthButtons + horizontalOffsetButtonsClock;
+    constexpr int yOffsetSegment = (visibleY - yLengthSevenSegments - 2 * (lengthElementSelection + yOffsetElementSelection)) / 2;
+    constexpr int relativeOffsetSegmentBase = widthSevenSegment / 2 + innerSpacingSevenSegmentElements;
+    // constexpr int  = ;
+    // constexpr int  = ;
+    // constexpr int  = ;
+    // constexpr int  = ;
+    // constexpr int  = ;
+    // constexpr int  = ;
+    // constexpr int  = ;
+    // constexpr int  = ;
 
 
     // The further at the front of the vecotr, the further at the front in the rendered image.
@@ -100,6 +119,31 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
                                              Coordinates2d::Position(xOffsetButtonDown + lengthButtons, yOffsetButtonDown + 3 * ySpacingButtons),
                                              /*color*/ 0),
 
+        // segment
+        // todo: relative position class, combining class
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetSegment0,                           yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle),
+                                             Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2,   yOffsetSegment + relativeOffsetSegmentBase),
+                                             Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment,       yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle),
+                                             /*color*/ 0),
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle),
+                                                         Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
+                                                         /*color*/ 0),
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetSegment0,                           yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle + lengthYSevenSegmentSquare),
+                                             Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2,   yOffsetSegment + relativeOffsetSegmentBase + 2 * lengthSevenSegmentTriangle + lengthYSevenSegmentSquare),
+                                             Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment,       yOffsetSegment + relativeOffsetSegmentBase + lengthSevenSegmentTriangle + lengthYSevenSegmentSquare),
+                                             /*color*/ 0),
+
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle,  yOffsetSegment),
+                                             Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase,                               yOffsetSegment + widthSevenSegment / 2),
+                                             Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle,  yOffsetSegment + widthSevenSegment),
+                                             /*color*/ 0),
+        std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle, yOffsetSegment),
+                                                         Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
+                                                         /*color*/ 0),
+        std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle + lengthXSevenSegmentSquare,       yOffsetSegment),
+                                             Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + 2 * lengthSevenSegmentTriangle + lengthXSevenSegmentSquare,   yOffsetSegment + widthSevenSegment / 2),
+                                             Coordinates2d::Position(xOffsetSegment0 + relativeOffsetSegmentBase + lengthSevenSegmentTriangle + lengthXSevenSegmentSquare,       yOffsetSegment + widthSevenSegment),
+                                             /*color*/ 0),
 
 
 
