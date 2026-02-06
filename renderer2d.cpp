@@ -4,6 +4,13 @@
 namespace // anonymous
 {
 
+constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
+                                Coordinates2d::Distance const & deltaLine,
+                                int const x)
+{
+    return (deltaLine.y * (x - linePoint0.x) /*todo: +/- .5 deltaLine.x */) / deltaLine.x + linePoint0.y;
+}
+
 bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
                           Coordinates2d::Position const & linePoint1,
                           Coordinates2d::Position const & sidePoint,
@@ -21,15 +28,13 @@ bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
     }
     else
     {
-        // todo: fixed-point arithmetic?
-        double const gradient = static_cast<double>(deltaLine.y) / static_cast<double>(deltaLine.x);
-
-        double const sideYReference = gradient * static_cast<double>(sidePoint.x - linePoint0.x) + linePoint0.y;
-        double const checkYReference = gradient * static_cast<double>(checkPoint.x - linePoint0.x) + linePoint0.y;
+        // Otherwise check with extrapolated y-Value along the line at the positions of sidePoint and checkPoint.
+        int const sideYReference = extraInterpolateY(linePoint0, deltaLine, sidePoint.x);
+        int const checkYReference = extraInterpolateY(linePoint0, deltaLine, checkPoint.x);
 
         // todo: handle int-overflow
-        deltaSide = sidePoint.y - static_cast<int>(std::round(sideYReference));
-        deltaCheck = checkPoint.y - static_cast<int>(std::round(checkYReference));
+        deltaSide = sidePoint.y - sideYReference;
+        deltaCheck = checkPoint.y - checkYReference;
     }
 
     bool result = false;
