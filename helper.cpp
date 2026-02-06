@@ -59,6 +59,7 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
                                                          Coordinates2d::Dimension(image_.width() - 2 * spareSpaceOutside, image_.height() - 2 * spareSpaceOutside), /*color*/ 255),
     };
 
+    // std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
     for (QRgb & value : imageData_)
     {
@@ -103,7 +104,7 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
 
     // std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
     // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
-
+    // std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
 
     painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
                        image_,
