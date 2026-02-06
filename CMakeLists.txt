@@ -2,25 +2,25 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.16)
-project(2dpainting LANGUAGES CXX)
+project(ClockSimulation LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL OpenGLWidgets Widgets)
 
 qt_standard_project_setup()
 
-qt_add_executable(2dpainting
+qt_add_executable(${PROJECT_NAME}
     glwidget.cpp glwidget.h
     helper.cpp helper.h
     main.cpp
     window.cpp window.h
 )
 
-set_target_properties(2dpainting PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
 
-target_link_libraries(2dpainting PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::OpenGL
@@ -28,14 +28,14 @@ target_link_libraries(2dpainting PRIVATE
     Qt6::Widgets
 )
 
-install(TARGETS 2dpainting
+install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 qt_generate_deploy_app_script(
-    TARGET 2dpainting
+    TARGET ${PROJECT_NAME}
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
 )
