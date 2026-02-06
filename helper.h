@@ -24,6 +24,8 @@ private:
     QFont textFont;
     QPen circlePen;
     QPen textPen;
+
+    QImage image_;
 };
 //! [0]
 

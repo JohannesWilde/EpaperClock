@@ -12,6 +12,7 @@
 
 //! [0]
 Helper::Helper()
+    : image_(264, 176, QImage::Format::Format_RGB32)
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -33,14 +34,23 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     textFont.setPixelSize(textSize);
 
 
-    QPixmap * pix = new QPixmap(264, 176);
-    pix->fill(background.color());
+    image_.fill(background.color());
+    image_.setPixelColor(0, 0, QColor(255, 0, 0));
+    // image_.setPixelColor(0, 1, QColor(255, 0, 0));
+    // image_.setPixelColor(0, 2, QColor(255, 0, 0));
+    // image_.setPixelColor(0, 3, QColor(255, 0, 0));
 
-    painter->drawPixmap(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
-                        *pix,
-                        /*source*/ QRect(0, 0, pix->width(), pix->height()));
+    image_.setPixelColor(0, image_.height() - 1, QColor(255, 0, 0));
+    // image_.setPixelColor(0, image_.height() - 2, QColor(255, 0, 0));
 
-    delete pix;
+    image_.setPixelColor(image_.width() - 1, 0, QColor(255, 0, 0));
+
+    image_.setPixelColor(image_.width() - 1, image_.height() - 1, QColor(255, 0, 0));
+
+
+    painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
+                       image_,
+                       /*source*/ QRect(0, 0, image_.width(), image_.height()));
 
 
     painter->translate(viewport.width() / 2, viewport.height() / 2);
