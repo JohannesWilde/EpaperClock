@@ -1,5 +1,7 @@
 #include "renderer2d.hpp"
 
+#include "constexprAbs.hpp"
+
 #include <cassert>
 #ifndef NDEBUG
 #include <limits>
@@ -7,13 +9,6 @@
 
 namespace // anonymous
 {
-
-// cmath's std::abs is only constexpr as of C++23. But even selection C++23 did not work with my current MSVC.
-constexpr int constexpr_abs(int const value)
-{
-    assert(std::numeric_limits<int>::min() != value);
-    return (0 > value) ? (-1 * value) : value;
-}
 
 // deltaLine.x must not be 0.
 constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,

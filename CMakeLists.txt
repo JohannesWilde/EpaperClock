@@ -17,6 +17,8 @@ qt_add_executable(${PROJECT_NAME}
     main.cpp
     window.cpp window.h
     renderer2d.hpp renderer2d.cpp
+    renderer2dextended.hpp renderer2dextended.cpp
+    constexprAbs.hpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
