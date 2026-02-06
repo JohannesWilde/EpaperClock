@@ -61,10 +61,7 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
 
     // std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
-    for (QRgb & value : imageData_)
-    {
-        value = background.color().rgba();
-    }
+    std::fill(imageData_.begin(), imageData_.end(), background.color().rgba());
 
     // std::chrono::steady_clock::time_point const startY = std::chrono::steady_clock::now();
 
@@ -78,13 +75,15 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
 
             Coordinates2d::Position const position(x, y);
 
+            QRgb & pixel = imageData_[y * imageWidth_ + x];
+
             for (std::shared_ptr<Renderer2d> const & renderer : renderers)
             {
                 assert(static_cast<bool>(renderer));
                 Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(position);
                 if (renderResult.valid)
                 {
-                    imageData_[y * imageWidth_ + x] = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
+                    pixel = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
                     break; // Don't look at further renderers.
                 }
                 else
@@ -92,7 +91,6 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
                     // intentionally empty
                 }
             }
-
 
             // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
             // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
