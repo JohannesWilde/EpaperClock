@@ -9,6 +9,8 @@
 #include <QTimer>
 
 #include <chrono>
+#include <format>
+#include <string>
 
 
 //! [0]
@@ -29,7 +31,7 @@ Window::Window()
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &Window::update);
-    timer->start(200);
+    timer->start(50);
 }
 
 
@@ -38,6 +40,11 @@ void Window::update()
     std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
 
     guiWidget_->animate(now);
+
+
+    using namespace std::chrono_literals;
+    std::string const s = std::format("{:%Y-%m-%d %H:%M:%S}", now);
+    labelWidget_->setText(QString::fromStdString(s));
 }
 
 //! [0]
