@@ -32,20 +32,20 @@ public:
 
 static constexpr int displayWidth = 264;
 static constexpr int displayHeight = 176;
-static constexpr int spareSpaceOutside = 4;
+static constexpr int spareSpaceOutside = 0;
 static constexpr int lengthButtons = 12;
 static constexpr int lengthButtonsInternal = 6;
 static constexpr int horizontalOffsetButtonsClock = 15;
-static constexpr int xOffsetElementSelection = 0;
-static constexpr int yOffsetElementSelection = 2;
-static constexpr int lengthElementSelection = 10;
 static constexpr int widthSevenSegment = 10;
 static constexpr int lengthXSevenSegmentSquare = 30;
-static constexpr int lengthYSevenSegmentSquare = 40;
+static constexpr int lengthYSevenSegmentSquare = 59;
 static constexpr int lengthSevenSegmentTriangle = 5;
 static constexpr int innerSpacingSevenSegmentElements = 3;
 static constexpr int horizontalLengthInterSegment = 10;
 static constexpr int lengthSegmentDots = 20;
+static constexpr int lengthElementSelection = 10;
+static constexpr int xOffsetElementSelection = (widthSevenSegment + lengthXSevenSegmentSquare - lengthElementSelection) / 2 + innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle;
+static constexpr int yOffsetElementSelection = 4;
 // constexpr int  = ;
 
 // (0, 0) is at top left.
@@ -68,7 +68,7 @@ static constexpr int xLengthSevenSegments = xSpacingSevenSegment + widthSevenSeg
 static constexpr int yLengthSevenSegments = 2 * ySpacingSevenSegment + widthSevenSegment;
 static constexpr int xSpacingSevenSegments = xLengthSevenSegments + horizontalLengthInterSegment;
 static constexpr int xOffsetSegment0 = xOffsetButtonDown + lengthButtons + horizontalOffsetButtonsClock;
-static constexpr int yOffsetSegment = (visibleY - yLengthSevenSegments - 2 * (lengthElementSelection + yOffsetElementSelection)) / 2;
+static constexpr int yOffsetSegment = (visibleY - yLengthSevenSegments - (yOffsetElementSelection + lengthElementSelection)) / 2;
 // constexpr int  = ;
 // constexpr int  = ;
 // constexpr int  = ;
@@ -105,6 +105,12 @@ static Renderer2dTriangle const buttonTriangleRight{Coordinates2d::Position(0,  
                                                     Coordinates2d::Position(0,                   lengthButtons),
                                                     Coordinates2d::Position(lengthButtons,       lengthButtons / 2),
                                                     /*color*/ Colors::black};
+
+// Element selection [triangle up]
+static Renderer2dTriangle const elementSelection{Coordinates2d::Position(0,                             lengthElementSelection),
+                                                 Coordinates2d::Position(lengthElementSelection / 2,    0),
+                                                 Coordinates2d::Position(lengthElementSelection,        lengthElementSelection),
+                                                 /*color*/ Colors::black};
 
 // Seven segment display
 
@@ -163,8 +169,8 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     // down
     std::make_shared<Renderer2dRelative>(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons)),
 
-    // segment
-    // todo: relative position class, combining class
+    // segment 0
+    // todo: enabling class, combining class
     std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + widthSevenSegment / 2)),
     std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment)),
     std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0 + xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2)),
@@ -173,6 +179,9 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     std::make_shared<Renderer2dRelative>(&sevenSegmentXElement, Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2, yOffsetSegment)),
     std::make_shared<Renderer2dRelative>(&sevenSegmentXElement, Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2, yOffsetSegment + ySpacingSevenSegment)),
     std::make_shared<Renderer2dRelative>(&sevenSegmentXElement, Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2, yOffsetSegment + 2 * ySpacingSevenSegment)),
+
+    // selection 0
+    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
 
     // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(61, 32), Coordinates2d::Dimension(3, 5), /*color*/ 128),
     // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
