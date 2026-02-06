@@ -8,6 +8,9 @@
 
 #include <QWidget>
 
+class GLWidget;
+class QLabel;
+
 //! [0]
 class Window : public QWidget
 {
@@ -16,8 +19,15 @@ class Window : public QWidget
 public:
     Window();
 
+protected:
+
+    void update();
+
 private:
     Helper helper;
+
+    GLWidget * guiWidget_;
+    QLabel * labelWidget_;
 };
 //! [0]
 

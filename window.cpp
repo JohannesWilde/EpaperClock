@@ -8,24 +8,36 @@
 #include <QLabel>
 #include <QTimer>
 
+#include <chrono>
+
+
 //! [0]
 Window::Window()
 {
     setWindowTitle(tr("Simulating Clock"));
 
-    GLWidget *openGL = new GLWidget(&helper, this);
-    QLabel *openGLLabel = new QLabel(tr("Text"));
-    openGLLabel->setAlignment(Qt::AlignHCenter);
-    openGLLabel->setSizePolicy(QSizePolicy(/*horizontal*/ QSizePolicy::Policy::Expanding,
-                                           /*vertical*/ QSizePolicy::Policy::Fixed));
+    guiWidget_ = new GLWidget(&helper, this);
+    labelWidget_ = new QLabel(tr("Text"));
+    labelWidget_->setAlignment(Qt::AlignHCenter);
+    labelWidget_->setSizePolicy(QSizePolicy(/*horizontal*/ QSizePolicy::Policy::Expanding,
+                                            /*vertical*/ QSizePolicy::Policy::Fixed));
 
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(openGL, 0, 1);
-    layout->addWidget(openGLLabel, 1, 1);
+    layout->addWidget(guiWidget_, 0, 1);
+    layout->addWidget(labelWidget_, 1, 1);
     setLayout(layout);
 
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, openGL, &GLWidget::animate);
+    connect(timer, &QTimer::timeout, this, &Window::update);
     timer->start(200);
 }
+
+
+void Window::update()
+{
+    std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
+
+    guiWidget_->animate(now);
+}
+
 //! [0]

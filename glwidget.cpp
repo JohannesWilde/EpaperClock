@@ -11,16 +11,15 @@
 GLWidget::GLWidget(Helper *helper, QWidget *parent)
     : QOpenGLWidget(parent), helper(helper)
 {
-    elapsed = 0;
     setAutoFillBackground(false);
     setMinimumSize(20, 20);
 }
 //! [0]
 
 //! [1]
-void GLWidget::animate()
+void GLWidget::animate(std::chrono::system_clock::time_point const now)
 {
-    elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval()) % 1000;
+    timestamp_ = now;
     update();
 }
 //! [1]

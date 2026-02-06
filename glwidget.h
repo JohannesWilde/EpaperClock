@@ -6,6 +6,9 @@
 
 #include <QOpenGLWidget>
 
+#include <chrono>
+
+
 //! [0]
 class Helper;
 
@@ -17,14 +20,14 @@ public:
     GLWidget(Helper *helper, QWidget *parent);
 
 public slots:
-    void animate();
+    void animate(std::chrono::system_clock::time_point const timestamp);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
     Helper *helper;
-    int elapsed;
+    std::chrono::system_clock::time_point timestamp_;
 };
 //! [0]
 
