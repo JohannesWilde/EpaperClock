@@ -32,9 +32,20 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
-    painter->fillRect(event->rect(), background);
+
+    QPixmap * pix = new QPixmap(264, 176);
+    pix->fill(background.color());
+
+    painter->drawPixmap(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
+                        *pix,
+                        /*source*/ QRect(0, 0, pix->width(), pix->height()));
+
+    delete pix;
+
+
     painter->translate(viewport.width() / 2, viewport.height() / 2);
 //! [1]
+
 
 //! [3]
     painter->setPen(textPen);
