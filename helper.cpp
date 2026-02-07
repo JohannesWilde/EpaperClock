@@ -325,15 +325,6 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
     std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
 
-    // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(61, 32), Coordinates2d::Dimension(3, 5), /*color*/ 128),
-    // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
-    // std::make_shared<Renderer2dTriangle>(Coordinates2d::Position(14, 4),
-    //                                      Coordinates2d::Position(19, 9),
-    //                                      Coordinates2d::Position(19, 9),
-    //                                      /*color*/ 164),
-    // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(8, 2), Coordinates2d::Position(19, 2), /*color*/ 0),
-    // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(6, 4), Coordinates2d::Position(6, 9), /*color*/ 0),
-
     // Background - not necessary but only as to highlight spareSpaceOutside.
     std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(spareSpaceOutside, spareSpaceOutside),
                                                      Coordinates2d::Dimension(displayWidth - 2 * spareSpaceOutside, displayHeight - 2 * spareSpaceOutside), /*color*/ 255),
