@@ -400,7 +400,7 @@ Helper::Helper()
 }
 
 
-void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport)
+void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp)
 {
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);

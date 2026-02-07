@@ -9,6 +9,7 @@
 #include <QPen>
 #include <QWidget>
 
+#include <chrono>
 #include <vector>
 
 //! [0]
@@ -18,7 +19,7 @@ public:
     Helper();
 
 public:
-    void paint(QPainter *painter, QPaintEvent *event, QSize const & viewport);
+    void paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp);
 
 private:
     QBrush background;
