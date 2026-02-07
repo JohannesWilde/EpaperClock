@@ -43,7 +43,7 @@ void Window::update()
 
 
     using namespace std::chrono_literals;
-    std::string const s = std::format("{:%Y-%m-%d %H:%M:%S}", now);
+    std::string const s = std::format("{:L%F %T}", now); // As of now this does not print local time using MSVC - even though it should.
     labelWidget_->setText(QString::fromStdString(s));
 }
 
