@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <time.h>
 #include <vector>
 
 // #include <chrono>
@@ -267,6 +268,31 @@ public:
     }
 
 
+    constexpr static Display singleDigitToDisplay(int const digit)
+    {
+        switch (digit)
+        {
+        case 0: return Display::number0;
+        case 1: return Display::number1;
+        case 2: return Display::number2;
+        case 3: return Display::number3;
+        case 4: return Display::number4;
+        case 5: return Display::number5;
+        case 6: return Display::number6;
+        case 7: return Display::number7;
+        case 8: return Display::number8;
+        case 9: return Display::number9;
+        case 0xa: return Display::a;
+        case 0xb: return Display::b;
+        case 0xc: return Display::c;
+        case 0xd: return Display::d;
+        case 0xe: return Display::e;
+        case 0xf: return Display::f;
+        default: return Display::none;
+        }
+    }
+
+
 private:
 
     // (1 << rightDown) | (1 << rightUp) | (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top)
@@ -379,11 +405,41 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
-    sevenSegments0.set(Renderer2dSevenSegments::Display::number8);
-    sevenSegments1.set(Renderer2dSevenSegments::Display::number8);
-    sevenSegments2.set(Renderer2dSevenSegments::Display::number8);
-    sevenSegments3.set(Renderer2dSevenSegments::Display::number8);
 
+    std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
+    std::time_t const nowTime = std::chrono::system_clock::to_time_t(now);
+
+    // MSVC
+    // static __inline errno_t __CRTDECL localtime_s(
+    //     _Out_ struct tm*    const _Tm,
+    //     _In_  time_t const* const _Time
+    //     )
+
+    struct tm nowLocal{0};
+    errno_t const success = localtime_s(&nowLocal, &nowTime);
+    if (0 == success)
+    {
+        int const hours = nowLocal.tm_hour;
+        int const minutes = nowLocal.tm_min;
+
+        int const hoursLow = hours % 10;
+        int const hoursHigh = hours / 10;
+
+        int const minutesLow = minutes % 10;
+        int const minutesHigh = minutes / 10;
+
+        sevenSegments0.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+        sevenSegments1.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+        sevenSegments2.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+        sevenSegments3.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+    }
+    else
+    {
+        sevenSegments0.set(Renderer2dSevenSegments::Display::number8);
+        sevenSegments1.set(Renderer2dSevenSegments::Display::number8);
+        sevenSegments2.set(Renderer2dSevenSegments::Display::number8);
+        sevenSegments3.set(Renderer2dSevenSegments::Display::number8);
+    }
 
     std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
