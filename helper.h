@@ -30,7 +30,7 @@ private:
     int const imageWidth_;
     int const imageHeight_;
     std::vector<QRgb> imageData_;
-    QImage const image_;
+    QImage image_;
 
 };
 //! [0]
