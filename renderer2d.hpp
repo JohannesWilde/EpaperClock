@@ -3,15 +3,16 @@
 
 #include "coordinates2d.hpp"
 
-#include <cassert>
 #include <array>
+#include <cassert>
+#include <cstdint>
 
 
 class Renderer2d
 {
 public:
 
-    typedef uint8_t Color;
+    typedef std::uint8_t Color;
 
     struct ValidityAndColor
     {
@@ -173,7 +174,7 @@ public:
     // None of the provided renderers must be nullptr.
     template<typename... Args>
     Renderer2dAccumulated(Args&&... others)
-        : renderers_(others...)
+        : renderers_{others...}
     {
 #ifndef NDEBUG
         for (Renderer2d const * const renderer : renderers_)
