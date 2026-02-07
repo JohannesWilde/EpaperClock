@@ -312,15 +312,18 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     // down
     std::make_shared<Renderer2dRelative>(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons)),
 
-    // segment 0
+    // segments
     std::make_shared<Renderer2dRelative>(&sevenSegments0, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment)),
     std::make_shared<Renderer2dRelative>(&sevenSegments1, Coordinates2d::Position(xOffsetSegment0 + xSpacingSevenSegments, yOffsetSegment)),
 
     std::make_shared<Renderer2dRelative>(&sevenSegments2, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment)),
     std::make_shared<Renderer2dRelative>(&sevenSegments3, Coordinates2d::Position(xOffsetSegment0 + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment)),
 
-    // selection 0
+    // selections
     std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
+    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + xSpacingSevenSegments, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
+    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
+    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
 
     // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(61, 32), Coordinates2d::Dimension(3, 5), /*color*/ 128),
     // std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(63, 34), Coordinates2d::Dimension(3, 5), /*color*/ 164),
