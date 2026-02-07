@@ -35,14 +35,14 @@ static constexpr int displayHeight = 176;
 static constexpr int spareSpaceOutside = 0;
 static constexpr int lengthButtons = 12;
 static constexpr int lengthButtonsInternal = 6;
-static constexpr int horizontalOffsetButtonsClock = 15;
+static constexpr int horizontalOffsetButtonsClock = 10;
 static constexpr int widthSevenSegment = 10;
-static constexpr int lengthXSevenSegmentSquare = 30;
+static constexpr int lengthXSevenSegmentSquare = 25;
 static constexpr int lengthYSevenSegmentSquare = 59;
 static constexpr int lengthSevenSegmentTriangle = 5;
 static constexpr int innerSpacingSevenSegmentElements = 3;
 static constexpr int horizontalLengthInterSegment = 10;
-static constexpr int lengthSegmentDots = 20;
+static constexpr int lengthSegmentDots = 15;
 static constexpr int lengthElementSelection = 10;
 static constexpr int xOffsetElementSelection = (widthSevenSegment + lengthXSevenSegmentSquare - lengthElementSelection) / 2 + innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle;
 static constexpr int yOffsetElementSelection = 4;
@@ -157,6 +157,109 @@ static Renderer2dRelative const sevenSegmentTriangleDownShifted{&sevenSegmentTri
 static Renderer2dAccumulated<3> const sevenSegmentYElement{&sevenSegmentTriangleUpShifted, &sevenSegmentYSquareShifted, &sevenSegmentTriangleDownShifted};
 
 
+static Renderer2dRelative const segmentShifted0_(&sevenSegmentYElement, Coordinates2d::Position(0, yOffsetSegment + widthSevenSegment / 2));
+static Renderer2dRelative const segmentShifted1_(&sevenSegmentYElement, Coordinates2d::Position(0, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment));
+static Renderer2dRelative const segmentShifted2_(&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2));
+static Renderer2dRelative const segmentShifted3_(&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment));
+
+static Renderer2dRelative const segmentShifted4_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 0));
+static Renderer2dRelative const segmentShifted5_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, ySpacingSevenSegment));
+static Renderer2dRelative const segmentShifted6_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 2 * ySpacingSevenSegment));
+
+class Renderer2dSevenSegments : public Renderer2d
+{
+public:
+
+    enum class Segment
+    {
+        top,
+        middle,
+        bottom,
+        leftUp,
+        leftDown,
+        rightUp,
+        rightDown
+    };
+
+    Renderer2dSevenSegments()
+        : segmentsEnabled_{Renderer2dEnabled{&segmentsShifted_[0],},
+                           Renderer2dEnabled{&segmentsShifted_[1],},
+                           Renderer2dEnabled{&segmentsShifted_[2],},
+                           Renderer2dEnabled{&segmentsShifted_[3],},
+                           Renderer2dEnabled{&segmentsShifted_[4],},
+                           Renderer2dEnabled{&segmentsShifted_[5],},
+                           Renderer2dEnabled{&segmentsShifted_[6],},}
+    {
+        // intentionally empty
+    }
+
+    Renderer2dSevenSegments(Renderer2dSevenSegments const & other) = default;
+    Renderer2dSevenSegments(Renderer2dSevenSegments && other) = default;
+    Renderer2dSevenSegments & operator=(Renderer2dSevenSegments const & other) = default;
+    Renderer2dSevenSegments & operator=(Renderer2dSevenSegments && other) = default;
+
+    virtual ValidityAndColor evaluate(Coordinates2d::Position const & position) const
+    {
+        ValidityAndColor renderResult;
+        for (Renderer2d const & renderer : segmentsEnabled_)
+        {
+            renderResult = renderer.evaluate(position);
+            if (renderResult.valid)
+            {
+                break; // Don't look at further renderers.
+            }
+            else
+            {
+                // intentionally empty
+            }
+        }
+        return renderResult;
+    }
+
+
+
+private:
+
+    static constexpr size_t enumToIndex_(Segment const segment)
+    {
+        switch (segment)
+        {
+        case Segment::top       : return 0;
+        case Segment::middle    : return 1;
+        case Segment::bottom    : return 2;
+        case Segment::leftUp    : return 3;
+        case Segment::leftDown  : return 4;
+        case Segment::rightUp   : return 5;
+        case Segment::rightDown : return 6;
+        }
+    }
+
+    static std::array<Renderer2dRelative const, 7> const segmentsShifted_;
+
+    std::array<Renderer2dEnabled, 7> segmentsEnabled_;
+
+};
+
+std::array<Renderer2dRelative const, 7> const Renderer2dSevenSegments::segmentsShifted_{
+    /*top      */  Renderer2dRelative{&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 0)},
+    /*middle   */  Renderer2dRelative{&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, ySpacingSevenSegment)},
+    /*bottom   */  Renderer2dRelative{&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 2 * ySpacingSevenSegment)},
+    /*leftUp   */  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(0, widthSevenSegment / 2)},
+    /*leftDown */  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(0, widthSevenSegment / 2 + ySpacingSevenSegment)},
+    /*rightUp  */  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, widthSevenSegment / 2)},
+    /*rightDown*/  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, widthSevenSegment / 2 + ySpacingSevenSegment)},
+};
+
+
+static Renderer2dSevenSegments sevenSegments0;
+static Renderer2dSevenSegments sevenSegments1;
+static Renderer2dSevenSegments sevenSegments2;
+static Renderer2dSevenSegments sevenSegments3;
+
+
+
+
+
 // The further at the front of the vecotr, the further at the front in the rendered image.
 static std::vector<std::shared_ptr<Renderer2d>> renderers{
     // on/off
@@ -170,15 +273,11 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     std::make_shared<Renderer2dRelative>(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons)),
 
     // segment 0
-    // todo: enabling class, combining class
-    std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + widthSevenSegment / 2)),
-    std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment)),
-    std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0 + xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2)),
-    std::make_shared<Renderer2dRelative>(&sevenSegmentYElement, Coordinates2d::Position(xOffsetSegment0 + xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment)),
+    std::make_shared<Renderer2dRelative>(&sevenSegments0, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment)),
+    std::make_shared<Renderer2dRelative>(&sevenSegments1, Coordinates2d::Position(xOffsetSegment0 + xSpacingSevenSegments, yOffsetSegment)),
 
-    std::make_shared<Renderer2dRelative>(&sevenSegmentXElement, Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2, yOffsetSegment)),
-    std::make_shared<Renderer2dRelative>(&sevenSegmentXElement, Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2, yOffsetSegment + ySpacingSevenSegment)),
-    std::make_shared<Renderer2dRelative>(&sevenSegmentXElement, Coordinates2d::Position(xOffsetSegment0 + widthSevenSegment / 2, yOffsetSegment + 2 * ySpacingSevenSegment)),
+    std::make_shared<Renderer2dRelative>(&sevenSegments2, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment)),
+    std::make_shared<Renderer2dRelative>(&sevenSegments3, Coordinates2d::Position(xOffsetSegment0 + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment)),
 
     // selection 0
     std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
