@@ -232,17 +232,24 @@ public:
     virtual ValidityAndColor evaluate(Coordinates2d::Position const & position) const
     {
         ValidityAndColor renderResult;
-        for (Renderer2d const & renderer : segmentsEnabled_)
+        if ((xLengthSevenSegments > position.x) && (yLengthSevenSegments > position.y))
         {
-            renderResult = renderer.evaluate(position);
-            if (renderResult.valid)
+            for (Renderer2d const & renderer : segmentsEnabled_)
             {
-                break; // Don't look at further renderers.
+                renderResult = renderer.evaluate(position);
+                if (renderResult.valid)
+                {
+                    break; // Don't look at further renderers.
+                }
+                else
+                {
+                    // intentionally empty
+                }
             }
-            else
-            {
-                // intentionally empty
-            }
+        }
+        else
+        {
+            // intentionally empty
         }
         return renderResult;
     }
