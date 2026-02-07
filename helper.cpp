@@ -500,16 +500,16 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
         std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
 
         image_ = QImage(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32);
-
-        painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
-                           image_,
-                           /*source*/ QRect(0, 0, image_.width(), image_.height()));
-
-
-        painter->translate(viewport.width() / 2, viewport.height() / 2);
     }
     else
     {
         // intentionally empty
     }
+
+    painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
+                       image_,
+                       /*source*/ QRect(0, 0, image_.width(), image_.height()));
+
+
+    painter->translate(viewport.width() / 2, viewport.height() / 2);
 }
