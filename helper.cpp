@@ -168,9 +168,11 @@ static Renderer2dRelative const segmentShifted6_(&sevenSegmentXElement, Coordina
 
 class Renderer2dSevenSegments : public Renderer2d
 {
+    typedef std::uint8_t SegmentConfiguration;
+
 public:
 
-    enum class Segment
+    enum Segment
     {
         top,
         middle,
@@ -179,6 +181,27 @@ public:
         leftDown,
         rightUp,
         rightDown
+    };
+
+    enum Display
+    {
+        none,
+        number0,
+        number1,
+        number2,
+        number3,
+        number4,
+        number5,
+        number6,
+        number7,
+        number8,
+        number9,
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
     };
 
     Renderer2dSevenSegments()
@@ -216,24 +239,41 @@ public:
         return renderResult;
     }
 
+    void set(Display const display)
+    {
+        SegmentConfiguration const configuration = configurations_[display];
+        segmentsEnabled_[Segment::top].set(0 != ((1 << Segment::top) & configuration));
+        segmentsEnabled_[Segment::middle].set(0 != ((1 << Segment::middle) & configuration));
+        segmentsEnabled_[Segment::bottom].set(0 != ((1 << Segment::bottom) & configuration));
+        segmentsEnabled_[Segment::leftUp].set(0 != ((1 << Segment::leftUp) & configuration));
+        segmentsEnabled_[Segment::leftDown].set(0 != ((1 << Segment::leftDown) & configuration));
+        segmentsEnabled_[Segment::rightUp].set(0 != ((1 << Segment::rightUp) & configuration));
+        segmentsEnabled_[Segment::rightDown].set(0 != ((1 << Segment::rightDown) & configuration));
+    }
 
 
 private:
 
-    static constexpr size_t enumToIndex_(Segment const segment)
-    {
-        switch (segment)
-        {
-        case Segment::top       : return 0;
-        case Segment::middle    : return 1;
-        case Segment::bottom    : return 2;
-        case Segment::leftUp    : return 3;
-        case Segment::leftDown  : return 4;
-        case Segment::rightUp   : return 5;
-        case Segment::rightDown : return 6;
-        }
-    }
-
+    // (1 << rightDown) | (1 << rightUp) | (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top)
+    constexpr static std::array<SegmentConfiguration, 17> const configurations_{
+        /*None*/ 0,
+        /*number0*/ (1 << rightDown) | (1 << rightUp) | (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << top),
+        /*number1*/ (1 << rightDown) | (1 << rightUp),
+        /*number2*/ (1 << rightUp) | (1 << leftDown) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*number3*/ (1 << rightDown) | (1 << rightUp) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*number4*/ (1 << rightDown) | (1 << rightUp) | (1 << leftUp) | (1 << middle),
+        /*number5*/ (1 << rightDown) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*number6*/ (1 << rightDown) | (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*number7*/ (1 << rightDown) | (1 << rightUp) | (1 << top),
+        /*number8*/ (1 << rightDown) | (1 << rightUp) | (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*number9*/ (1 << rightDown) | (1 << rightUp) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*A*/ (1 << rightDown) | (1 << rightUp) | (1 << leftDown) | (1 << leftUp) | (1 << middle) | (1 << top),
+        /*b*/ (1 << rightDown) | (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << middle),
+        /*C*/ (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << top),
+        /*d*/ (1 << rightDown) | (1 << rightUp) | (1 << leftDown) | (1 << bottom) | (1 << middle),
+        /*E*/ (1 << leftDown) | (1 << leftUp) | (1 << bottom) | (1 << middle) | (1 << top),
+        /*F*/ (1 << leftDown) | (1 << leftUp) | (1 << middle) | (1 << top),
+    };
     static std::array<Renderer2dRelative const, 7> const segmentsShifted_;
 
     std::array<Renderer2dEnabled, 7> segmentsEnabled_;
@@ -324,6 +364,10 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
+    sevenSegments0.set(Renderer2dSevenSegments::Display::d);
+    sevenSegments1.set(Renderer2dSevenSegments::Display::e);
+    sevenSegments2.set(Renderer2dSevenSegments::Display::f);
+    sevenSegments3.set(Renderer2dSevenSegments::Display::number8);
 
 
     std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
