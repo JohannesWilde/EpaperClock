@@ -43,6 +43,7 @@ static constexpr int lengthSevenSegmentTriangle = 5;
 static constexpr int innerSpacingSevenSegmentElements = 3;
 static constexpr int horizontalLengthInterSegment = 10;
 static constexpr int lengthSegmentDots = 15;
+static constexpr int yDistanceDots = 20;
 static constexpr int lengthElementSelection = 10;
 static constexpr int xOffsetElementSelection = (widthSevenSegment + lengthXSevenSegmentSquare - lengthElementSelection) / 2 + innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle;
 static constexpr int yOffsetElementSelection = 4;
@@ -111,6 +112,13 @@ static Renderer2dTriangle const elementSelection{Coordinates2d::Position(0,     
                                                  Coordinates2d::Position(lengthElementSelection / 2,    0),
                                                  Coordinates2d::Position(lengthElementSelection,        lengthElementSelection),
                                                  /*color*/ Colors::black};
+
+// Dots
+
+static Renderer2dAxesAlignedRectangle const clockDot{Coordinates2d::Position(0, 0),
+                                                     Coordinates2d::Dimension(lengthSegmentDots, lengthSegmentDots),
+                                                     /*outsideColor*/ Colors::black};
+
 
 // Seven segment display
 
@@ -325,6 +333,12 @@ static std::vector<std::shared_ptr<Renderer2d>> renderers{
     std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
     std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
 
+    // dots
+    std::make_shared<Renderer2dRelative>(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
+                                                                            yOffsetSegment + yLengthSevenSegments / 2 - lengthSegmentDots - yDistanceDots / 2)),
+    std::make_shared<Renderer2dRelative>(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
+                                                                            yOffsetSegment + yLengthSevenSegments / 2 + yDistanceDots / 2)),
+
     // Background - not necessary but only as to highlight spareSpaceOutside.
     std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(spareSpaceOutside, spareSpaceOutside),
                                                      Coordinates2d::Dimension(displayWidth - 2 * spareSpaceOutside, displayHeight - 2 * spareSpaceOutside), /*color*/ 255),
@@ -358,9 +372,9 @@ void Helper::paint(QPainter *painter, QPaintEvent *event, QSize const & viewport
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
-    sevenSegments0.set(Renderer2dSevenSegments::Display::d);
-    sevenSegments1.set(Renderer2dSevenSegments::Display::e);
-    sevenSegments2.set(Renderer2dSevenSegments::Display::f);
+    sevenSegments0.set(Renderer2dSevenSegments::Display::number8);
+    sevenSegments1.set(Renderer2dSevenSegments::Display::number8);
+    sevenSegments2.set(Renderer2dSevenSegments::Display::number8);
     sevenSegments3.set(Renderer2dSevenSegments::Display::number8);
 
 
