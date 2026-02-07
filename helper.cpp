@@ -386,6 +386,7 @@ Helper::Helper()
     , imageHeight_(displayHeight)
     , imageData_(imageWidth_ * imageHeight_)
     , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
+    , previousMinutesLow_(-1)
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -409,6 +410,7 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
     std::time_t const nowTime = std::chrono::system_clock::to_time_t(now);
 
+    bool updateRender = true;
     // MSVC
     // static __inline errno_t __CRTDECL localtime_s(
     //     _Out_ struct tm*    const _Tm,
@@ -428,10 +430,19 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
         int const minutesLow = minutes % 10;
         int const minutesHigh = minutes / 10;
 
-        sevenSegments0.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
-        sevenSegments1.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
-        sevenSegments2.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
-        sevenSegments3.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+        if (previousMinutesLow_ != minutesLow)
+        {
+            sevenSegments0.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+            sevenSegments1.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+            sevenSegments2.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+            sevenSegments3.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+
+            previousMinutesLow_ = minutesLow;
+        }
+        else
+        {
+            updateRender = false;
+        }
     }
     else
     {
@@ -441,57 +452,64 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
         sevenSegments3.set(Renderer2dSevenSegments::Display::number8);
     }
 
-    std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
-
-    std::fill(imageData_.begin(), imageData_.end(), background.color().rgba());
-
-    // std::chrono::steady_clock::time_point const startY = std::chrono::steady_clock::now();
-
-    for (int y = 0; image_.height() > y; ++y)
+    if (updateRender)
     {
-        // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
-        for (int x = 0; image_.width() > x; ++x)
+        std::fill(imageData_.begin(), imageData_.end(), background.color().rgba());
+
+        // std::chrono::steady_clock::time_point const startY = std::chrono::steady_clock::now();
+
+        for (int y = 0; image_.height() > y; ++y)
         {
-            // std::chrono::steady_clock::time_point const startR = std::chrono::steady_clock::now();
+            // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
 
-            Coordinates2d::Position const position(x, y);
-
-            QRgb & pixel = imageData_[y * imageWidth_ + x];
-
-            for (std::shared_ptr<Renderer2d> const & renderer : renderers)
+            for (int x = 0; image_.width() > x; ++x)
             {
-                assert(static_cast<bool>(renderer));
-                Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(position);
-                if (renderResult.valid)
+                // std::chrono::steady_clock::time_point const startR = std::chrono::steady_clock::now();
+
+                Coordinates2d::Position const position(x, y);
+
+                QRgb & pixel = imageData_[y * imageWidth_ + x];
+
+                for (std::shared_ptr<Renderer2d> const & renderer : renderers)
                 {
-                    pixel = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
-                    break; // Don't look at further renderers.
+                    assert(static_cast<bool>(renderer));
+                    Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(position);
+                    if (renderResult.valid)
+                    {
+                        pixel = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
+                        break; // Don't look at further renderers.
+                    }
+                    else
+                    {
+                        // intentionally empty
+                    }
                 }
-                else
-                {
-                    // intentionally empty
-                }
+
+                // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
+                // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
             }
 
-            // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
-            // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
+            // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
+            // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
         }
 
-        // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
-        // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
+        std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
+        // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
+        std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
+
+        image_ = QImage(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32);
+
+        painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
+                           image_,
+                           /*source*/ QRect(0, 0, image_.width(), image_.height()));
+
+
+        painter->translate(viewport.width() / 2, viewport.height() / 2);
     }
-
-    std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
-    // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
-    std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
-
-    image_ = QImage(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32);
-
-    painter->drawImage(/*target*/ QRect(0, 0, viewport.width(), viewport.height()),
-                       image_,
-                       /*source*/ QRect(0, 0, image_.width(), image_.height()));
-
-
-    painter->translate(viewport.width() / 2, viewport.height() / 2);
+    else
+    {
+        // intentionally empty
+    }
 }

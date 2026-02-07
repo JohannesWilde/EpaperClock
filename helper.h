@@ -33,6 +33,8 @@ private:
     std::vector<QRgb> imageData_;
     QImage image_;
 
+    int previousMinutesLow_;
+
 };
 //! [0]
 
