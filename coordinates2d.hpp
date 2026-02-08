@@ -29,10 +29,10 @@ public:
         }
     }
 
-    Dimension(Dimension const & other) = default;
-    Dimension(Dimension && other) = default;
-    Dimension & operator=(Dimension const & other) = default;
-    Dimension & operator=(Dimension && other) = default;
+    constexpr Dimension(Dimension const & other) = default;
+    constexpr Dimension(Dimension && other) = default;
+    constexpr Dimension & operator=(Dimension const & other) = default;
+    constexpr Dimension & operator=(Dimension && other) = default;
 
     Dimension operator+(Dimension const & other) const
     {
@@ -48,7 +48,7 @@ public:
         return Dimension{x_ - other.x_, y_ - other.y_};
     }
 
-    Dimension & operator+=(Dimension const & other)
+    constexpr Dimension & operator+=(Dimension const & other)
     {
           x_ += other.x_;
           y_ += other.y_;
@@ -66,17 +66,17 @@ public:
         return *this;
     }
 
-    bool operator==(Dimension const & other) const
+    constexpr bool operator==(Dimension const & other) const
     {
         return ((x_ == other.x_) && (y_ == other.y_));
     }
 
-    int getX() const
+    constexpr int getX() const
     {
         return x_;
     }
 
-    int getY() const
+    constexpr int getY() const
     {
         return y_;
     }
@@ -99,12 +99,12 @@ public:
         y_ = value;
     }
 
-    int size() const
+    constexpr int size() const
     {
         return x_ * y_;
     }
 
-    bool contains(Position const & position) const;
+    constexpr bool contains(Position const & position) const;
 
 private:
 
@@ -129,66 +129,66 @@ public:
     {
     }
 
-    Distance(Distance const & other) = default;
-    Distance(Distance && other) = default;
-    Distance & operator=(Distance const & other) = default;
-    Distance & operator=(Distance && other) = default;
+    constexpr Distance(Distance const & other) = default;
+    constexpr Distance(Distance && other) = default;
+    constexpr Distance & operator=(Distance const & other) = default;
+    constexpr Distance & operator=(Distance && other) = default;
 
-    Distance(Position const & first, Position const & second);
+    constexpr Distance(Position const & first, Position const & second);
 
     double norm() const;
 
-    Distance operator-() const
+    constexpr Distance operator-() const
     {
         return Distance{-x, -y};
     }
 
-    Distance operator+(Distance const & other) const
+    constexpr Distance operator+(Distance const & other) const
     {
         return Distance{x + other.x, y + other.y};
     }
 
-    Distance operator-(Distance const & other) const
+    constexpr Distance operator-(Distance const & other) const
     {
         return *this + (-other);
     }
 
-    Distance & operator+=(Distance const & other)
+    constexpr Distance & operator+=(Distance const & other)
     {
           x += other.x;
           y += other.y;
           return *this;
     }
 
-    Distance & operator-=(Distance const & other)
+    constexpr Distance & operator-=(Distance const & other)
     {
         *this += -other;
         return *this;
     }
 
-    bool operator==(Distance const & other) const
+    constexpr bool operator==(Distance const & other) const
     {
         return ((x == other.x) && (y == other.y));
     }
 
-    Distance operator*(int const factor) const
+    constexpr Distance operator*(int const factor) const
     {
         return Distance{x * factor, y * factor};
     }
 
-    Distance operator/(int const factor) const
+    constexpr Distance operator/(int const factor) const
     {
         return Distance{x / factor, y / factor};
     }
 
-    Distance & operator*=(int const factor)
+    constexpr Distance & operator*=(int const factor)
     {
           x *= factor;
           y *= factor;
           return *this;
     }
 
-    Distance & operator/=(int const factor)
+    constexpr Distance & operator/=(int const factor)
     {
         x /= factor;
         y /= factor;
@@ -203,44 +203,44 @@ public:
 class Position
 {
 public:
-    Position()
+    constexpr Position()
         : x(0)
         , y(0)
     {
     }
 
-    Position(int const x, int const y)
+    constexpr Position(int const x, int const y)
         : x(x)
         , y(y)
     {
     }
 
-    Position(Position const & other) = default;
-    Position(Position && other) = default;
-    Position & operator=(Position const & other) = default;
-    Position & operator=(Position && other) = default;
+    constexpr Position(Position const & other) = default;
+    constexpr Position(Position && other) = default;
+    constexpr Position & operator=(Position const & other) = default;
+    constexpr Position & operator=(Position && other) = default;
 
-    Distance distanceTo(Position const & other = Position(0, 0)) const
+    constexpr Distance distanceTo(Position const & other = Position(0, 0)) const
     {
         return Distance(x - other.x, y - other.y);
     }
 
-    Position operator-() const
+    constexpr Position operator-() const
     {
         return Position{-x, -y};
     }
 
-    Position operator+(Distance const & other) const
+    constexpr Position operator+(Distance const & other) const
     {
         return Position{x + other.x, y + other.y};
     }
 
-    Position operator-(Distance const & other) const
+    constexpr Position operator-(Distance const & other) const
     {
         return *this + (-other);
     }
 
-    Position & operator+=(Distance const & other)
+    constexpr Position & operator+=(Distance const & other)
     {
           x += other.x;
           y += other.y;
@@ -253,7 +253,7 @@ public:
         return *this;
     }
 
-    bool operator==(Position const & other) const
+    constexpr bool operator==(Position const & other) const
     {
         return ((x == other.x) && (y == other.y));
     }
