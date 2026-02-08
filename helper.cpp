@@ -30,6 +30,8 @@ public:
     static constexpr Renderer2d::Color white = 255;
 };
 
+namespace GuiFixtures
+{
 
 static constexpr int displayWidth = 264;
 static constexpr int displayHeight = 176;
@@ -174,6 +176,7 @@ static Renderer2dRelative const segmentShifted3_(&sevenSegmentYElement, Coordina
 static Renderer2dRelative const segmentShifted4_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 0));
 static Renderer2dRelative const segmentShifted5_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, ySpacingSevenSegment));
 static Renderer2dRelative const segmentShifted6_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 2 * ySpacingSevenSegment));
+
 
 class Renderer2dSevenSegments : public Renderer2d
 {
@@ -332,58 +335,128 @@ std::array<Renderer2dRelative const, 7> const Renderer2dSevenSegments::segmentsS
 };
 
 
-static Renderer2dSevenSegments sevenSegments0;
-static Renderer2dSevenSegments sevenSegments1;
-static Renderer2dSevenSegments sevenSegments2;
-static Renderer2dSevenSegments sevenSegments3;
+// on/off
+static const Renderer2dRelative buttonOnOff(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown));
+// settings
+static const Renderer2dRelative buttonSettings(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons));
+static const Renderer2dRelative buttonSettingsRight(&buttonTriangleRight, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons));
+// up
+static const Renderer2dRelative buttonUp(&buttonTriangleUp, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons));
+// down
+static const Renderer2dRelative buttonDown(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons));
+
+// selections
+static const Renderer2dRelative selection0(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
+static const Renderer2dRelative selection1(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + xSpacingSevenSegments, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
+static const Renderer2dRelative selection2(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
+static const Renderer2dRelative selection3(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
+
+// dots
+static const Renderer2dRelative dotUpper(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
+                                                                            yOffsetSegment + yLengthSevenSegments / 2 - lengthSegmentDots - yDistanceDots / 2));
+static const Renderer2dRelative dotLower(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
+                                                                            yOffsetSegment + yLengthSevenSegments / 2 + yDistanceDots / 2));
+
+} // namespace GuiFixtures
 
 
+class Renderer2dClockGui : public Renderer2d
+{
+public:
 
+    Renderer2dClockGui()
+        : buttonOnOff(&GuiFixtures::buttonOnOff)
+        , buttonSettings(&GuiFixtures::buttonSettings)
+        , buttonSettingsRight(&GuiFixtures::buttonSettingsRight, false)
+        , buttonUp(&GuiFixtures::buttonUp)
+        , buttonDown(&GuiFixtures::buttonDown)
+        , selection0(&GuiFixtures::selection0)
+        , selection1(&GuiFixtures::selection1)
+        , selection2(&GuiFixtures::selection2)
+        , selection3(&GuiFixtures::selection3)
+        , dotUpper(&GuiFixtures::dotUpper)
+        , dotLower(&GuiFixtures::dotLower)
+        , sevenSegments0Relative_(&sevenSegments0, Coordinates2d::Position(GuiFixtures::xOffsetSegment0,
+                                                                           GuiFixtures::yOffsetSegment))
+        , sevenSegments1Relative_(&sevenSegments1, Coordinates2d::Position(GuiFixtures::xOffsetSegment0 + GuiFixtures::xSpacingSevenSegments,
+                                                                           GuiFixtures::yOffsetSegment))
+        , sevenSegments2Relative_(&sevenSegments2, Coordinates2d::Position(GuiFixtures::xOffsetSegment0 + 2 * GuiFixtures::xSpacingSevenSegments + GuiFixtures::horizontalLengthInterSegment + GuiFixtures::lengthSegmentDots,
+                                                                           GuiFixtures::yOffsetSegment))
+        , sevenSegments3Relative_(&sevenSegments3, Coordinates2d::Position(GuiFixtures::xOffsetSegment0 + 3 * GuiFixtures::xSpacingSevenSegments + GuiFixtures::horizontalLengthInterSegment + GuiFixtures::lengthSegmentDots,
+                                                                           GuiFixtures::yOffsetSegment))
+    {
+        // intentionally empty
+    }
 
+    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override
+    {
+        ValidityAndColor result;
 
-// The further at the front of the vecotr, the further at the front in the rendered image.
-static std::vector<std::shared_ptr<Renderer2d>> renderers{
-    // on/off
-    std::make_shared<Renderer2dRelative>(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown)),
-    // settings
-    std::make_shared<Renderer2dRelative>(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons)),
-    // std::make_shared<Renderer2dRelative>(&buttonTriangleRight, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons)),
-    // up
-    std::make_shared<Renderer2dRelative>(&buttonTriangleUp, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons)),
-    // down
-    std::make_shared<Renderer2dRelative>(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons)),
+        for (Renderer2d const * const renderer : std::array<Renderer2d const *, 15>{
+                 &sevenSegments0Relative_,
+                 &sevenSegments1Relative_,
+                 &sevenSegments2Relative_,
+                 &sevenSegments3Relative_,
+                 &buttonOnOff,
+                 &buttonSettings,
+                 &buttonSettingsRight,
+                 &buttonUp,
+                 &buttonDown,
+                 &selection0,
+                 &selection1,
+                 &selection2,
+                 &selection3,
+                 &dotUpper,
+                 &dotLower,})
+        {
+            result = renderer->evaluate(position);
+            if (result.valid)
+            {
+                break; // Don't look at further renderers.
+            }
+            else
+            {
+                // intentionally empty
+            }
+        }
 
-    // segments
-    std::make_shared<Renderer2dRelative>(&sevenSegments0, Coordinates2d::Position(xOffsetSegment0, yOffsetSegment)),
-    std::make_shared<Renderer2dRelative>(&sevenSegments1, Coordinates2d::Position(xOffsetSegment0 + xSpacingSevenSegments, yOffsetSegment)),
+        return result;
+    }
 
-    std::make_shared<Renderer2dRelative>(&sevenSegments2, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment)),
-    std::make_shared<Renderer2dRelative>(&sevenSegments3, Coordinates2d::Position(xOffsetSegment0 + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment)),
+    Renderer2dEnabled buttonOnOff;
+    Renderer2dEnabled buttonSettings;
+    Renderer2dEnabled buttonSettingsRight;
+    Renderer2dEnabled buttonUp;
+    Renderer2dEnabled buttonDown;
+    Renderer2dEnabled selection0;
+    Renderer2dEnabled selection1;
+    Renderer2dEnabled selection2;
+    Renderer2dEnabled selection3;
+    Renderer2dEnabled dotUpper;
+    Renderer2dEnabled dotLower;
 
-    // selections
-    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
-    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + xSpacingSevenSegments, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
-    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
-    std::make_shared<Renderer2dRelative>(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection)),
+    GuiFixtures::Renderer2dSevenSegments sevenSegments0;
+    GuiFixtures::Renderer2dSevenSegments sevenSegments1;
+    GuiFixtures::Renderer2dSevenSegments sevenSegments2;
+    GuiFixtures::Renderer2dSevenSegments sevenSegments3;
 
-    // dots
-    std::make_shared<Renderer2dRelative>(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
-                                                                            yOffsetSegment + yLengthSevenSegments / 2 - lengthSegmentDots - yDistanceDots / 2)),
-    std::make_shared<Renderer2dRelative>(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
-                                                                            yOffsetSegment + yLengthSevenSegments / 2 + yDistanceDots / 2)),
+private:
 
-    // Background - not necessary but only as to highlight spareSpaceOutside.
-    std::make_shared<Renderer2dAxesAlignedRectangle>(Coordinates2d::Position(spareSpaceOutside, spareSpaceOutside),
-                                                     Coordinates2d::Dimension(displayWidth - 2 * spareSpaceOutside, displayHeight - 2 * spareSpaceOutside), /*color*/ 255),
+    Renderer2dRelative sevenSegments0Relative_;
+    Renderer2dRelative sevenSegments1Relative_;
+    Renderer2dRelative sevenSegments2Relative_;
+    Renderer2dRelative sevenSegments3Relative_;
 };
+
+static Renderer2dClockGui clockGui;
 
 
 } // namespace anonymous
 
 
 Helper::Helper()
-    : imageWidth_(displayWidth)
-    , imageHeight_(displayHeight)
+    : imageWidth_(GuiFixtures::displayWidth)
+    , imageHeight_(GuiFixtures::displayHeight)
     , imageData_(imageWidth_ * imageHeight_)
     , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
     , previousMinutesLow_(-1)
@@ -392,7 +465,7 @@ Helper::Helper()
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(1.0, QColor(0xa6, 0xce, 0x39));
 
-    background = QBrush(QColor(45, 83, 129));
+    background = Qt::white; // QBrush(QColor(45, 83, 129));
     circleBrush = QBrush(gradient);
     circlePen = QPen(Qt::black);
     circlePen.setWidth(1);
@@ -432,10 +505,10 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
         if (previousMinutesLow_ != minutesLow)
         {
-            sevenSegments0.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
-            sevenSegments1.set(Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
-            sevenSegments2.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
-            sevenSegments3.set(Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+            clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+            clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+            clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+            clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
 
             previousMinutesLow_ = minutesLow;
         }
@@ -446,10 +519,10 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     }
     else
     {
-        sevenSegments0.set(Renderer2dSevenSegments::Display::number8);
-        sevenSegments1.set(Renderer2dSevenSegments::Display::number8);
-        sevenSegments2.set(Renderer2dSevenSegments::Display::number8);
-        sevenSegments3.set(Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
     }
 
     if (updateRender)
@@ -470,21 +543,14 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
                 Coordinates2d::Position const position(x, y);
 
-                QRgb & pixel = imageData_[y * imageWidth_ + x];
-
-                for (std::shared_ptr<Renderer2d> const & renderer : renderers)
+                Renderer2d::ValidityAndColor const renderResult = clockGui.evaluate(position);
+                if (renderResult.valid)
                 {
-                    assert(static_cast<bool>(renderer));
-                    Renderer2d::ValidityAndColor const renderResult = renderer->evaluate(position);
-                    if (renderResult.valid)
-                    {
-                        pixel = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
-                        break; // Don't look at further renderers.
-                    }
-                    else
-                    {
-                        // intentionally empty
-                    }
+                    imageData_[y * imageWidth_ + x] = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
+                }
+                else
+                {
+                    // intentionally empty
                 }
 
                 // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
