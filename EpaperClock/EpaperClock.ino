@@ -1,19 +1,2 @@
-
-// the setup function runs once when you press reset or power the board
-void setup()
-{
-	
-    while (true)
-    {
-        
-    }
-}
-
-
-void loop() 
-{
-	// this shall not be reached - if however, then reset here.
-    void(* resetFunc) (void) = 0;//declare reset function at address 0
-	resetFunc(); //call reset  
-}
-
+// Simply relay to actual hpp/cpp files [the C++ ClangCodeModel temporarily has problems with *.ino files]:
+#include "EpaperClock.hpp"
