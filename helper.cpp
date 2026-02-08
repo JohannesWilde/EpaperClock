@@ -480,49 +480,73 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     textFont.setPixelSize(textSize);
 
 
-    std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
-    std::time_t const nowTime = std::chrono::system_clock::to_time_t(now);
 
-    bool updateRender = true;
-    // MSVC
-    // static __inline errno_t __CRTDECL localtime_s(
-    //     _Out_ struct tm*    const _Tm,
-    //     _In_  time_t const* const _Time
-    //     )
-
-    struct tm nowLocal{0};
-    errno_t const success = localtime_s(&nowLocal, &nowTime);
-    if (0 == success)
+    std::chrono::steady_clock::time_point const steadyNow = std::chrono::steady_clock::now();
+    if (std::holds_alternative<std::monostate>(firstRender_))
     {
-        int const hours = nowLocal.tm_hour;
-        int const minutes = nowLocal.tm_min;
-
-        int const hoursLow = hours % 10;
-        int const hoursHigh = hours / 10;
-
-        int const minutesLow = minutes % 10;
-        int const minutesHigh = minutes / 10;
-
-        if (previousMinutesLow_ != minutesLow)
-        {
-            clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
-            clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
-            clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
-            clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
-
-            previousMinutesLow_ = minutesLow;
-        }
-        else
-        {
-            updateRender = false;
-        }
+        firstRender_ = steadyNow;
     }
     else
     {
-        clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        // intentionally empty
+    }
+
+
+    bool updateRender = true;
+
+    if (steadyNow == std::get<std::chrono::steady_clock::time_point>(firstRender_))
+    {
+        // Show all symbols for the first second.
+    }
+    else if (std::chrono::seconds(1) >= steadyNow - std::get<std::chrono::steady_clock::time_point>(firstRender_))
+    {
+        // But render only once.
+        updateRender = false;
+    }
+    else
+    {
+        std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
+
+        // MSVC
+        // static __inline errno_t __CRTDECL localtime_s(
+        //     _Out_ struct tm*    const _Tm,
+        //     _In_  time_t const* const _Time
+        //     )
+
+        struct tm nowLocal{0};
+        errno_t const success = localtime_s(&nowLocal, &nowTime);
+        if (0 == success)
+        {
+            int const hours = nowLocal.tm_hour;
+            int const minutes = nowLocal.tm_min;
+
+            int const hoursLow = hours % 10;
+            int const hoursHigh = hours / 10;
+
+            int const minutesLow = minutes % 10;
+            int const minutesHigh = minutes / 10;
+
+            if (previousMinutesLow_ != minutesLow)
+            {
+                clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+                clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+                clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+                clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+
+                previousMinutesLow_ = minutesLow;
+            }
+            else
+            {
+                updateRender = false;
+            }
+        }
+        else
+        {
+            clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        }
     }
 
     if (updateRender)

@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <memory>
+#include <variant>
 #include <vector>
 
 class Renderer2dClockGui;
@@ -38,6 +39,7 @@ private:
     std::vector<QRgb> imageData_;
     QImage image_;
 
+    std::variant<std::monostate, std::chrono::steady_clock::time_point> firstRender_;
     int previousMinutesLow_;
 
     std::shared_ptr<Renderer2dClockGui> clockGui_;
