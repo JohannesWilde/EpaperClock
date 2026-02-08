@@ -10,7 +10,12 @@
 #include <QWidget>
 
 #include <chrono>
+#include <memory>
 #include <vector>
+
+class Renderer2dClockGui;
+
+
 
 //! [0]
 class Helper
@@ -34,6 +39,8 @@ private:
     QImage image_;
 
     int previousMinutesLow_;
+
+    std::shared_ptr<Renderer2dClockGui> clockGui_;
 
 };
 //! [0]

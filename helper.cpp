@@ -359,6 +359,8 @@ static const Renderer2dRelative dotLower(&clockDot, Coordinates2d::Position(xOff
 
 } // namespace GuiFixtures
 
+} // namespace anonymous
+
 
 class Renderer2dClockGui : public Renderer2d
 {
@@ -448,10 +450,7 @@ private:
     Renderer2dRelative sevenSegments3Relative_;
 };
 
-static Renderer2dClockGui clockGui;
 
-
-} // namespace anonymous
 
 
 Helper::Helper()
@@ -460,6 +459,7 @@ Helper::Helper()
     , imageData_(imageWidth_ * imageHeight_)
     , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
     , previousMinutesLow_(-1)
+    , clockGui_(std::make_shared<Renderer2dClockGui>())
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -505,10 +505,10 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
         if (previousMinutesLow_ != minutesLow)
         {
-            clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
-            clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
-            clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
-            clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+            clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+            clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+            clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+            clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
 
             previousMinutesLow_ = minutesLow;
         }
@@ -519,10 +519,10 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     }
     else
     {
-        clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
     }
 
     if (updateRender)
@@ -543,7 +543,7 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
                 Coordinates2d::Position const position(x, y);
 
-                Renderer2d::ValidityAndColor const renderResult = clockGui.evaluate(position);
+                Renderer2d::ValidityAndColor const renderResult = clockGui_->evaluate(position);
                 if (renderResult.valid)
                 {
                     imageData_[y * imageWidth_ + x] = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
