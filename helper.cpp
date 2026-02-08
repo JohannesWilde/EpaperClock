@@ -570,7 +570,7 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
     if (updateRender)
     {
-        std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
+        // std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
         std::fill(imageData_.begin(), imageData_.end(), background.color().rgba());
 
@@ -604,9 +604,9 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
             // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
         }
 
-        std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
+        // std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
         // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
-        std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
+        // std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
 
         image_ = QImage(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32);
     }
