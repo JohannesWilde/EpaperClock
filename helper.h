@@ -40,6 +40,7 @@ private:
     QImage image_;
 
     std::variant<std::monostate, std::chrono::steady_clock::time_point> firstRender_;
+    bool reducedDisplaySymbols_;
     int previousMinutesLow_;
 
     std::shared_ptr<Renderer2dClockGui> clockGui_;

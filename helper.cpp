@@ -458,6 +458,7 @@ Helper::Helper()
     , imageHeight_(GuiFixtures::displayHeight)
     , imageData_(imageWidth_ * imageHeight_)
     , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
+    , reducedDisplaySymbols_(false)
     , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
 {
@@ -505,6 +506,24 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     }
     else
     {
+        if (not reducedDisplaySymbols_)
+        {
+            clockGui_->buttonUp.set(false);
+            clockGui_->buttonDown.set(false);
+            clockGui_->selection0.set(false);
+            clockGui_->selection1.set(false);
+            clockGui_->selection2.set(false);
+            clockGui_->selection3.set(false);
+            clockGui_->buttonDown.set(false);
+
+            reducedDisplaySymbols_ = true;
+        }
+        else
+        {
+            // intentionally empty
+        }
+
+
         std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
 
         // MSVC
