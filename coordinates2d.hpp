@@ -2,6 +2,8 @@
 #define COORDINATES_2D_HPP
 
 #include <iostream>
+#include <stdexcept>
+
 
 namespace Coordinates2d
 {
