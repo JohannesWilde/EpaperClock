@@ -95,7 +95,7 @@ Renderer2d::ValidityAndColor Renderer2dAxesAlignedRectangle::evaluate(Coordinate
     }
     else
     {
-        result.valid = false;
+        // result.valid = false;
     }
 
     return result;

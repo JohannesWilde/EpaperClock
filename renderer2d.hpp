@@ -16,23 +16,23 @@ public:
 
     struct ValidityAndColor
     {
-        ValidityAndColor()
+        constexpr ValidityAndColor()
             : valid(false)
             , color(0)
         {
             // inentionally empty
         }
-        ValidityAndColor(bool const valid, Color const color)
+        constexpr ValidityAndColor(bool const valid, Color const color)
             : valid(valid)
             , color(color)
         {
             // inentionally empty
         }
 
-        ValidityAndColor(ValidityAndColor const & other) = default;
-        ValidityAndColor(ValidityAndColor && other) = default;
-        ValidityAndColor & operator=(ValidityAndColor const & other) = default;
-        ValidityAndColor & operator=(ValidityAndColor && other) = default;
+        constexpr ValidityAndColor(ValidityAndColor const & other) = default;
+        constexpr ValidityAndColor(ValidityAndColor && other) = default;
+        constexpr ValidityAndColor & operator=(ValidityAndColor const & other) = default;
+        constexpr ValidityAndColor & operator=(ValidityAndColor && other) = default;
 
         bool valid;
         Color color;
@@ -41,11 +41,11 @@ public:
     virtual ValidityAndColor evaluate(Coordinates2d::Position const & position) const = 0;
 
 protected:
-    Renderer2d() = default;
-    Renderer2d(Renderer2d const & other) = default;
-    Renderer2d(Renderer2d && other) = default;
-    Renderer2d & operator=(Renderer2d const & other) = default;
-    Renderer2d & operator=(Renderer2d && other) = default;
+    constexpr Renderer2d() = default;
+    constexpr Renderer2d(Renderer2d const & other) = default;
+    constexpr Renderer2d(Renderer2d && other) = default;
+    constexpr Renderer2d & operator=(Renderer2d const & other) = default;
+    constexpr Renderer2d & operator=(Renderer2d && other) = default;
 };
 
 
@@ -67,7 +67,7 @@ class Renderer2dAxesAlignedRectangle : public Renderer2d
     }
 
 public:
-    Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner0,
+    constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner0,
                                    Coordinates2d::Position const corner1,
                                    Renderer2d::Color const color)
         : color_(color)
@@ -76,7 +76,7 @@ public:
         sortMinMaxTo_(corner0.y, corner1.y, &smallestCoordinate_.y, &biggestCoordinate_.y);
     }
 
-    Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner,
+    constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner,
                                    Coordinates2d::Dimension const dimension,
                                    Renderer2d::Color const color)
         : smallestCoordinate_(corner)
@@ -86,10 +86,10 @@ public:
         // intentionally empty
     }
 
-    Renderer2dAxesAlignedRectangle(Renderer2dAxesAlignedRectangle const & other) = default;
-    Renderer2dAxesAlignedRectangle(Renderer2dAxesAlignedRectangle && other) = default;
-    Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle const & other) = default;
-    Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle && other) = default;
+    constexpr Renderer2dAxesAlignedRectangle(Renderer2dAxesAlignedRectangle const & other) = default;
+    constexpr Renderer2dAxesAlignedRectangle(Renderer2dAxesAlignedRectangle && other) = default;
+    constexpr Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle const & other) = default;
+    constexpr Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle && other) = default;
 
     ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
 
@@ -106,7 +106,7 @@ private:
 class Renderer2dTriangle : public Renderer2d
 {
 public:
-    Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
+    constexpr Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
                        Renderer2d::Color const color)
         : corners_(corners)
         , color_(color)
@@ -114,7 +114,7 @@ public:
         // intentionally empty
     }
 
-    Renderer2dTriangle(Coordinates2d::Position const & corner0,
+    constexpr Renderer2dTriangle(Coordinates2d::Position const & corner0,
                        Coordinates2d::Position const & corner1,
                        Coordinates2d::Position const & corner2,
                        Renderer2d::Color const color)
@@ -124,10 +124,10 @@ public:
         // intentionally empty
     }
 
-    Renderer2dTriangle(Renderer2dTriangle const & other) = default;
-    Renderer2dTriangle(Renderer2dTriangle && other) = default;
-    Renderer2dTriangle & operator=(Renderer2dTriangle const & other) = default;
-    Renderer2dTriangle & operator=(Renderer2dTriangle && other) = default;
+    constexpr Renderer2dTriangle(Renderer2dTriangle const & other) = default;
+    constexpr Renderer2dTriangle(Renderer2dTriangle && other) = default;
+    constexpr Renderer2dTriangle & operator=(Renderer2dTriangle const & other) = default;
+    constexpr Renderer2dTriangle & operator=(Renderer2dTriangle && other) = default;
 
     ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
 
@@ -143,18 +143,18 @@ class Renderer2dRelative : public Renderer2d
 {
 public:
 
-    Renderer2dRelative(Renderer2d const * other,
-                       Coordinates2d::Position const & virtualOrigin)
+    constexpr Renderer2dRelative(Renderer2d const * other,
+                                 Coordinates2d::Position const & virtualOrigin)
         : renderer_(other)
         , offset_(-1 * virtualOrigin.x, -1 * virtualOrigin.y)
     {
         assert(nullptr != other);
     }
 
-    Renderer2dRelative(Renderer2dRelative const & other) = default;
-    Renderer2dRelative(Renderer2dRelative && other) = default;
-    Renderer2dRelative & operator=(Renderer2dRelative const & other) = default;
-    Renderer2dRelative & operator=(Renderer2dRelative && other) = default;
+    constexpr Renderer2dRelative(Renderer2dRelative const & other) = default;
+    constexpr Renderer2dRelative(Renderer2dRelative && other) = default;
+    constexpr Renderer2dRelative & operator=(Renderer2dRelative const & other) = default;
+    constexpr Renderer2dRelative & operator=(Renderer2dRelative && other) = default;
 
     ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
 
@@ -173,7 +173,7 @@ public:
 
     // None of the provided renderers must be nullptr.
     template<typename... Args>
-    Renderer2dAccumulated(Args&&... others)
+    constexpr Renderer2dAccumulated(Args&&... others)
         : renderers_{others...}
     {
 #ifndef NDEBUG
@@ -184,10 +184,10 @@ public:
 #endif // NDEBUG
     }
 
-    Renderer2dAccumulated(Renderer2dAccumulated const & other) = default;
-    Renderer2dAccumulated(Renderer2dAccumulated && other) = default;
-    Renderer2dAccumulated & operator=(Renderer2dAccumulated const & other) = default;
-    Renderer2dAccumulated & operator=(Renderer2dAccumulated && other) = default;
+    constexpr Renderer2dAccumulated(Renderer2dAccumulated const & other) = default;
+    constexpr Renderer2dAccumulated(Renderer2dAccumulated && other) = default;
+    constexpr Renderer2dAccumulated & operator=(Renderer2dAccumulated const & other) = default;
+    constexpr Renderer2dAccumulated & operator=(Renderer2dAccumulated && other) = default;
 
     ValidityAndColor evaluate(Coordinates2d::Position const & position) const override
     {
@@ -220,20 +220,30 @@ class Renderer2dEnabled : public Renderer2d
 {
 public:
 
-    Renderer2dEnabled(Renderer2d const * other,
-                      bool const enabled = true)
+    constexpr Renderer2dEnabled(Renderer2d const * other,
+                                bool const enabled = true)
         : renderer_(other)
         , enabled_(enabled)
     {
         // intentionally empty
     }
 
-    Renderer2dEnabled(Renderer2dEnabled const & other) = default;
-    Renderer2dEnabled(Renderer2dEnabled && other) = default;
-    Renderer2dEnabled & operator=(Renderer2dEnabled const & other) = default;
-    Renderer2dEnabled & operator=(Renderer2dEnabled && other) = default;
+    constexpr Renderer2dEnabled(Renderer2dEnabled const & other) = default;
+    constexpr Renderer2dEnabled(Renderer2dEnabled && other) = default;
+    constexpr Renderer2dEnabled & operator=(Renderer2dEnabled const & other) = default;
+    constexpr Renderer2dEnabled & operator=(Renderer2dEnabled && other) = default;
 
     ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+
+    constexpr void set(bool const enabled)
+    {
+        enabled_ = enabled;
+    }
+
+    constexpr bool get() const
+    {
+        return enabled_;
+    }
 
 private:
 
