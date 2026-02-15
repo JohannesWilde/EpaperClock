@@ -4,7 +4,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "helper.h"
+#include "helper.hpp"
 
 #include <QWidget>
 

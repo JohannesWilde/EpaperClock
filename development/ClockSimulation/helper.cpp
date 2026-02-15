@@ -1,7 +1,7 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#include "helper.h"
+#include "helper.hpp"
 #include "renderer2d.hpp"
 #include "renderer2dclockgui.hpp"
 

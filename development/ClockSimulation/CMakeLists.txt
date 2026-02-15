@@ -13,7 +13,7 @@ qt_standard_project_setup()
 qt_add_executable(${PROJECT_NAME}
     coordinates2d.cpp coordinates2d.hpp
     glwidget.cpp glwidget.h
-    helper.cpp helper.h
+    helper.cpp helper.hpp
     main.cpp
     window.cpp window.h
     renderer2d.hpp renderer2d.cpp
