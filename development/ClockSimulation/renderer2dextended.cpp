@@ -6,5 +6,5 @@ void Renderer2dButton::render(Coordinates2d::Position const & offset,
             Color * const data) const
 {
     rendererOutside_.render(offset, dimension, data);
-    rendererInside_.render(offset, dimension, data);
+    rendererInsideRelative_.render(offset, dimension, data);
 }

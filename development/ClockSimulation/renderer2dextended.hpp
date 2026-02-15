@@ -13,13 +13,13 @@ public:
                      Renderer2d::Color const outsideColor,
                      int const offsetInside,
                      Renderer2d::Color const insideColor)
-        : rendererOutside_(Coordinates2d::Position(0, 0),
-                           Coordinates2d::Position(0, 0) + Coordinates2d::Distance(outsideDimension.getX(), outsideDimension.getY()),
+        : rendererOutside_(outsideDimension,
                            outsideColor)
-        , rendererInside_(rendererOutside_.getSmallestCoordinate() + Coordinates2d::Distance(offsetInside, offsetInside),
-                          Coordinates2d::Dimension(constexpr_abs(rendererOutside_.getBiggestCoordinate().x - rendererOutside_.getSmallestCoordinate().x) - 2 * offsetInside,
-                                                   constexpr_abs(rendererOutside_.getBiggestCoordinate().y - rendererOutside_.getSmallestCoordinate().y) - 2 * offsetInside),
+        , rendererInside_(Coordinates2d::Dimension(outsideDimension.getX() - 2 * offsetInside,
+                                                   outsideDimension.getY() - 2 * offsetInside),
                           insideColor)
+        , rendererInsideRelative_(&rendererInside_,
+                                  Coordinates2d::Position(offsetInside, offsetInside))
     {
         assert(0 <= offsetInside);
     }
@@ -37,6 +37,7 @@ private:
 
     Renderer2dAxesAlignedRectangle rendererOutside_;
     Renderer2dAxesAlignedRectangle rendererInside_;
+    Renderer2dRelative rendererInsideRelative_;
 
 };
 

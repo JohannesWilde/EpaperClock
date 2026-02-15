@@ -101,8 +101,7 @@ constexpr static Renderer2dTriangle elementSelection{Coordinates2d::Position(0, 
 
 // Dots
 
-static Renderer2dAxesAlignedRectangle const clockDot{Coordinates2d::Position(0, 0),
-                                                     Coordinates2d::Dimension(lengthSegmentDots, lengthSegmentDots),
+static Renderer2dAxesAlignedRectangle const clockDot{Coordinates2d::Dimension(lengthSegmentDots, lengthSegmentDots),
                                                      /*outsideColor*/ Colors::black};
 
 
@@ -128,12 +127,10 @@ constexpr static Renderer2dTriangle sevenSegmentTriangleRight{Coordinates2d::Pos
                                                               Coordinates2d::Position(lengthSevenSegmentTriangle,   widthSevenSegment / 2),
                                                               /*color*/ Colors::black};
 
-static Renderer2dAxesAlignedRectangle const sevenSegmentXSquare{Coordinates2d::Position(0, 0),
-                                                                Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
+static Renderer2dAxesAlignedRectangle const sevenSegmentXSquare{Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
                                                                 /*color*/ 0};
 
-static Renderer2dAxesAlignedRectangle const sevenSegmentYSquare{Coordinates2d::Position(0, 0),
-                                                                Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
+static Renderer2dAxesAlignedRectangle const sevenSegmentYSquare{Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
                                                                 /*color*/ 0};
 
 

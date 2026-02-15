@@ -89,8 +89,8 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
     int const renderYStart = offset.y;
     int const renderYEnd = offset.y + dimension.getY();
 
-    int const rectangleYStart = smallestCoordinate_.y;
-    int const rectangleYEnd = biggestCoordinate_.y;
+    int const rectangleYStart = 0;
+    int const rectangleYEnd = dimension_.getY();
 
     int const actualYStart = std::max(renderYStart, rectangleYStart);
     int const actualYEnd = std::min(renderYEnd, rectangleYEnd);
@@ -102,8 +102,8 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
     int const renderXStart = offset.x;
     int const renderXEnd = offset.x + dimension.getX();
 
-    int const rectangleXStart = smallestCoordinate_.x;
-    int const rectangleXEnd = biggestCoordinate_.x;
+    int const rectangleXStart = 0;
+    int const rectangleXEnd = dimension_.getX();
 
     int const actualXStart = std::max(renderXStart, rectangleXStart);
     int const actualXEnd = std::min(renderXEnd, rectangleXEnd);

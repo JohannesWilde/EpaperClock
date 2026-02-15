@@ -45,20 +45,10 @@ class Renderer2dAxesAlignedRectangle : public Renderer2d
     }
 
 public:
-    constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner0,
-                                             Coordinates2d::Position const corner1,
-                                             Renderer2d::Color const color)
-        : color_(color)
-    {
-        sortMinMaxTo_(corner0.x, corner1.x, &smallestCoordinate_.x, &biggestCoordinate_.x);
-        sortMinMaxTo_(corner0.y, corner1.y, &smallestCoordinate_.y, &biggestCoordinate_.y);
-    }
 
-    constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner,
-                                             Coordinates2d::Dimension const dimension,
+    constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Dimension const dimension,
                                              Renderer2d::Color const color)
-        : smallestCoordinate_(corner)
-        , biggestCoordinate_(corner + Coordinates2d::Distance(dimension.getX(), dimension.getY()))
+        : dimension_(dimension)
         , color_(color)
     {
         // intentionally empty
@@ -74,20 +64,14 @@ public:
                 Color * const data) const override;
 
 
-    Coordinates2d::Position const & getSmallestCoordinate() const
+    Coordinates2d::Dimension const & getDimension() const
     {
-        return smallestCoordinate_;
-    }
-
-    Coordinates2d::Position const & getBiggestCoordinate() const
-    {
-        return biggestCoordinate_;
+        return dimension_;
     }
 
 private:
 
-    Coordinates2d::Position smallestCoordinate_;
-    Coordinates2d::Position biggestCoordinate_;
+    Coordinates2d::Dimension dimension_;
 
     Renderer2d::Color color_;
 
