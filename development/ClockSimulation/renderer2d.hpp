@@ -105,6 +105,7 @@ public:
 private:
 
     std::array<Coordinates2d::Position, 3> corners_;
+    size_t indexYCenter_;
     Renderer2d::Color color_;
 
 };
