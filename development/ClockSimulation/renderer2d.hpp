@@ -73,6 +73,17 @@ public:
                 Coordinates2d::Dimension const & dimension,
                 Color * const data) const override;
 
+
+    Coordinates2d::Position const & getSmallestCoordinate() const
+    {
+        return smallestCoordinate_;
+    }
+
+    Coordinates2d::Position const & getBiggestCoordinate() const
+    {
+        return biggestCoordinate_;
+    }
+
 private:
 
     Coordinates2d::Position smallestCoordinate_;

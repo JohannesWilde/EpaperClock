@@ -9,36 +9,19 @@ class Renderer2dButton : public Renderer2d
 {
 public:
 
-    Renderer2dButton(Coordinates2d::Position const outsideCorner0,
-                     Coordinates2d::Position const outsideCorner1,
+    Renderer2dButton(Coordinates2d::Dimension const & outsideDimension,
                      Renderer2d::Color const outsideColor,
                      int const offsetInside,
                      Renderer2d::Color const insideColor)
-        : rendererOutside_(outsideCorner0,
-                           outsideCorner1,
+        : rendererOutside_(Coordinates2d::Position(0, 0),
+                           Coordinates2d::Position(0, 0) + Coordinates2d::Distance(outsideDimension.getX(), outsideDimension.getY()),
                            outsideColor)
-        , rendererInside_(outsideCorner0 + Coordinates2d::Distance(offsetInside, offsetInside),
-                          Coordinates2d::Dimension(constexpr_abs(outsideCorner1.x - outsideCorner0.x) - 2 * offsetInside,
-                                                   constexpr_abs(outsideCorner1.y - outsideCorner0.y) - 2 * offsetInside),
+        , rendererInside_(rendererOutside_.getSmallestCoordinate() + Coordinates2d::Distance(offsetInside, offsetInside),
+                          Coordinates2d::Dimension(constexpr_abs(rendererOutside_.getBiggestCoordinate().x - rendererOutside_.getSmallestCoordinate().x) - 2 * offsetInside,
+                                                   constexpr_abs(rendererOutside_.getBiggestCoordinate().y - rendererOutside_.getSmallestCoordinate().y) - 2 * offsetInside),
                           insideColor)
     {
         assert(0 <= offsetInside);
-        assert(constexpr_abs(outsideCorner0.x - outsideCorner1.x) / 2 >= offsetInside);
-        assert(constexpr_abs(outsideCorner0.y - outsideCorner1.y) / 2 >= offsetInside);
-    }
-
-    Renderer2dButton(Coordinates2d::Position const outsideCorner,
-                     Coordinates2d::Dimension const outsideDimension,
-                     Renderer2d::Color const outsideColor,
-                     int const offsetInside,
-                     Renderer2d::Color const insideColor)
-        : Renderer2dButton(outsideCorner,
-                           outsideCorner + Coordinates2d::Distance(outsideDimension.getX(), outsideDimension.getY()),
-                           outsideColor,
-                           offsetInside,
-                           insideColor)
-    {
-        // intentionally empty
     }
 
     Renderer2dButton(Renderer2dButton const & other) = default;

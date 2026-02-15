@@ -68,8 +68,7 @@ static constexpr int yOffsetSegment = (visibleY - yLengthSevenSegments - (yOffse
 
 // Buttons
 
-static Renderer2dButton const buttonSquare{Coordinates2d::Position(0, 0),
-                                           Coordinates2d::Dimension(lengthButtons, lengthButtons),
+static Renderer2dButton const buttonSquare{Coordinates2d::Dimension(lengthButtons, lengthButtons),
                                            /*outsideColor*/ Colors::black,
                                            (lengthButtons - lengthButtonsInternal) / 2,
                                            /*insideColor*/ Colors::white};
