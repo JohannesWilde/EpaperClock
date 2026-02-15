@@ -82,19 +82,13 @@ class Renderer2dTriangle : public Renderer2d
 {
 public:
     constexpr Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
-                                 Renderer2d::Color const color)
-        : corners_(corners)
-        , color_(color)
-    {
-        // intentionally empty
-    }
+                                 Renderer2d::Color const color);
 
     constexpr Renderer2dTriangle(Coordinates2d::Position const & corner0,
                                  Coordinates2d::Position const & corner1,
                                  Coordinates2d::Position const & corner2,
                                  Renderer2d::Color const color)
-        : corners_{corner0, corner1, corner2, }
-        , color_(color)
+        : Renderer2dTriangle(std::array<Coordinates2d::Position, 3>{corner0, corner1, corner2, }, color)
     {
         // intentionally empty
     }

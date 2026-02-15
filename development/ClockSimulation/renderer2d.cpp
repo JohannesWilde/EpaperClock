@@ -142,6 +142,41 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
     }
 }
 
+constexpr Renderer2dTriangle::Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
+                                                 Color const color)
+    : corners_(corners)
+    , color_(color)
+{
+    // sort ascending in x [very inefficiently - but only once during construction]
+    for (size_t index = 0; (corners_.size() - 1) > index; )
+    {
+        size_t const nextIndex = index + 1;
+        if ((corners_[nextIndex].x < corners_[index].x) ||
+            ((corners_[nextIndex].x == corners_[index].x) && (corners_[nextIndex].y < corners_[index].y)))
+        {
+            // swap entries
+            {
+                int const temp = corners_[index].x;
+                corners_[index].x = corners_[nextIndex].x;
+                corners_[nextIndex].x = temp;
+            }
+
+            {
+                int const temp = corners_[index].y;
+                corners_[index].y = corners_[nextIndex].y;
+                corners_[nextIndex].y = temp;
+            }
+
+            // re-iterate swapping
+            index = 0;
+        }
+        else
+        {
+            ++index;
+        }
+    }
+}
+
 void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
                                 Coordinates2d::Dimension const & dimension,
                                 Color * const data) const
