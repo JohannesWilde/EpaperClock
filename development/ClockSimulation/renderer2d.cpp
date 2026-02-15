@@ -10,6 +10,37 @@
 namespace // anonymous
 {
 
+constexpr int roundedDivision(int const nominator, int const denominator)
+{
+    // Round away from 0.
+    int rounded = 0;
+    if (((nominator > 0) && (denominator > 0)) ||
+        ((nominator < 0) && (denominator < 0)))
+    {
+        rounded = nominator + (denominator / 2); // todo: handle int-overflow
+    }
+    else
+    {
+        rounded = nominator - (denominator / 2); // todo: handle int-overflow
+    }
+    return rounded / denominator;
+}
+
+// deltaLine.x must not be 0.
+constexpr int extraInterpolateX(Coordinates2d::Position const & linePoint0,
+                                Coordinates2d::Distance const & deltaLine,
+                                int const y)
+{
+    assert(0 != deltaLine.y);
+    assert((y == linePoint0.y) || (constexpr_abs(deltaLine.y) < constexpr_abs(std::numeric_limits<int>::max() / (y - linePoint0.y)))); // todo: handle int-overflow
+
+    int const deltaYScaled = deltaLine.x * (y - linePoint0.y); // todo: handle int-overflow
+
+    int const deltaXScaled = roundedDivision(deltaYScaled, deltaLine.y);
+
+    return deltaXScaled + linePoint0.x; // todo: handle int-overflow
+}
+
 // deltaLine.x must not be 0.
 constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
                                 Coordinates2d::Distance const & deltaLine,
@@ -18,21 +49,11 @@ constexpr int extraInterpolateY(Coordinates2d::Position const & linePoint0,
     assert(0 != deltaLine.x);
     assert((x == linePoint0.x) || (constexpr_abs(deltaLine.y) < constexpr_abs(std::numeric_limits<int>::max() / (x - linePoint0.x)))); // todo: handle int-overflow
 
-    int const deltaScaled = deltaLine.y * (x - linePoint0.x); // todo: handle int-overflow
+    int const deltaXScaled = deltaLine.y * (x - linePoint0.x); // todo: handle int-overflow
 
-    // Round away from 0.
-    int deltaRound = 0;
-    if (((deltaScaled > 0) && (deltaLine.x > 0)) ||
-        ((deltaScaled < 0) && (deltaLine.x < 0)))
-    {
-        deltaRound = deltaScaled + (deltaLine.x / 2); // todo: handle int-overflow
-    }
-    else
-    {
-        deltaRound = deltaScaled - (deltaLine.x / 2); // todo: handle int-overflow
-    }
+    int const deltaYScaled = roundedDivision(deltaXScaled, deltaLine.x);
 
-    return deltaRound / deltaLine.x + linePoint0.y; // todo: handle int-overflow
+    return deltaYScaled + linePoint0.y; // todo: handle int-overflow
 }
 
 bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
