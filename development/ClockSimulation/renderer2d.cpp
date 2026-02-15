@@ -146,67 +146,102 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
                                 Coordinates2d::Dimension const & dimension,
                                 Color * const data) const
 {
-    // ValidityAndColor result;
+    // determine corners to check
 
-    // // First check enclosing axes-aligned rectangle to contain the position [necessary condition].
-    // if (((corners_[0].x <= position.x) || (corners_[1].x <= position.x) || (corners_[2].x <= position.x)) &&
-    //     ((corners_[0].x >= position.x) || (corners_[1].x >= position.x) || (corners_[2].x >= position.x)) &&
-    //     ((corners_[0].y <= position.y) || (corners_[1].y <= position.y) || (corners_[2].y <= position.y)) &&
-    //     ((corners_[0].y >= position.y) || (corners_[1].y >= position.y) || (corners_[2].y >= position.y)))
-    // {
-    //     // Now check the point is actually contained in the triangle [sufficient condition].
-    //     bool insideTriangle = true;
+    // y ^
+    //   |       2
+    //   |      /\
+    //   |     /  \
+    //   |    / _ - 3
+    //   |   /-
+    //   |  1
+    //  -|-------------> x
+    Coordinates2d::Position const dataMax = offset + Coordinates2d::Distance(dimension.getX(), dimension.getY());
 
-    //     if (insideTriangle)
-    //     {
-    //         insideTriangle = checkSameSideOfLine_(corners_[0],
-    //                                               corners_[1],
-    //                                               corners_[2],
-    //                                               position);
-    //     }
-    //     else
-    //     {
-    //         // intentionally empty
-    //     }
-    //     if (insideTriangle)
-    //     {
-    //         insideTriangle = checkSameSideOfLine_(corners_[0],
-    //                                               corners_[2],
-    //                                               corners_[1],
-    //                                               position);
-    //     }
-    //     else
-    //     {
-    //         // intentionally empty
-    //     }
-    //     if (insideTriangle)
-    //     {
-    //         insideTriangle = checkSameSideOfLine_(corners_[1],
-    //                                               corners_[2],
-    //                                               corners_[0],
-    //                                               position);
-    //     }
-    //     else
-    //     {
-    //         // intentionally empty
-    //     }
+    // 1. check in y-range
+    if ((corners_[indicesYOrder_.min].y <= dataMax.y) &&
+        (corners_[indicesYOrder_.max].y >= offset.y))
+    {
+        // 2. check in x bounding rectangle
+        if ((corners_[/*x-min*/ 0].x <= dataMax.x) &&
+            (corners_[/*x-max*/ 2].x >= offset.x))
+        {
+            int const yMin = std::max(corners_[indicesYOrder_.min].y, offset.y);
+            int const yMax = std::min(corners_[indicesYOrder_.max].y, dataMax.y);
+            int const yCenter = corners_[indicesYOrder_.center].y;
 
-    //     if (insideTriangle)
-    //     {
-    //         result.valid = true;
-    //         result.color = color_;
-    //     }
-    //     else
-    //     {
-    //         result.valid = false;
-    //     }
-    // }
-    // else
-    // {
-    //     result.valid = false;
-    // }
+            for (int y = yMin; yMax >= y; ++y)
+            {
+                int triangleXBegin = 0;
+                int triangleXEnd = 0;
 
-    // return result;
+                // 3. Check min [1] --- max [2] line.
+                Coordinates2d::Distance const deltaLine1 = corners_[indicesYOrder_.min].distanceTo(corners_[indicesYOrder_.max]);
+                if (0 == deltaLine1.y)
+                {
+                    // x-line or single point - don't calculate gradient of infinity but simply compare to the 1 y-Value.
+                    triangleXBegin = corners_[/*x-min*/ 0].x;
+                    triangleXEnd = corners_[/*x-max*/ 2].x;
+                }
+                else
+                {
+                    // 4. determine y-center [3 in above graphic]
+                    size_t indexReference = std::numeric_limits<size_t>::max();
+                    if (yCenter <= y)
+                    {
+                        // a. y-center <= y: min [1] --- max [2], *max [2]* --- center [3]
+                        indexReference = indicesYOrder_.max;
+                    }
+                    else
+                    {
+                        // b. y-center >  y: min [1] --- max [2], *min [1]* --- center [3]
+                        indexReference = indicesYOrder_.min;
+                    }
+
+                    Coordinates2d::Distance const deltaLine2 = corners_[indicesYOrder_.center].distanceTo(corners_[indexReference]);
+                    if (0 == deltaLine2.y)
+                    {
+                        // "Horizontal" line - don't calculate gradient of infinity but simply compare to the 1 y-Value.
+                        triangleXBegin = corners_[indicesYOrder_.center].x;
+                        triangleXEnd = corners_[indexReference].x;
+                    }
+                    else
+                    {
+                        triangleXBegin = extraInterpolateX(corners_[indicesYOrder_.min], deltaLine1, y);
+                        triangleXEnd = extraInterpolateX(corners_[indicesYOrder_.center], deltaLine2, y);
+                    }
+                }
+
+                if (triangleXBegin > triangleXEnd)
+                {
+                    std::swap(triangleXBegin, triangleXEnd);
+                }
+                else
+                {
+                    // intentionally empty
+                }
+
+                // draw
+                int const relativeY = y - offset.y;
+
+                int const relativeXStart = triangleXBegin - offset.x;
+                int const relativeXEnd = triangleXEnd - offset.x;
+
+                for (int x = relativeXStart; relativeXEnd > x; ++x)
+                {
+                    data[relativeY * dimension.getX() + x] = color_;
+                }
+            }
+        }
+        else
+        {
+            // intentionally empty
+        }
+    }
+    else
+    {
+        // intentionally empty
+    }
 }
 
 void Renderer2dRelative::render(Coordinates2d::Position const & offset,
