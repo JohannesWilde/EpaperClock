@@ -86,22 +86,39 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
                                             Coordinates2d::Dimension const & dimension,
                                             Color * const data) const
 {
-    // ValidityAndColor result;
+    int const renderYStart = offset.y;
+    int const renderYEnd = offset.y + dimension.getY();
 
-    // if ((smallestCoordinate_.x <= position.x) &&
-    //     (biggestCoordinate_.x >= position.x)  &&
-    //     (smallestCoordinate_.y <= position.y) &&
-    //     (biggestCoordinate_.y >= position.y))
-    // {
-    //     result.valid = true;
-    //     result.color = color_;
-    // }
-    // else
-    // {
-    //     // result.valid = false;
-    // }
+    int const rectangleYStart = smallestCoordinate_.y;
+    int const rectangleYEnd = biggestCoordinate_.y;
 
-    // return result;
+    int const actualYStart = std::max(renderYStart, rectangleYStart);
+    int const actualYEnd = std::min(renderYEnd, rectangleYEnd);
+
+    int const relativeYStart = actualYStart - renderYStart;
+    int const relativeYEnd = actualYEnd - renderYStart;
+
+
+    int const renderXStart = offset.x;
+    int const renderXEnd = offset.x + dimension.getX();
+
+    int const rectangleXStart = smallestCoordinate_.x;
+    int const rectangleXEnd = biggestCoordinate_.x;
+
+    int const actualXStart = std::max(renderXStart, rectangleXStart);
+    int const actualXEnd = std::min(renderXEnd, rectangleXEnd);
+
+    int const relativeXStart = actualXStart - renderXStart;
+    int const relativeXEnd = actualXEnd - renderXStart;
+
+
+    for (int y = relativeYStart; relativeYEnd > y; ++y)
+    {
+        for (int x = relativeXStart; relativeXEnd > x; ++x)
+        {
+            data[y * dimension.getX() + x] = color_;
+        }
+    }
 }
 
 void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
@@ -175,8 +192,8 @@ void Renderer2dRelative::render(Coordinates2d::Position const & offset,
                                 Coordinates2d::Dimension const & dimension,
                                 Color * const data) const
 {
-    // Coordinates2d::Position const shiftedPosition = position + offset_;
-    // return renderer_->evaluate(shiftedPosition);
+    Coordinates2d::Position const shiftedOffset = offset + offset_;
+    renderer_->render(shiftedOffset, dimension, data);
 }
 
 
@@ -184,16 +201,12 @@ void Renderer2dEnabled::render(Coordinates2d::Position const & offset,
                                Coordinates2d::Dimension const & dimension,
                                Color * const data) const
 {
-    // Renderer2d::ValidityAndColor renderResult;
-
-    // if (enabled_)
-    // {
-    //     renderResult = renderer_->evaluate(position);
-    // }
-    // else
-    // {
-    //     // renderResult.valid = false;
-    // }
-
-    // return renderResult;
+    if (enabled_)
+    {
+        renderer_->render(offset, dimension, data);
+    }
+    else
+    {
+        // intentionally empty
+    }
 }
