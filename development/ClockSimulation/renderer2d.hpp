@@ -104,8 +104,33 @@ public:
 
 private:
 
+    struct IndexOrdering
+    {
+        IndexOrdering()
+            : min(3)
+            , center(3)
+            , max(3)
+        {
+            // intentionally empty
+        }
+
+        IndexOrdering(uint8_t const min,
+                      uint8_t const center,
+                      uint8_t const max)
+            : min(min)
+            , center(center)
+            , max(max)
+        {
+            // intentionally empty
+        }
+
+        uint8_t min : 2;
+        uint8_t center : 2;
+        uint8_t max : 2;
+    };
+
     std::array<Coordinates2d::Position, 3> corners_;
-    size_t indexYCenter_;
+    IndexOrdering indicesYOrder_;
     Renderer2d::Color color_;
 
 };

@@ -145,7 +145,6 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
 constexpr Renderer2dTriangle::Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
                                                  Color const color)
     : corners_(corners)
-    , indexYCenter_(std::numeric_limits<decltype(indexYCenter_)>::max())
     , color_(color)
 {
     // sort ascending in x [very inefficiently - but only once during construction]
@@ -177,18 +176,30 @@ constexpr Renderer2dTriangle::Renderer2dTriangle(std::array<Coordinates2d::Posit
         }
     }
 
-    for (size_t index = 0; corners_.size() > index; ++index)
+    static_assert(3 == std::tuple_size<decltype(corners_)>::value);
+    for (size_t index = 0; 3 > index; ++index)
     {
-        static_assert(3 == std::tuple_size<decltype(corners_)>::value);
         int const otherIndex1 = (index + 1) % 3;
         int const otherIndex2 = (index + 2) % 3;
 
-        if (((corners_[index].y >= corners_[otherIndex1].y) &&
-             (corners_[index].y <= corners_[otherIndex2].y)) ||
-            ((corners_[index].y <= corners_[otherIndex1].y) &&
-             (corners_[index].y >= corners_[otherIndex2].y)))
+        int const positionYIndex = corners_[index].y;
+        int const positionYOtherIndex1 = corners_[otherIndex1].y;
+        int const positionYOtherIndex2 = corners_[otherIndex2].y;
+
+        if ((positionYIndex >= positionYOtherIndex1) &&
+            (positionYIndex <= positionYOtherIndex2))
         {
-            indexYCenter_ = index;
+            indicesYOrder_.min = otherIndex1;
+            indicesYOrder_.center = index;
+            indicesYOrder_.max = otherIndex2;
+            break;
+        }
+        else if ((positionYIndex <= positionYOtherIndex1) &&
+                 (positionYIndex >= positionYOtherIndex2))
+        {
+            indicesYOrder_.min = otherIndex2;
+            indicesYOrder_.center = index;
+            indicesYOrder_.max = otherIndex1;
             break;
         }
         else
