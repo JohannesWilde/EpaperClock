@@ -10,6 +10,7 @@
 #include <QWidget>
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <variant>
 #include <vector>
@@ -36,6 +37,7 @@ private:
 
     int const imageWidth_;
     int const imageHeight_;
+    std::vector<uint8_t> renderData_;
     std::vector<QRgb> imageData_;
     QImage image_;
 

@@ -81,110 +81,119 @@ bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
 } // namespace anonymous
 
 
-Renderer2d::ValidityAndColor Renderer2dAxesAlignedRectangle::evaluate(Coordinates2d::Position const & position) const
+
+void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offset,
+                                            Coordinates2d::Dimension const & dimension,
+                                            Color * const data) const
 {
-    ValidityAndColor result;
+    // ValidityAndColor result;
 
-    if ((smallestCoordinate_.x <= position.x) &&
-        (biggestCoordinate_.x >= position.x)  &&
-        (smallestCoordinate_.y <= position.y) &&
-        (biggestCoordinate_.y >= position.y))
-    {
-        result.valid = true;
-        result.color = color_;
-    }
-    else
-    {
-        // result.valid = false;
-    }
+    // if ((smallestCoordinate_.x <= position.x) &&
+    //     (biggestCoordinate_.x >= position.x)  &&
+    //     (smallestCoordinate_.y <= position.y) &&
+    //     (biggestCoordinate_.y >= position.y))
+    // {
+    //     result.valid = true;
+    //     result.color = color_;
+    // }
+    // else
+    // {
+    //     // result.valid = false;
+    // }
 
-    return result;
+    // return result;
 }
 
-Renderer2d::ValidityAndColor Renderer2dTriangle::evaluate(Coordinates2d::Position const & position) const
+void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
+                                Coordinates2d::Dimension const & dimension,
+                                Color * const data) const
 {
-    ValidityAndColor result;
+    // ValidityAndColor result;
 
-    // First check enclosing axes-aligned rectangle to contain the position [necessary condition].
-    if (((corners_[0].x <= position.x) || (corners_[1].x <= position.x) || (corners_[2].x <= position.x)) &&
-        ((corners_[0].x >= position.x) || (corners_[1].x >= position.x) || (corners_[2].x >= position.x)) &&
-        ((corners_[0].y <= position.y) || (corners_[1].y <= position.y) || (corners_[2].y <= position.y)) &&
-        ((corners_[0].y >= position.y) || (corners_[1].y >= position.y) || (corners_[2].y >= position.y)))
-    {
-        // Now check the point is actually contained in the triangle [sufficient condition].
-        bool insideTriangle = true;
+    // // First check enclosing axes-aligned rectangle to contain the position [necessary condition].
+    // if (((corners_[0].x <= position.x) || (corners_[1].x <= position.x) || (corners_[2].x <= position.x)) &&
+    //     ((corners_[0].x >= position.x) || (corners_[1].x >= position.x) || (corners_[2].x >= position.x)) &&
+    //     ((corners_[0].y <= position.y) || (corners_[1].y <= position.y) || (corners_[2].y <= position.y)) &&
+    //     ((corners_[0].y >= position.y) || (corners_[1].y >= position.y) || (corners_[2].y >= position.y)))
+    // {
+    //     // Now check the point is actually contained in the triangle [sufficient condition].
+    //     bool insideTriangle = true;
 
-        if (insideTriangle)
-        {
-            insideTriangle = checkSameSideOfLine_(corners_[0],
-                                                  corners_[1],
-                                                  corners_[2],
-                                                  position);
-        }
-        else
-        {
-            // intentionally empty
-        }
-        if (insideTriangle)
-        {
-            insideTriangle = checkSameSideOfLine_(corners_[0],
-                                                  corners_[2],
-                                                  corners_[1],
-                                                  position);
-        }
-        else
-        {
-            // intentionally empty
-        }
-        if (insideTriangle)
-        {
-            insideTriangle = checkSameSideOfLine_(corners_[1],
-                                                  corners_[2],
-                                                  corners_[0],
-                                                  position);
-        }
-        else
-        {
-            // intentionally empty
-        }
+    //     if (insideTriangle)
+    //     {
+    //         insideTriangle = checkSameSideOfLine_(corners_[0],
+    //                                               corners_[1],
+    //                                               corners_[2],
+    //                                               position);
+    //     }
+    //     else
+    //     {
+    //         // intentionally empty
+    //     }
+    //     if (insideTriangle)
+    //     {
+    //         insideTriangle = checkSameSideOfLine_(corners_[0],
+    //                                               corners_[2],
+    //                                               corners_[1],
+    //                                               position);
+    //     }
+    //     else
+    //     {
+    //         // intentionally empty
+    //     }
+    //     if (insideTriangle)
+    //     {
+    //         insideTriangle = checkSameSideOfLine_(corners_[1],
+    //                                               corners_[2],
+    //                                               corners_[0],
+    //                                               position);
+    //     }
+    //     else
+    //     {
+    //         // intentionally empty
+    //     }
 
-        if (insideTriangle)
-        {
-            result.valid = true;
-            result.color = color_;
-        }
-        else
-        {
-            result.valid = false;
-        }
-    }
-    else
-    {
-        result.valid = false;
-    }
+    //     if (insideTriangle)
+    //     {
+    //         result.valid = true;
+    //         result.color = color_;
+    //     }
+    //     else
+    //     {
+    //         result.valid = false;
+    //     }
+    // }
+    // else
+    // {
+    //     result.valid = false;
+    // }
 
-    return result;
+    // return result;
 }
 
-Renderer2d::ValidityAndColor Renderer2dRelative::evaluate(Coordinates2d::Position const & position) const
+void Renderer2dRelative::render(Coordinates2d::Position const & offset,
+                                Coordinates2d::Dimension const & dimension,
+                                Color * const data) const
 {
-    Coordinates2d::Position const shiftedPosition = position + offset_;
-    return renderer_->evaluate(shiftedPosition);
+    // Coordinates2d::Position const shiftedPosition = position + offset_;
+    // return renderer_->evaluate(shiftedPosition);
 }
 
 
-Renderer2d::ValidityAndColor Renderer2dEnabled::evaluate(Coordinates2d::Position const & position) const
+void Renderer2dEnabled::render(Coordinates2d::Position const & offset,
+                               Coordinates2d::Dimension const & dimension,
+                               Color * const data) const
 {
-    Renderer2d::ValidityAndColor renderResult;
+    // Renderer2d::ValidityAndColor renderResult;
 
-    if (enabled_)
-    {
-        renderResult = renderer_->evaluate(position);
-    }
-    else
-    {
-        // renderResult.valid = false;
-    }
+    // if (enabled_)
+    // {
+    //     renderResult = renderer_->evaluate(position);
+    // }
+    // else
+    // {
+    //     // renderResult.valid = false;
+    // }
 
-    return renderResult;
+    // return renderResult;
 }

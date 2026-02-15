@@ -46,7 +46,9 @@ public:
     Renderer2dButton & operator=(Renderer2dButton const & other) = default;
     Renderer2dButton & operator=(Renderer2dButton && other) = default;
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override;
 
 private:
 

@@ -217,29 +217,21 @@ public:
     Renderer2dSevenSegments & operator=(Renderer2dSevenSegments const & other) = default;
     Renderer2dSevenSegments & operator=(Renderer2dSevenSegments && other) = default;
 
-    virtual ValidityAndColor evaluate(Coordinates2d::Position const & position) const
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override
     {
-        ValidityAndColor renderResult;
-        if ((xLengthSevenSegments > position.x) && (yLengthSevenSegments > position.y))
-        {
+        // if ((xLengthSevenSegments > position.x) && (yLengthSevenSegments > position.y))
+        // {
             for (Renderer2d const & renderer : segmentsEnabled_)
             {
-                renderResult = renderer.evaluate(position);
-                if (renderResult.valid)
-                {
-                    break; // Don't look at further renderers.
-                }
-                else
-                {
-                    // intentionally empty
-                }
+                renderer.render(offset, dimension, data);
             }
-        }
-        else
-        {
-            // intentionally empty
-        }
-        return renderResult;
+        // }
+        // else
+        // {
+        //     // intentionally empty
+        // }
     }
 
     void set(Display const display)
@@ -372,10 +364,11 @@ public:
         // intentionally empty
     }
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override
-    {
-        ValidityAndColor result;
 
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override
+    {
         for (Renderer2d const * const renderer : std::array<Renderer2d const *, 15>{
                  &sevenSegments0Relative_,
                  &sevenSegments1Relative_,
@@ -393,18 +386,8 @@ public:
                  &dotUpper,
                  &dotLower,})
         {
-            result = renderer->evaluate(position);
-            if (result.valid)
-            {
-                break; // Don't look at further renderers.
-            }
-            else
-            {
-                // intentionally empty
-            }
+            renderer->render(offset, dimension, data);
         }
-
-        return result;
     }
 
     Renderer2dEnabled buttonOnOff;

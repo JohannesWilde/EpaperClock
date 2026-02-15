@@ -14,31 +14,9 @@ public:
 
     typedef std::uint8_t Color;
 
-    struct ValidityAndColor
-    {
-        constexpr ValidityAndColor()
-            : valid(false)
-            , color(0)
-        {
-            // inentionally empty
-        }
-        constexpr ValidityAndColor(bool const valid, Color const color)
-            : valid(valid)
-            , color(color)
-        {
-            // inentionally empty
-        }
-
-        constexpr ValidityAndColor(ValidityAndColor const & other) = default;
-        constexpr ValidityAndColor(ValidityAndColor && other) = default;
-        constexpr ValidityAndColor & operator=(ValidityAndColor const & other) = default;
-        constexpr ValidityAndColor & operator=(ValidityAndColor && other) = default;
-
-        bool valid;
-        Color color;
-    };
-
-    virtual ValidityAndColor evaluate(Coordinates2d::Position const & position) const = 0;
+    virtual void render(Coordinates2d::Position const & offset,
+                        Coordinates2d::Dimension const & dimension,
+                        Color * const data) const = 0;
 
 protected:
     constexpr Renderer2d() = default;
@@ -68,8 +46,8 @@ class Renderer2dAxesAlignedRectangle : public Renderer2d
 
 public:
     constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner0,
-                                   Coordinates2d::Position const corner1,
-                                   Renderer2d::Color const color)
+                                             Coordinates2d::Position const corner1,
+                                             Renderer2d::Color const color)
         : color_(color)
     {
         sortMinMaxTo_(corner0.x, corner1.x, &smallestCoordinate_.x, &biggestCoordinate_.x);
@@ -77,8 +55,8 @@ public:
     }
 
     constexpr Renderer2dAxesAlignedRectangle(Coordinates2d::Position const corner,
-                                   Coordinates2d::Dimension const dimension,
-                                   Renderer2d::Color const color)
+                                             Coordinates2d::Dimension const dimension,
+                                             Renderer2d::Color const color)
         : smallestCoordinate_(corner)
         , biggestCoordinate_(corner + Coordinates2d::Distance(dimension.getX(), dimension.getY()))
         , color_(color)
@@ -91,7 +69,9 @@ public:
     constexpr Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle const & other) = default;
     constexpr Renderer2dAxesAlignedRectangle & operator=(Renderer2dAxesAlignedRectangle && other) = default;
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override;
 
 private:
 
@@ -107,7 +87,7 @@ class Renderer2dTriangle : public Renderer2d
 {
 public:
     constexpr Renderer2dTriangle(std::array<Coordinates2d::Position, 3> corners,
-                       Renderer2d::Color const color)
+                                 Renderer2d::Color const color)
         : corners_(corners)
         , color_(color)
     {
@@ -115,9 +95,9 @@ public:
     }
 
     constexpr Renderer2dTriangle(Coordinates2d::Position const & corner0,
-                       Coordinates2d::Position const & corner1,
-                       Coordinates2d::Position const & corner2,
-                       Renderer2d::Color const color)
+                                 Coordinates2d::Position const & corner1,
+                                 Coordinates2d::Position const & corner2,
+                                 Renderer2d::Color const color)
         : corners_{corner0, corner1, corner2, }
         , color_(color)
     {
@@ -129,7 +109,9 @@ public:
     constexpr Renderer2dTriangle & operator=(Renderer2dTriangle const & other) = default;
     constexpr Renderer2dTriangle & operator=(Renderer2dTriangle && other) = default;
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override;
 
 private:
 
@@ -156,7 +138,9 @@ public:
     constexpr Renderer2dRelative & operator=(Renderer2dRelative const & other) = default;
     constexpr Renderer2dRelative & operator=(Renderer2dRelative && other) = default;
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override;
 
 private:
 
@@ -189,24 +173,15 @@ public:
     constexpr Renderer2dAccumulated & operator=(Renderer2dAccumulated const & other) = default;
     constexpr Renderer2dAccumulated & operator=(Renderer2dAccumulated && other) = default;
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override
-    {
-        Renderer2d::ValidityAndColor renderResult;
 
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override
+    {
         for (Renderer2d const * const renderer : renderers_)
         {
-            renderResult = renderer->evaluate(position);
-            if (renderResult.valid)
-            {
-                break; // Don't look at further renderers.
-            }
-            else
-            {
-                // intentionally empty
-            }
+            renderer->render(offset, dimension, data);
         }
-
-        return renderResult;
     }
 
 private:
@@ -233,7 +208,9 @@ public:
     constexpr Renderer2dEnabled & operator=(Renderer2dEnabled const & other) = default;
     constexpr Renderer2dEnabled & operator=(Renderer2dEnabled && other) = default;
 
-    ValidityAndColor evaluate(Coordinates2d::Position const & position) const override;
+    void render(Coordinates2d::Position const & offset,
+                Coordinates2d::Dimension const & dimension,
+                Color * const data) const override;
 
     constexpr void set(bool const enabled)
     {

@@ -22,6 +22,7 @@
 Helper::Helper()
     : imageWidth_(GuiFixtures::displayWidth)
     , imageHeight_(GuiFixtures::displayHeight)
+    , renderData_(imageWidth_ * imageHeight_)
     , imageData_(imageWidth_ * imageHeight_)
     , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
     , reducedDisplaySymbols_(false)
@@ -138,41 +139,44 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     {
         // std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
-        std::fill(imageData_.begin(), imageData_.end(), background.color().rgba());
+        std::fill(renderData_.begin(), renderData_.end(), GuiFixtures::Colors::white);
 
         // std::chrono::steady_clock::time_point const startY = std::chrono::steady_clock::now();
 
-        for (int y = 0; image_.height() > y; ++y)
-        {
-            // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
+        // for (int y = 0; image_.height() > y; ++y)
+        // {
+        //     // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
 
-            for (int x = 0; image_.width() > x; ++x)
-            {
+        //     for (int x = 0; image_.width() > x; ++x)
+        //     {
                 // std::chrono::steady_clock::time_point const startR = std::chrono::steady_clock::now();
 
-                Coordinates2d::Position const position(x, y);
+                Coordinates2d::Position const offset(0, 0);
+                Coordinates2d::Dimension const dimension(imageWidth_, imageHeight_);
+                Renderer2d::Color * const data = renderData_.data();
 
-                Renderer2d::ValidityAndColor const renderResult = clockGui_->evaluate(position);
-                if (renderResult.valid)
-                {
-                    imageData_[y * imageWidth_ + x] = QColor(renderResult.color, renderResult.color, renderResult.color).rgba();
-                }
-                else
-                {
-                    // intentionally empty
-                }
+                clockGui_->render(offset, dimension, data);
 
                 // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
                 // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
-            }
+        //     }
 
-            // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
-            // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
-        }
+        //     // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
+        //     // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
+        // }
 
         // std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
         // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
         // std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
+
+        std::vector<Renderer2d::Color>::const_iterator render = renderData_.cbegin();
+        std::vector<Renderer2d::Color>::const_iterator renderEnd = renderData_.cend();
+        std::vector<QRgb>::iterator image = imageData_.begin();
+        for (; renderEnd > render; ++render, ++image)
+        {
+            Renderer2d::Color const color = *render;
+            *image = QColor(color, color, color).rgba();
+        }
 
         image_ = QImage(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32);
     }
