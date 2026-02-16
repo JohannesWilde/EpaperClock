@@ -133,11 +133,11 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
     int const relativeXEnd = actualXEnd - renderXStart;
 
 
-    for (int y = relativeYStart; relativeYEnd > y; ++y)
+    for (int y = relativeYStart; relativeYEnd >= y; ++y)
     {
-        for (int x = relativeXStart; relativeXEnd > x; ++x)
+        for (int x = relativeXStart; relativeXEnd >= x; ++x)
         {
-            data[y * dimension.getX() + x] = color_;
+            // data[y * dimension.getX() + x] = color_;
         }
     }
 }
@@ -227,7 +227,7 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
                 int const relativeXStart = triangleXBegin - offset.x;
                 int const relativeXEnd = triangleXEnd - offset.x;
 
-                for (int x = relativeXStart; relativeXEnd > x; ++x)
+                for (int x = relativeXStart; relativeXEnd >= x; ++x)
                 {
                     data[relativeY * dimension.getX() + x] = color_;
                 }
