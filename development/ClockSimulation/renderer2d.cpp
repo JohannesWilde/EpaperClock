@@ -10,10 +10,11 @@
 namespace // anonymous
 {
 
-constexpr int roundedDivision(int const nominator, int const denominator)
+template <typename T>
+constexpr T roundedDivision(T const nominator, T const denominator)
 {
     // Round away from 0.
-    int rounded = 0;
+    T rounded = 0;
     if (((nominator > 0) && (denominator > 0)) ||
         ((nominator < 0) && (denominator < 0)))
     {
@@ -36,7 +37,7 @@ constexpr int extraInterpolateX(Coordinates2d::Position const & linePoint0,
 
     int const deltaYScaled = deltaLine.x * (y - linePoint0.y); // todo: handle int-overflow
 
-    int const deltaXScaled = roundedDivision(deltaYScaled, deltaLine.y);
+    int const deltaXScaled = roundedDivision<int>(deltaYScaled, deltaLine.y);
 
     return deltaXScaled + linePoint0.x; // todo: handle int-overflow
 }
