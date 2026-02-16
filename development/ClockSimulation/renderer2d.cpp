@@ -108,7 +108,7 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
                                             Color * const data) const
 {
     int const renderYStart = offset.y;
-    int const renderYEnd = offset.y + dimension.getY();
+    int const renderYEnd = offset.y + dimension.getY() - 1; // Also works for dimension.getY() == 0.
 
     int const rectangleYStart = 0;
     int const rectangleYEnd = dimension_.getY();
@@ -121,7 +121,7 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
 
 
     int const renderXStart = offset.x;
-    int const renderXEnd = offset.x + dimension.getX();
+    int const renderXEnd = offset.x + dimension.getX() - 1; // Also works for dimension.getX() == 0.
 
     int const rectangleXStart = 0;
     int const rectangleXEnd = dimension_.getX();
@@ -137,7 +137,7 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
     {
         for (int x = relativeXStart; relativeXEnd >= x; ++x)
         {
-            // data[y * dimension.getX() + x] = color_;
+            data[y * dimension.getX() + x] = color_;
         }
     }
 }
@@ -156,7 +156,7 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
     //   |   /-
     //   |  1
     //  -|-------------> x
-    Coordinates2d::Position const dataMax = offset + Coordinates2d::Distance(dimension.getX(), dimension.getY());
+    Coordinates2d::Position const dataMax = offset + Coordinates2d::Distance(dimension.getX() - 1, dimension.getY() - 1);
 
     // 1. check in y-range
     if ((corners_[indicesYOrder_.min].y <= dataMax.y) &&
