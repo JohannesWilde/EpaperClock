@@ -228,7 +228,10 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
                 int const relativeXStart = triangleXBegin - offset.x;
                 int const relativeXEnd = triangleXEnd - offset.x;
 
-                for (int x = relativeXStart; relativeXEnd >= x; ++x)
+                int const boundedXStart = std::max(relativeXStart, offset.x);
+                int const boundedXEnd = std::min(relativeXEnd, dimension.getX() - 1);
+
+                for (int x = boundedXStart; boundedXEnd >= x; ++x)
                 {
                     data[relativeY * dimension.getX() + x] = color_;
                 }
