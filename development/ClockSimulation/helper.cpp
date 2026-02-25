@@ -135,39 +135,64 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
         }
     }
 
-    if (updateRender)
+    if (updateRender & (0 < imageWidth_) & (0 < imageHeight_))
     {
-        // std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
+        // todo: render in chunks of 1 kB a 4 Pixels per byte
+        // todo: fix dimensions [width - 1]
+
+        std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
 
         std::fill(renderData_.begin(), renderData_.end(), GuiFixtures::Colors::white);
 
         // std::chrono::steady_clock::time_point const startY = std::chrono::steady_clock::now();
 
-        // for (int y = 0; image_.height() > y; ++y)
-        // {
-        //     // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
+        size_t constexpr numberOfPixelsToRenderAtOnceMax = 1024 * 4;
+        size_t const numberOfLinesToRenderAtOnce = numberOfPixelsToRenderAtOnceMax / imageWidth_;
+        if (0 < numberOfLinesToRenderAtOnce)
+        {
 
-        //     for (int x = 0; image_.width() > x; ++x)
-        //     {
-                // std::chrono::steady_clock::time_point const startR = std::chrono::steady_clock::now();
+            for (int y = 0; image_.height() > y; y += numberOfLinesToRenderAtOnce)
+            {
+                // std::chrono::steady_clock::time_point const startX = std::chrono::steady_clock::now();
 
-                Coordinates2d::Position const offset(0, 0);
-                Coordinates2d::Dimension const dimension(imageWidth_, imageHeight_);
-                Renderer2d::Color * const data = renderData_.data();
+            //     for (int x = 0; image_.width() > x; ++x)
+            //     {
+                    // std::chrono::steady_clock::time_point const startR = std::chrono::steady_clock::now();
 
-                clockGui_->render(offset, dimension, data);
+                    Coordinates2d::Position const offset(0, y);
 
-                // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
-                // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
-        //     }
+                    size_t const remainingLines = imageHeight_ - y;
+                    size_t const linesToRenderNow = std::min(remainingLines, numberOfLinesToRenderAtOnce);
 
-        //     // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
-        //     // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
-        // }
+                    Coordinates2d::Dimension const dimension(imageWidth_, linesToRenderNow);
+                    Renderer2d::Color * const data = renderData_.data() + y * imageWidth_;
 
-        // std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
+                    clockGui_->render(offset, dimension, data);
+
+
+                    static Renderer2dTriangle triangleTest{Coordinates2d::Position(10, 30),
+                                                           Coordinates2d::Position(10, 30),
+                                                           Coordinates2d::Position(10, 30),
+                                                           /*color*/ 256 / 3};
+                    triangleTest.render(offset, dimension, data);
+
+                    // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
+                    // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
+            //     }
+
+                // std::chrono::steady_clock::time_point const endX = std::chrono::steady_clock::now();
+                // std::cout << "x: " << std::chrono::duration_cast<std::chrono::milliseconds>(endX - startX).count() << " ms" << std::endl;
+            }
+        }
+        else
+        {
+            // Render sub-lines.
+            assert(false);
+        }
+
+        std::chrono::steady_clock::time_point const endY = std::chrono::steady_clock::now();
         // std::cout << "y: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startY).count() << " ms" << std::endl;
-        // std::cout << "overall: " << std::chrono::duration_cast<std::chrono::milliseconds>(endY - startFill).count() << " ms" << std::endl;
+        std::cout << "overall: " << std::chrono::duration_cast<std::chrono::microseconds>(endY - startFill).count() << " us" << std::endl;
 
         std::vector<Renderer2d::Color>::const_iterator render = renderData_.cbegin();
         std::vector<Renderer2d::Color>::const_iterator renderEnd = renderData_.cend();
