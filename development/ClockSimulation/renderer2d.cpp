@@ -109,7 +109,7 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
                                             Color * const data) const
 {
     int const renderYStart = offset.y;
-    int const renderYEnd = offset.y + dimension.getY() - 1; // Also works for dimension.getY() == 0.
+    int const renderYEnd = offset.y + dimension.getY();
 
     int const rectangleYStart = 0;
     int const rectangleYEnd = dimension_.getY();
@@ -122,7 +122,7 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
 
 
     int const renderXStart = offset.x;
-    int const renderXEnd = offset.x + dimension.getX() - 1; // Also works for dimension.getX() == 0.
+    int const renderXEnd = offset.x + dimension.getX();
 
     int const rectangleXStart = 0;
     int const rectangleXEnd = dimension_.getX();
@@ -134,9 +134,9 @@ void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offs
     int const relativeXEnd = actualXEnd - renderXStart;
 
 
-    for (int y = relativeYStart; relativeYEnd >= y; ++y)
+    for (int y = relativeYStart; relativeYEnd > y; ++y)
     {
-        for (int x = relativeXStart; relativeXEnd >= x; ++x)
+        for (int x = relativeXStart; relativeXEnd > x; ++x)
         {
             data[y * dimension.getX() + x] = color_;
         }
