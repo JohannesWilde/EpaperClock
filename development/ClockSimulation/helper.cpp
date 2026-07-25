@@ -169,13 +169,6 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
                     clockGui_->render(offset, dimension, data);
 
-
-                    static Renderer2dTriangle triangleTest{Coordinates2d::Position(10, 30),
-                                                           Coordinates2d::Position(10, 30),
-                                                           Coordinates2d::Position(10, 30),
-                                                           /*color*/ 256 / 3};
-                    triangleTest.render(offset, dimension, data);
-
                     // std::chrono::steady_clock::time_point const endR = std::chrono::steady_clock::now();
                     // std::cout << "r [" << x << ", " << y << "]: " << std::chrono::duration_cast<std::chrono::microseconds>(endR - startR).count() << " us" << std::endl;
             //     }
