@@ -31,7 +31,7 @@ static constexpr int innerSpacingSevenSegmentElements = 3;
 static constexpr int horizontalLengthInterSegment = 10;
 static constexpr int lengthSegmentDots = 15;
 static constexpr int yDistanceDots = 20;
-static constexpr int lengthElementSelection = 11;
+static constexpr int lengthElementSelection = 10;
 static constexpr int xOffsetElementSelection = (widthSevenSegment + lengthXSevenSegmentSquare - lengthElementSelection) / 2 + innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle;
 static constexpr int yOffsetElementSelection = 4;
 // constexpr int  = ;
@@ -108,7 +108,7 @@ static Renderer2dAxesAlignedRectangle const clockDot{Coordinates2d::Dimension(le
 // Seven segment display
 
 constexpr static Renderer2dTriangle sevenSegmentTriangleUp{Coordinates2d::Position(0,                          lengthSevenSegmentTriangle),
-                                                           Coordinates2d::Position((widthSevenSegment) / 2,      0),
+                                                           Coordinates2d::Position(widthSevenSegment / 2,      0),
                                                            Coordinates2d::Position(widthSevenSegment,          lengthSevenSegmentTriangle),
                                                            /*color*/ Colors::black};
 
