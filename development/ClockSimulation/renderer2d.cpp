@@ -157,21 +157,21 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
     //   |   /-
     //   |  1
     //  -|-------------> x
-    Coordinates2d::Position const dataMax = offset + Coordinates2d::Distance(dimension.getX(), dimension.getY());
+    Coordinates2d::Position const dataMax = offset + Coordinates2d::Distance(dimension.getX() - 1, dimension.getY() - 1);
 
     // 1. check in y-range
-    if ((corners_[indicesYOrder_.min].y < dataMax.y) &&
-        (corners_[indicesYOrder_.max].y > offset.y))
+    if ((corners_[indicesYOrder_.min].y <= dataMax.y) &&
+        (corners_[indicesYOrder_.max].y >= offset.y))
     {
         // 2. check in x bounding rectangle
-        if ((corners_[/*x-min*/ 0].x < dataMax.x) &&
-            (corners_[/*x-max*/ 2].x > offset.x))
+        if ((corners_[/*x-min*/ 0].x <= dataMax.x) &&
+            (corners_[/*x-max*/ 2].x >= offset.x))
         {
             int const yMin = std::max(corners_[indicesYOrder_.min].y, offset.y);
             int const yMax = std::min(corners_[indicesYOrder_.max].y, dataMax.y);
             int const yCenter = corners_[indicesYOrder_.center].y;
 
-            for (int y = yMin; yMax > y; ++y)
+            for (int y = yMin; yMax >= y; ++y)
             {
                 int triangleXBegin = 0;
                 int triangleXEnd = 0;
@@ -229,9 +229,9 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
                 int const relativeXEnd = triangleXEnd - offset.x;
 
                 int const boundedXStart = std::max(relativeXStart, offset.x);
-                int const boundedXEnd = std::min(relativeXEnd, dimension.getX());
+                int const boundedXEnd = std::min(relativeXEnd, dimension.getX() - 1);
 
-                for (int x = boundedXStart; boundedXEnd > x; ++x)
+                for (int x = boundedXStart; boundedXEnd >= x; ++x)
                 {
                     data[relativeY * dimension.getX() + x] = color_;
                 }
