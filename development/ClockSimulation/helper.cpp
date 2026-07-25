@@ -76,12 +76,12 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
         if (not reducedDisplaySymbols_)
         {
             clockGui_->buttonUp.set(false);
-            clockGui_->buttonDown.set(false);
+            // clockGui_->buttonDown.set(false);
+            clockGui_->buttonSettingsRight.set(false);
             clockGui_->selection0.set(false);
             clockGui_->selection1.set(false);
             clockGui_->selection2.set(false);
             clockGui_->selection3.set(false);
-            clockGui_->buttonDown.set(false);
 
             reducedDisplaySymbols_ = true;
         }
