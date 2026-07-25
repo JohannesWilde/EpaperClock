@@ -73,6 +73,9 @@ static Renderer2dButton const buttonSquare{Coordinates2d::Dimension(lengthButton
                                            (lengthButtons - lengthButtonsInternal) / 2,
                                            /*insideColor*/ Colors::white};
 
+static Renderer2dAxesAlignedRectangle const buttonSquareFull{Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                                             /*outsideColor*/ Colors::black};
+
 constexpr static Renderer2dTriangle buttonTriangleUp{Coordinates2d::Position(0,                         lengthButtons - 1),
                                                      Coordinates2d::Position((lengthButtons - 1) / 2,   0),
                                                      Coordinates2d::Position(lengthButtons - 1,         lengthButtons - 1),
@@ -308,14 +311,15 @@ std::array<Renderer2dRelative const, 7> const Renderer2dSevenSegments::segmentsS
 
 
 // on/off
-static const Renderer2dRelative buttonOnOff(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown));
+static const Renderer2dRelative buttonSettings(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 0 * ySpacingButtons));
 // settings
-static const Renderer2dRelative buttonSettings(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons));
-static const Renderer2dRelative buttonSettingsRight(&buttonTriangleRight, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + ySpacingButtons));
+static const Renderer2dRelative buttonSettingsRight(&buttonTriangleRight, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 1 * ySpacingButtons));
 // up
 static const Renderer2dRelative buttonUp(&buttonTriangleUp, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons));
 // down
 static const Renderer2dRelative buttonDown(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons));
+// on/off
+static const Renderer2dRelative buttonOnOff(&buttonSquareFull, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons));
 
 // selections
 static const Renderer2dRelative selection0(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
@@ -339,9 +343,9 @@ public:
     Renderer2dClockGui()
         : buttonOnOff(&GuiFixtures::buttonOnOff)
         , buttonSettings(&GuiFixtures::buttonSettings)
-        , buttonSettingsRight(&GuiFixtures::buttonSettingsRight, false)
+        , buttonSettingsRight(&GuiFixtures::buttonSettingsRight)
         , buttonUp(&GuiFixtures::buttonUp)
-        , buttonDown(&GuiFixtures::buttonDown)
+        , buttonDown(&GuiFixtures::buttonDown, false)
         , selection0(&GuiFixtures::selection0)
         , selection1(&GuiFixtures::selection1)
         , selection2(&GuiFixtures::selection2)
