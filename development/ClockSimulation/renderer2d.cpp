@@ -100,8 +100,12 @@ bool checkSameSideOfLine_(Coordinates2d::Position const & linePoint0,
     return result;
 }
 
-} // namespace anonymous
 
+static constexpr size_t indexXOrderMin = 0;
+static constexpr size_t indexXOrderCenter = 1;
+static constexpr size_t indexXOrderMax = 2;
+
+} // namespace anonymous
 
 
 void Renderer2dAxesAlignedRectangle::render(Coordinates2d::Position const & offset,
@@ -164,8 +168,8 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
         (corners_[indicesYOrder_.max].y >= offset.y))
     {
         // 2. check in x bounding rectangle
-        if ((corners_[/*x-min*/ 0].x <= dataMax.x) &&
-            (corners_[/*x-max*/ 2].x >= offset.x))
+        if ((corners_[indexXOrderMin].x <= dataMax.x) &&
+            (corners_[indexXOrderMax].x >= offset.x))
         {
             int const yMin = std::max(corners_[indicesYOrder_.min].y, offset.y);
             int const yMax = std::min(corners_[indicesYOrder_.max].y, dataMax.y);
