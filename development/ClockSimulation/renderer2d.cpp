@@ -185,8 +185,8 @@ void Renderer2dTriangle::render(Coordinates2d::Position const & offset,
                 if (0 == deltaLine1.y)
                 {
                     // x-line or single point - don't calculate gradient of infinity but simply compare to the 1 y-Value.
-                    triangleXBegin = corners_[/*x-min*/ 0].x;
-                    triangleXEnd = corners_[/*x-max*/ 2].x;
+                    triangleXBegin = corners_[indexXOrderMin].x;
+                    triangleXEnd = corners_[indexXOrderMax].x;
                 }
                 else
                 {
