@@ -365,25 +365,21 @@ public:
                 Coordinates2d::Dimension const & dimension,
                 Color * const data) const override
     {
-        for (Renderer2d const * const renderer : std::array<Renderer2d const *, 15>{
-                 &sevenSegments0Relative_,
-                 &sevenSegments1Relative_,
-                 &sevenSegments2Relative_,
-                 &sevenSegments3Relative_,
-                 &buttonOnOff,
-                 &buttonSettings,
-                 &buttonSettingsRight,
-                 &buttonUp,
-                 &buttonDown,
-                 &selection0,
-                 &selection1,
-                 &selection2,
-                 &selection3,
-                 &dotUpper,
-                 &dotLower,})
-        {
-            renderer->render(offset, dimension, data);
-        }
+        sevenSegments0Relative_.render(offset, dimension, data);
+        sevenSegments1Relative_.render(offset, dimension, data);
+        sevenSegments2Relative_.render(offset, dimension, data);
+        sevenSegments3Relative_.render(offset, dimension, data);
+        buttonOnOff.render(offset, dimension, data);
+        buttonSettings.render(offset, dimension, data);
+        buttonSettingsRight.render(offset, dimension, data);
+        buttonUp.render(offset, dimension, data);
+        buttonDown.render(offset, dimension, data);
+        selection0.render(offset, dimension, data);
+        selection1.render(offset, dimension, data);
+        selection2.render(offset, dimension, data);
+        selection3.render(offset, dimension, data);
+        dotUpper.render(offset, dimension, data);
+        dotLower.render(offset, dimension, data);
     }
 
     Renderer2dEnabled buttonOnOff;
