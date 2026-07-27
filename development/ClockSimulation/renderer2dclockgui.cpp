@@ -1,5 +1,104 @@
 #include "renderer2dclockgui.hpp"
 
+
+namespace GuiFixtures
+{
+
+Renderer2dButton const buttonSquare{Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                    /*outsideColor*/ Colors::black,
+                                    (lengthButtons - lengthButtonsInternal) / 2,
+                                    /*insideColor*/ Colors::white};
+
+Renderer2dAxesAlignedRectangle const buttonSquareFull{Coordinates2d::Dimension(lengthButtons, lengthButtons),
+                                                      /*outsideColor*/ Colors::black};
+
+Renderer2dTriangle const buttonTriangleUp{Coordinates2d::Position(0,                         lengthButtons - 1),
+                                          Coordinates2d::Position((lengthButtons - 1) / 2,   0),
+                                          Coordinates2d::Position(lengthButtons - 1,         lengthButtons - 1),
+                                          /*color*/ Colors::black};
+
+Renderer2dTriangle const buttonTriangleDown{Coordinates2d::Position(0,                       0),
+                                            Coordinates2d::Position((lengthButtons - 1) / 2, lengthButtons - 1),
+                                            Coordinates2d::Position(lengthButtons - 1,       0),
+                                            /*color*/ Colors::black};
+
+Renderer2dTriangle const buttonTriangleLeft{Coordinates2d::Position(lengthButtons - 1,   0),
+                                            Coordinates2d::Position(0,                   (lengthButtons - 1) / 2),
+                                            Coordinates2d::Position(0,                   lengthButtons - 1),
+                                            /*color*/ Colors::black};
+
+Renderer2dTriangle const buttonTriangleRight{Coordinates2d::Position(0,                   0),
+                                             Coordinates2d::Position(0,                   lengthButtons - 1),
+                                             Coordinates2d::Position(lengthButtons - 1,   (lengthButtons - 1) / 2),
+                                             /*color*/ Colors::black};
+
+// Element selection [triangle up]
+Renderer2dTriangle const elementSelection{Coordinates2d::Position(0,                                 (lengthElementSelection - 1)),
+                                          Coordinates2d::Position((lengthElementSelection - 1)/ 2,   0),
+                                          Coordinates2d::Position((lengthElementSelection - 1),      (lengthElementSelection - 1)),
+                                          /*color*/ Colors::black};
+
+// Dots
+
+Renderer2dAxesAlignedRectangle const clockDot{Coordinates2d::Dimension(lengthSegmentDots, lengthSegmentDots),
+                                              /*outsideColor*/ Colors::black};
+
+
+// Seven segment display
+
+Renderer2dTriangle const sevenSegmentTriangleUp{Coordinates2d::Position(0,                               lengthSevenSegmentTriangle - 1),
+                                                Coordinates2d::Position((widthSevenSegment - 1) / 2,     0),
+                                                Coordinates2d::Position(widthSevenSegment - 1,           lengthSevenSegmentTriangle - 1),
+                                                /*color*/ Colors::black};
+
+Renderer2dTriangle const sevenSegmentTriangleDown{Coordinates2d::Position(0,                             0),
+                                                  Coordinates2d::Position((widthSevenSegment - 1) / 2,   lengthSevenSegmentTriangle - 1),
+                                                  Coordinates2d::Position((widthSevenSegment - 1),       0),
+                                                  /*color*/ Colors::black};
+
+Renderer2dTriangle const sevenSegmentTriangleLeft{Coordinates2d::Position((lengthSevenSegmentTriangle - 1),  0),
+                                                  Coordinates2d::Position(0,                                 (widthSevenSegment - 1) / 2),
+                                                  Coordinates2d::Position((lengthSevenSegmentTriangle - 1),  (widthSevenSegment - 1)),
+                                                  /*color*/ Colors::black};
+
+Renderer2dTriangle const sevenSegmentTriangleRight{Coordinates2d::Position(0,                                0),
+                                                   Coordinates2d::Position(0,                                (widthSevenSegment - 1)),
+                                                   Coordinates2d::Position(lengthSevenSegmentTriangle - 1,   (widthSevenSegment - 1) / 2),
+                                                   /*color*/ Colors::black};
+
+Renderer2dAxesAlignedRectangle const sevenSegmentXSquare{Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
+                                                         /*color*/ 0};
+
+Renderer2dAxesAlignedRectangle const sevenSegmentYSquare{Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
+                                                         /*color*/ 0};
+
+
+Renderer2dRelative const sevenSegmentTriangleLeftShifted{&sevenSegmentTriangleLeft, Coordinates2d::Position(innerSpacingSevenSegmentElements, 0)};
+Renderer2dRelative const sevenSegmentXSquareShifted{&sevenSegmentXSquare, Coordinates2d::Position(innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle, 0)};
+Renderer2dRelative const sevenSegmentTriangleRightShifted{&sevenSegmentTriangleRight, Coordinates2d::Position(innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle + lengthXSevenSegmentSquare, 0)};
+
+Renderer2dAccumulated<3> const sevenSegmentXElement{&sevenSegmentTriangleLeftShifted, &sevenSegmentXSquareShifted, &sevenSegmentTriangleRightShifted};
+
+
+Renderer2dRelative const sevenSegmentTriangleUpShifted{&sevenSegmentTriangleUp, Coordinates2d::Position(0, innerSpacingSevenSegmentElements)};
+Renderer2dRelative const sevenSegmentYSquareShifted{&sevenSegmentYSquare, Coordinates2d::Position(0, innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle)};
+Renderer2dRelative const sevenSegmentTriangleDownShifted{&sevenSegmentTriangleDown, Coordinates2d::Position(0, innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle + lengthYSevenSegmentSquare)};
+
+Renderer2dAccumulated<3> const sevenSegmentYElement{&sevenSegmentTriangleUpShifted, &sevenSegmentYSquareShifted, &sevenSegmentTriangleDownShifted};
+
+
+Renderer2dRelative const segmentShifted0_(&sevenSegmentYElement, Coordinates2d::Position(0, yOffsetSegment + widthSevenSegment / 2));
+Renderer2dRelative const segmentShifted1_(&sevenSegmentYElement, Coordinates2d::Position(0, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment));
+Renderer2dRelative const segmentShifted2_(&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2));
+Renderer2dRelative const segmentShifted3_(&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment));
+
+Renderer2dRelative const segmentShifted4_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 0));
+Renderer2dRelative const segmentShifted5_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, ySpacingSevenSegment));
+Renderer2dRelative const segmentShifted6_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 2 * ySpacingSevenSegment));
+
+} // namespace GuiFixtures
+
+
 using namespace GuiFixtures;
 
 std::array<Renderer2dRelative const, 7> const Renderer2dSevenSegments::segmentsShifted_{

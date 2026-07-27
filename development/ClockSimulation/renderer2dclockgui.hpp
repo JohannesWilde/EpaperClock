@@ -17,148 +17,92 @@ public:
     static constexpr Renderer2d::Color white = 255;
 };
 
-static constexpr int displayWidth = 264;
-static constexpr int displayHeight = 176;
-static constexpr int spareSpaceOutside = 0;
-static constexpr int lengthButtons = 13;
-static constexpr int lengthButtonsInternal = 6;
-static constexpr int horizontalOffsetButtonsClock = 10;
-static constexpr int widthSevenSegment = 11;
-static constexpr int lengthXSevenSegmentSquare = 18;
-static constexpr int lengthYSevenSegmentSquare = 57;
-static constexpr int lengthSevenSegmentTriangle = 6;
-static constexpr int innerSpacingSevenSegmentElements = 3;
-static constexpr int horizontalLengthInterSegment = 10;
-static constexpr int lengthSegmentDots = 13;
-static constexpr int yDistanceDots = 22;
-static constexpr int lengthElementSelection = 11;
-static constexpr int xOffsetElementSelection = (widthSevenSegment + lengthXSevenSegmentSquare - lengthElementSelection) / 2 + innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle;
-static constexpr int yOffsetElementSelection = 4;
-// constexpr int  = ;
+constexpr int displayWidth = 264;
+constexpr int displayHeight = 176;
+constexpr int spareSpaceOutside = 0;
+constexpr int lengthButtons = 13;
+constexpr int lengthButtonsInternal = 6;
+constexpr int horizontalOffsetButtonsClock = 10;
+constexpr int widthSevenSegment = 11;
+constexpr int lengthXSevenSegmentSquare = 18;
+constexpr int lengthYSevenSegmentSquare = 57;
+constexpr int lengthSevenSegmentTriangle = 6;
+constexpr int innerSpacingSevenSegmentElements = 3;
+constexpr int horizontalLengthInterSegment = 10;
+constexpr int lengthSegmentDots = 13;
+constexpr int yDistanceDots = 22;
+constexpr int lengthElementSelection = 11;
+constexpr int xOffsetElementSelection = (widthSevenSegment + lengthXSevenSegmentSquare - lengthElementSelection) / 2 + innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle;
+constexpr int yOffsetElementSelection = 4;
 
 // (0, 0) is at top left.
 // x [first index - width] goes to the right. y [second index - height] goes down.
 
-static constexpr int visibleX = (displayWidth - 2 * spareSpaceOutside);
-static constexpr int visibleY = (displayHeight - 2 * spareSpaceOutside);
+constexpr int visibleX = (displayWidth - 2 * spareSpaceOutside);
+constexpr int visibleY = (displayHeight - 2 * spareSpaceOutside);
 
-static constexpr int numberOfButtons = 4;
-static constexpr int ySpacingButtons = (displayHeight - 2 * spareSpaceOutside) / numberOfButtons;
-static constexpr int xOffsetButtonDown = spareSpaceOutside;
-static constexpr int yOffsetButtonDown = spareSpaceOutside + ySpacingButtons / 2 - lengthButtons / 2;
-static constexpr int offsetButtonDownInternal = (lengthButtons - lengthButtonsInternal) / 2;
-static constexpr int xOffsetButtonDownInternal = xOffsetButtonDown + offsetButtonDownInternal;
-static constexpr int yOffsetButtonDownInternal = yOffsetButtonDown + offsetButtonDownInternal;
+constexpr int numberOfButtons = 4;
+constexpr int ySpacingButtons = (displayHeight - 2 * spareSpaceOutside) / numberOfButtons;
+constexpr int xOffsetButtonDown = spareSpaceOutside;
+constexpr int yOffsetButtonDown = spareSpaceOutside + ySpacingButtons / 2 - lengthButtons / 2;
+constexpr int offsetButtonDownInternal = (lengthButtons - lengthButtonsInternal) / 2;
+constexpr int xOffsetButtonDownInternal = xOffsetButtonDown + offsetButtonDownInternal;
+constexpr int yOffsetButtonDownInternal = yOffsetButtonDown + offsetButtonDownInternal;
 
-static constexpr int xSpacingSevenSegment = lengthXSevenSegmentSquare + 2 * lengthSevenSegmentTriangle + 2 * innerSpacingSevenSegmentElements;
-static constexpr int ySpacingSevenSegment = lengthYSevenSegmentSquare + 2 * lengthSevenSegmentTriangle + 2 * innerSpacingSevenSegmentElements;
-static constexpr int xLengthSevenSegments = xSpacingSevenSegment + widthSevenSegment;
-static constexpr int yLengthSevenSegments = 2 * ySpacingSevenSegment + widthSevenSegment;
-static constexpr int xSpacingSevenSegments = xLengthSevenSegments + horizontalLengthInterSegment;
-static constexpr int xOffsetSegment0 = xOffsetButtonDown + lengthButtons + horizontalOffsetButtonsClock;
-static constexpr int yOffsetSegment = (visibleY - yLengthSevenSegments - (yOffsetElementSelection + lengthElementSelection)) / 2;
-// constexpr int  = ;
-// constexpr int  = ;
-// constexpr int  = ;
-// constexpr int  = ;
-// constexpr int  = ;
-// constexpr int  = ;
-// constexpr int  = ;
-// constexpr int  = ;
+constexpr int xSpacingSevenSegment = lengthXSevenSegmentSquare + 2 * lengthSevenSegmentTriangle + 2 * innerSpacingSevenSegmentElements;
+constexpr int ySpacingSevenSegment = lengthYSevenSegmentSquare + 2 * lengthSevenSegmentTriangle + 2 * innerSpacingSevenSegmentElements;
+constexpr int xLengthSevenSegments = xSpacingSevenSegment + widthSevenSegment;
+constexpr int yLengthSevenSegments = 2 * ySpacingSevenSegment + widthSevenSegment;
+constexpr int xSpacingSevenSegments = xLengthSevenSegments + horizontalLengthInterSegment;
+constexpr int xOffsetSegment0 = xOffsetButtonDown + lengthButtons + horizontalOffsetButtonsClock;
+constexpr int yOffsetSegment = (visibleY - yLengthSevenSegments - (yOffsetElementSelection + lengthElementSelection)) / 2;
 
 // Buttons
 
-static Renderer2dButton const buttonSquare{Coordinates2d::Dimension(lengthButtons, lengthButtons),
-                                           /*outsideColor*/ Colors::black,
-                                           (lengthButtons - lengthButtonsInternal) / 2,
-                                           /*insideColor*/ Colors::white};
-
-static Renderer2dAxesAlignedRectangle const buttonSquareFull{Coordinates2d::Dimension(lengthButtons, lengthButtons),
-                                                             /*outsideColor*/ Colors::black};
-
-constexpr static Renderer2dTriangle buttonTriangleUp{Coordinates2d::Position(0,                         lengthButtons - 1),
-                                                     Coordinates2d::Position((lengthButtons - 1) / 2,   0),
-                                                     Coordinates2d::Position(lengthButtons - 1,         lengthButtons - 1),
-                                                     /*color*/ Colors::black};
-
-constexpr static Renderer2dTriangle buttonTriangleDown{Coordinates2d::Position(0,                       0),
-                                                       Coordinates2d::Position((lengthButtons - 1) / 2, lengthButtons - 1),
-                                                       Coordinates2d::Position(lengthButtons - 1,       0),
-                                                       /*color*/ Colors::black};
-
-constexpr static Renderer2dTriangle buttonTriangleLeft{Coordinates2d::Position(lengthButtons - 1,   0),
-                                                       Coordinates2d::Position(0,                   (lengthButtons - 1) / 2),
-                                                       Coordinates2d::Position(0,                   lengthButtons - 1),
-                                                       /*color*/ Colors::black};
-
-constexpr static Renderer2dTriangle buttonTriangleRight{Coordinates2d::Position(0,                   0),
-                                                        Coordinates2d::Position(0,                   lengthButtons - 1),
-                                                        Coordinates2d::Position(lengthButtons - 1,   (lengthButtons - 1) / 2),
-                                                        /*color*/ Colors::black};
+extern Renderer2dButton const buttonSquare;
+extern Renderer2dAxesAlignedRectangle const buttonSquareFull;
+extern Renderer2dTriangle const buttonTriangleUp;
+extern Renderer2dTriangle const buttonTriangleDown;
+extern Renderer2dTriangle const buttonTriangleLeft;
+extern Renderer2dTriangle const buttonTriangleRight;
 
 // Element selection [triangle up]
-constexpr static Renderer2dTriangle elementSelection{Coordinates2d::Position(0,                                 (lengthElementSelection - 1)),
-                                                     Coordinates2d::Position((lengthElementSelection - 1)/ 2,   0),
-                                                     Coordinates2d::Position((lengthElementSelection - 1),      (lengthElementSelection - 1)),
-                                                     /*color*/ Colors::black};
+extern Renderer2dTriangle const elementSelection;
 
 // Dots
-
-static Renderer2dAxesAlignedRectangle const clockDot{Coordinates2d::Dimension(lengthSegmentDots, lengthSegmentDots),
-                                                     /*outsideColor*/ Colors::black};
+extern Renderer2dAxesAlignedRectangle const clockDot;
 
 
 // Seven segment display
 
-constexpr static Renderer2dTriangle sevenSegmentTriangleUp{Coordinates2d::Position(0,                               lengthSevenSegmentTriangle - 1),
-                                                           Coordinates2d::Position((widthSevenSegment - 1) / 2,     0),
-                                                           Coordinates2d::Position(widthSevenSegment - 1,           lengthSevenSegmentTriangle - 1),
-                                                           /*color*/ Colors::black};
+extern Renderer2dTriangle const sevenSegmentTriangleUp;
+extern Renderer2dTriangle const sevenSegmentTriangleDown;
+extern Renderer2dTriangle const sevenSegmentTriangleLeft;
+extern Renderer2dTriangle const sevenSegmentTriangleRight;
 
-constexpr static Renderer2dTriangle sevenSegmentTriangleDown{Coordinates2d::Position(0,                             0),
-                                                             Coordinates2d::Position((widthSevenSegment - 1) / 2,   lengthSevenSegmentTriangle - 1),
-                                                             Coordinates2d::Position((widthSevenSegment - 1),       0),
-                                                             /*color*/ Colors::black};
+extern Renderer2dAxesAlignedRectangle const sevenSegmentXSquare;
+extern Renderer2dAxesAlignedRectangle const sevenSegmentYSquare;
 
-constexpr static Renderer2dTriangle sevenSegmentTriangleLeft{Coordinates2d::Position((lengthSevenSegmentTriangle - 1),  0),
-                                                             Coordinates2d::Position(0,                                 (widthSevenSegment - 1) / 2),
-                                                             Coordinates2d::Position((lengthSevenSegmentTriangle - 1),  (widthSevenSegment - 1)),
-                                                             /*color*/ Colors::black};
+extern Renderer2dRelative const sevenSegmentTriangleLeftShifted;
+extern Renderer2dRelative const sevenSegmentXSquareShifted;
+extern Renderer2dRelative const sevenSegmentTriangleRightShifted;
 
-constexpr static Renderer2dTriangle sevenSegmentTriangleRight{Coordinates2d::Position(0,                                0),
-                                                              Coordinates2d::Position(0,                                (widthSevenSegment - 1)),
-                                                              Coordinates2d::Position(lengthSevenSegmentTriangle - 1,   (widthSevenSegment - 1) / 2),
-                                                              /*color*/ Colors::black};
+extern Renderer2dAccumulated<3> const sevenSegmentXElement;
 
-static Renderer2dAxesAlignedRectangle const sevenSegmentXSquare{Coordinates2d::Dimension(lengthXSevenSegmentSquare, widthSevenSegment),
-                                                                /*color*/ 0};
+extern Renderer2dRelative const sevenSegmentTriangleUpShifted;
+extern Renderer2dRelative const sevenSegmentYSquareShifted;
+extern Renderer2dRelative const sevenSegmentTriangleDownShifted;
 
-static Renderer2dAxesAlignedRectangle const sevenSegmentYSquare{Coordinates2d::Dimension(widthSevenSegment, lengthYSevenSegmentSquare),
-                                                                /*color*/ 0};
+extern Renderer2dAccumulated<3> const sevenSegmentYElement;
 
+extern Renderer2dRelative const segmentShifted0_;
+extern Renderer2dRelative const segmentShifted1_;
+extern Renderer2dRelative const segmentShifted2_;
+extern Renderer2dRelative const segmentShifted3_;
 
-constexpr static Renderer2dRelative sevenSegmentTriangleLeftShifted{&sevenSegmentTriangleLeft, Coordinates2d::Position(innerSpacingSevenSegmentElements, 0)};
-constexpr static Renderer2dRelative sevenSegmentXSquareShifted{&sevenSegmentXSquare, Coordinates2d::Position(innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle, 0)};
-constexpr static Renderer2dRelative sevenSegmentTriangleRightShifted{&sevenSegmentTriangleRight, Coordinates2d::Position(innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle + lengthXSevenSegmentSquare, 0)};
-
-static Renderer2dAccumulated<3> const sevenSegmentXElement{&sevenSegmentTriangleLeftShifted, &sevenSegmentXSquareShifted, &sevenSegmentTriangleRightShifted};
-
-
-constexpr static Renderer2dRelative sevenSegmentTriangleUpShifted{&sevenSegmentTriangleUp, Coordinates2d::Position(0, innerSpacingSevenSegmentElements)};
-constexpr static Renderer2dRelative sevenSegmentYSquareShifted{&sevenSegmentYSquare, Coordinates2d::Position(0, innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle)};
-constexpr static Renderer2dRelative sevenSegmentTriangleDownShifted{&sevenSegmentTriangleDown, Coordinates2d::Position(0, innerSpacingSevenSegmentElements + lengthSevenSegmentTriangle + lengthYSevenSegmentSquare)};
-
-static Renderer2dAccumulated<3> const sevenSegmentYElement{&sevenSegmentTriangleUpShifted, &sevenSegmentYSquareShifted, &sevenSegmentTriangleDownShifted};
-
-
-constexpr static Renderer2dRelative segmentShifted0_(&sevenSegmentYElement, Coordinates2d::Position(0, yOffsetSegment + widthSevenSegment / 2));
-constexpr static Renderer2dRelative segmentShifted1_(&sevenSegmentYElement, Coordinates2d::Position(0, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment));
-constexpr static Renderer2dRelative segmentShifted2_(&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2));
-constexpr static Renderer2dRelative segmentShifted3_(&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, yOffsetSegment + widthSevenSegment / 2 + ySpacingSevenSegment));
-
-constexpr static Renderer2dRelative segmentShifted4_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 0));
-constexpr static Renderer2dRelative segmentShifted5_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, ySpacingSevenSegment));
-constexpr static Renderer2dRelative segmentShifted6_(&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 2 * ySpacingSevenSegment));
+extern Renderer2dRelative const segmentShifted4_;
+extern Renderer2dRelative const segmentShifted5_;
+extern Renderer2dRelative const segmentShifted6_;
 
 
 class Renderer2dSevenSegments : public Renderer2d
