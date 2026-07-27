@@ -5,6 +5,7 @@
 #define GLWIDGET_H
 
 #include <QOpenGLWidget>
+#include <QMouseEvent>
 
 #include <chrono>
 
@@ -24,6 +25,10 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
+
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     Helper *helper;
