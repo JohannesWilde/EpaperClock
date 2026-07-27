@@ -245,27 +245,25 @@ private:
 
 
 // on/off
-static const Renderer2dRelative buttonSettings(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 0 * ySpacingButtons));
+extern const Renderer2dRelative buttonSettings;
 // settings
-static const Renderer2dRelative buttonSettingsRight(&buttonTriangleRight, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 1 * ySpacingButtons));
+extern const Renderer2dRelative buttonSettingsRight;
 // up
-static const Renderer2dRelative buttonUp(&buttonTriangleUp, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 2 * ySpacingButtons));
+extern const Renderer2dRelative buttonUp;
 // down
-static const Renderer2dRelative buttonDown(&buttonTriangleDown, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons));
+extern const Renderer2dRelative buttonDown;
 // on/off
-static const Renderer2dRelative buttonOnOff(&buttonSquareFull, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 3 * ySpacingButtons));
+extern const Renderer2dRelative buttonOnOff;
 
 // selections
-static const Renderer2dRelative selection0(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
-static const Renderer2dRelative selection1(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + xSpacingSevenSegments, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
-static const Renderer2dRelative selection2(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 2 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
-static const Renderer2dRelative selection3(&elementSelection, Coordinates2d::Position(xOffsetSegment0 + xOffsetElementSelection + 3 * xSpacingSevenSegments + horizontalLengthInterSegment + lengthSegmentDots, yOffsetSegment + yLengthSevenSegments + yOffsetElementSelection));
+extern const Renderer2dRelative selection0;
+extern const Renderer2dRelative selection1;
+extern const Renderer2dRelative selection2;
+extern const Renderer2dRelative selection3;
 
 // dots
-static const Renderer2dRelative dotUpper(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
-                                                                            yOffsetSegment + yLengthSevenSegments / 2 - lengthSegmentDots - yDistanceDots / 2));
-static const Renderer2dRelative dotLower(&clockDot, Coordinates2d::Position(xOffsetSegment0 + 2 * xSpacingSevenSegments,
-                                                                            yOffsetSegment + yLengthSevenSegments / 2 + yDistanceDots / 2));
+extern const Renderer2dRelative dotUpper;
+extern const Renderer2dRelative dotLower;
 
 } // namespace GuiFixtures
 
