@@ -299,16 +299,6 @@ private:
 
 };
 
-std::array<Renderer2dRelative const, 7> const Renderer2dSevenSegments::segmentsShifted_{
-    /*top      */  Renderer2dRelative{&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 0)},
-    /*middle   */  Renderer2dRelative{&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, ySpacingSevenSegment)},
-    /*bottom   */  Renderer2dRelative{&sevenSegmentXElement, Coordinates2d::Position(widthSevenSegment / 2, 2 * ySpacingSevenSegment)},
-    /*leftUp   */  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(0, widthSevenSegment / 2)},
-    /*leftDown */  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(0, widthSevenSegment / 2 + ySpacingSevenSegment)},
-    /*rightUp  */  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, widthSevenSegment / 2)},
-    /*rightDown*/  Renderer2dRelative{&sevenSegmentYElement, Coordinates2d::Position(xSpacingSevenSegment, widthSevenSegment / 2 + ySpacingSevenSegment)},
-    };
-
 
 // on/off
 static const Renderer2dRelative buttonSettings(&buttonSquare, Coordinates2d::Position(xOffsetButtonDown, yOffsetButtonDown + 0 * ySpacingButtons));
@@ -411,5 +401,18 @@ private:
     Renderer2dRelative sevenSegments3Relative_;
 };
 
+
+enum class ClockGuiButton
+{
+    None,
+    Settings,
+    Right,
+    Up,
+    OnOffOrDown
+};
+
+char const * toString(ClockGuiButton const button);
+
+ClockGuiButton positionToButton(Coordinates2d::Position const pos);
 
 #endif // RENDERER_2D_CLOCK_GUI_HPP

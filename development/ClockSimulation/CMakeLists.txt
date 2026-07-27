@@ -20,6 +20,7 @@ qt_add_executable(${PROJECT_NAME}
     renderer2dextended.hpp renderer2dextended.cpp
     constexprAbs.hpp
     renderer2dclockgui.hpp
+    renderer2dclockgui.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
