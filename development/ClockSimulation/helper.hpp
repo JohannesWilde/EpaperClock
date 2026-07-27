@@ -28,6 +28,9 @@ public:
 public:
     void paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp);
 
+    void mousePress(QPoint const & point);
+    void mouseRelease(QPoint const & point);
+
 private:
     QBrush background;
     QBrush circleBrush;

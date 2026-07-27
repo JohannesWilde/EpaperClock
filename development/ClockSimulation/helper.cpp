@@ -210,3 +210,14 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
     painter->translate(viewport.width() / 2, viewport.height() / 2);
 }
+
+void Helper::mousePress(const QPoint & point)
+{
+    std::cout << "press: " << point.x() << ", " << point.y() << " ["
+              << toString(positionToButton(Coordinates2d::Position{point.x(), point.y()})) << "]" << std::endl;
+}
+
+void Helper::mouseRelease(const QPoint & point)
+{
+    std::cout << "release: " << point.x() << ", " << point.y() << std::endl;
+}

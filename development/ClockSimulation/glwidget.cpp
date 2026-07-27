@@ -3,7 +3,6 @@
 
 #include "glwidget.h"
 #include "helper.hpp"
-#include "renderer2dclockgui.hpp"
 
 #include <QPainter>
 #include <QTimer>
@@ -41,15 +40,14 @@ void GLWidget::paintEvent(QPaintEvent *event)
 
 void GLWidget::mousePressEvent(QMouseEvent * event)
 {
-    std::cout << "press: " << event->pos().x() << ", " << event->pos().y() << " ["
-              << toString(positionToButton(Coordinates2d::Position{event->pos().x(), event->pos().y()})) << "]" << std::endl;
+    helper->mousePress(event->pos());
 
     QOpenGLWidget::mousePressEvent(event);
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * event)
 {
-    std::cout << "release: " << event->pos().x() << ", " << event->pos().y() << std::endl;
+    helper->mouseRelease(event->pos());
 
     QOpenGLWidget::mouseReleaseEvent(event);
 }
