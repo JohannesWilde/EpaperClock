@@ -10,6 +10,9 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL OpenGLWidgets Widgets)
 
 qt_standard_project_setup()
 
+add_subdirectory(customDrivers)
+
+
 qt_add_executable(${PROJECT_NAME}
     coordinates2d.cpp coordinates2d.hpp
     glwidget.cpp glwidget.h
