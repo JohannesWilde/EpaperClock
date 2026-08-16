@@ -37,6 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::OpenGL
     Qt6::OpenGLWidgets
     Qt6::Widgets
+    customDrivers
 )
 
 install(TARGETS ${PROJECT_NAME}

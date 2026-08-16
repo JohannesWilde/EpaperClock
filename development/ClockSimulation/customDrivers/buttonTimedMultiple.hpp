@@ -6,6 +6,7 @@
 #include "buttonTimedProperties.hpp"
 
 #include <array>
+#include <chrono>
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -22,14 +23,14 @@ enum class ButtonState
  * short or long.
  * For more info see ButtonTimedMultiple.
  */
-template <ButtonTimedProperties::Duration_t DurationShort_,
-          ButtonTimedProperties::Duration_t DurationLong_,
+template <unsigned DurationShortMs_,
+          unsigned DurationLongMs_,
           size_t HistoryLength_ = 2>
 class ButtonTimed
 {
 public:
-    static_assert(ButtonTimedProperties::Duration_t(0) < DurationShort_);
-    static_assert(DurationShort_ < DurationLong_);
+    static_assert(0 < DurationShortMs_);
+    static_assert(DurationShortMs_ < DurationLongMs_);
     static_assert(2 <= HistoryLength_);
 
 
@@ -51,7 +52,7 @@ public:
         : state_(state)
         , currentTimestamp_(history_.data())
     {
-        clearHistory();
+        clearHistory(state);
     }
 
     void clearHistory(ButtonState const state = ButtonState::Up)
@@ -91,12 +92,12 @@ public:
 
     bool pressed(Timestamp_t const & since) const
     {
-        return (isDown() && (since < *currentTimestamp_));
+        return (isDown() && somethingHappened_(since));
     }
 
     bool released(Timestamp_t const & since) const
     {
-        return (!isDown() && (since < *currentTimestamp_));
+        return (!isDown() && somethingHappened_(since));
     }
 
     bool toggled(Timestamp_t const & since) const
@@ -105,7 +106,7 @@ public:
         // the frequency with which buttons are pressed and released - I can't know what state there was at
         // since. So use any change as the next best thing. If the calls are more frequent than the button
         // presses/releases then this should work as expected.
-        return (since < *currentTimestamp_);
+        return somethingHappened_(since);
     }
 
 
@@ -196,7 +197,7 @@ public:
 
 protected:
 
-    ButtonTimedProperties::Duration_t previousDuration_(size_t const offset, Timestamps_t const * const timestamp = nullptr) const
+    ButtonTimedProperties::Duration_t previousDuration_(size_t const offset, Timestamp_t const * const timestamp = nullptr) const
     {
         ButtonTimedProperties::Duration_t duration = 0;
         if (HistoryLength_ > offset)
@@ -246,25 +247,36 @@ protected:
     static ButtonTimedProperties::Duration durationToState_(ButtonTimedProperties::Duration_t const & duration)
     {
         ButtonTimedProperties::Duration state = ButtonTimedProperties::Duration::TooShort;
-        if (duration >= DurationLong_)
+        if (duration >= std::chrono::milliseconds(DurationLongMs_))
         {
             state = ButtonTimedProperties::Duration::Long;
         }
-        else if (duration >= DurationShort_)
+        else if (duration >= DurationShortMs_)
         {
             state = ButtonTimedProperties::Duration::Short;
         }
+        else
+        {
+            // intentionally empty
+        }
         return state;
+    }
+
+protected:
+
+    constexpr bool somethingHappened_(Timestamp_t const & since)
+    {
+        return (since < *currentTimestamp_);
     }
 
 private:
 
     ButtonState state_;
 
-    std::arra<Timestamp_t, HistoryLength_> history_;
+    std::array<Timestamp_t, HistoryLength_> history_;
     Timestamp_t * currentTimestamp_;
 
-    ButtonTimedProperties::Duration_t * otherDuration_(
+    ButtonTimedProperties::Duration_t * otherTimestamp_(
         Timestamp_t * const currentTimestamp,
         bool const forward,
         size_t const offset) const
@@ -301,6 +313,67 @@ private:
         }
         return otherDuration;
     }
+
+};
+
+// ----------------------------------------------------------------------------------------------------
+
+template <unsigned DurationShortMs_,
+          unsigned DurationLongMs_,
+          unsigned DurationCombineMaxMs_,
+          size_t HistoryLength_ = 5,
+          typename... Args>
+class ButtonTimedMultiple : public ButtonTimed<DurationShortMs_, DurationLongMs_, HistoryLength_>
+{
+    typedef ButtonTimed<DurationShortMs_, DurationLongMs_, HistoryLength_> BaseButton;
+
+public:
+
+    static_assert(DurationShortMs_ <= DurationCombineMaxMs_);
+    static_assert(5 <= HistoryLength_);
+
+    ButtonTimedMultiple(Args... args)
+        : BaseButton(args...)
+    {
+        // intentionally empty
+    }
+
+    // convenience access methods
+
+    bool isDoubleDownShortFinished(BaseButton::Timestamp_t const & since)
+    {
+        return (BaseButton::somethingHappened_(since) &&
+                BaseButton::isUp() &&
+                // Current long enough not to potentially belong to the next one.
+                (DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                // Second short button press.
+                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
+                // Intermediate not tooShort, but short enough to fit DurationCombineMaxMs_.
+                (DurationShortMs_ <= ButtonTimedMultiple::previousDuration_(2)) &&
+                (DurationCombineMaxMs_ >= ButtonTimedMultiple::previousDuration_(2)) &&
+                // First short button press.
+                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(3)) &&
+                // Rule out more than double press.
+                ((DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(4)) ||
+                 (0 == ButtonTimedMultiple::previousDuration_(4)))
+               );
+    }
+
+    bool isSingleDownShortFinished(BaseButton::Timestamp_t const & since)
+    {
+        return (BaseButton::somethingHappened_(since) &&
+                BaseButton::isUp() &&
+                // Current long enough not to potentially belong to the next one.
+                (DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                // First short button press.
+                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
+                // Rule out more than single press.
+                ((DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(2)) ||
+                 (0 == ButtonTimedMultiple::previousDuration_(2)))
+               );
+    }
+
+private:
 
 };
 

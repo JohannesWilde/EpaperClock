@@ -4,6 +4,8 @@
 #ifndef HELPER_H
 #define HELPER_H
 
+#include <customDrivers/buttonTimedMultiple.hpp>
+
 #include <QBrush>
 #include <QFont>
 #include <QPen>
@@ -49,6 +51,10 @@ private:
     int previousMinutesLow_;
 
     std::shared_ptr<Renderer2dClockGui> clockGui_;
+
+    ButtonTimedMultiple</*DurationShortMs_*/ 100,
+                        /*DurationLongMs_*/ 500,
+                        /*DurationCombineMaxMs_*/ 100> button_;
 
 };
 //! [0]
