@@ -52,9 +52,7 @@ private:
 
     std::shared_ptr<Renderer2dClockGui> clockGui_;
 
-    ButtonTimedMultiple</*DurationShortMs_*/ 100,
-                        /*DurationLongMs_*/ 500,
-                        /*DurationCombineMaxMs_*/ 100> button_;
+    ButtonTimedMultiple<> button_;
 
 };
 //! [0]

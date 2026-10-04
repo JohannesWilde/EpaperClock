@@ -28,6 +28,9 @@ Helper::Helper()
     , reducedDisplaySymbols_(false)
     , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
+    , button_(std::chrono::milliseconds(100),
+              std::chrono::milliseconds(500),
+              std::chrono::milliseconds(100))
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);

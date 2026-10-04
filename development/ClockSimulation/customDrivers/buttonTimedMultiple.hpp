@@ -6,6 +6,7 @@
 #include "buttonTimedProperties.hpp"
 
 #include <array>
+#include <cassert>
 #include <chrono>
 
 // ----------------------------------------------------------------------------------------------------
@@ -23,16 +24,11 @@ enum class ButtonState
  * short or long.
  * For more info see ButtonTimedMultiple.
  */
-template <unsigned DurationShortMs_,
-          unsigned DurationLongMs_,
-          size_t HistoryLength_ = 2>
+template <size_t HistoryLength_ = 2>
 class ButtonTimed
 {
 public:
-    static_assert(0 < DurationShortMs_);
-    static_assert(DurationShortMs_ < DurationLongMs_);
     static_assert(2 <= HistoryLength_);
-
 
     typedef std::chrono::steady_clock::time_point Timestamp_t;
 
@@ -48,11 +44,18 @@ private:
 public:
 
 
-    ButtonTimed(ButtonState const state = ButtonState::Up)
-        : state_(state)
+    ButtonTimed(ButtonTimedProperties::Duration_t const durationShort,
+                ButtonTimedProperties::Duration_t const durationLong,
+                ButtonState const state = ButtonState::Up)
+        : durationShort_(durationShort)
+        , durationLong_(durationLong)
+        , state_(state)
         , currentTimestamp_(history_.data())
     {
         clearHistory(state);
+
+        assert(ButtonTimedProperties::Duration_t(0) < durationShort);
+        assert(durationShort < durationLong);
     }
 
     void clearHistory(ButtonState const state = ButtonState::Up)
@@ -247,11 +250,11 @@ protected:
     static ButtonTimedProperties::Duration durationToState_(ButtonTimedProperties::Duration_t const & duration)
     {
         ButtonTimedProperties::Duration state = ButtonTimedProperties::Duration::TooShort;
-        if (duration >= std::chrono::milliseconds(DurationLongMs_))
+        if (duration >= durationLong_)
         {
             state = ButtonTimedProperties::Duration::Long;
         }
-        else if (duration >= DurationShortMs_)
+        else if (duration >= durationShort_)
         {
             state = ButtonTimedProperties::Duration::Short;
         }
@@ -269,7 +272,22 @@ protected:
         return (since < *currentTimestamp_);
     }
 
+
+    ButtonTimedProperties::Duration_t getDurationShort_() const
+    {
+        return durationShort_;
+    };
+
+    ButtonTimedProperties::Duration_t getDurationLong_() const
+    {
+        return durationLong_;
+    };
+
+
 private:
+
+    ButtonTimedProperties::Duration_t const durationShort_;
+    ButtonTimedProperties::Duration_t const durationLong_;
 
     ButtonState state_;
 
@@ -318,24 +336,25 @@ private:
 
 // ----------------------------------------------------------------------------------------------------
 
-template <unsigned DurationShortMs_,
-          unsigned DurationLongMs_,
-          unsigned DurationCombineMaxMs_,
-          size_t HistoryLength_ = 5,
-          typename... Args>
-class ButtonTimedMultiple : public ButtonTimed<DurationShortMs_, DurationLongMs_, HistoryLength_>
+template <size_t HistoryLength_ = 5>
+class ButtonTimedMultiple : public ButtonTimed<HistoryLength_>
 {
-    typedef ButtonTimed<DurationShortMs_, DurationLongMs_, HistoryLength_> BaseButton;
+    typedef ButtonTimed<HistoryLength_> BaseButton;
 
 public:
 
-    static_assert(DurationShortMs_ <= DurationCombineMaxMs_);
     static_assert(5 <= HistoryLength_);
 
-    ButtonTimedMultiple(Args... args)
-        : BaseButton(args...)
+    ButtonTimedMultiple(ButtonTimedProperties::Duration_t const durationShort,
+                        ButtonTimedProperties::Duration_t const durationLong,
+                        ButtonTimedProperties::Duration_t const durationCombineMax,
+                        ButtonState const state = ButtonState::Up)
+        : BaseButton(durationShort,
+                     durationLong,
+                     state)
+        , durationCombineMax_(durationCombineMax)
     {
-        // intentionally empty
+        assert(durationShort <= durationCombineMax);
     }
 
     // convenience access methods
@@ -345,16 +364,16 @@ public:
         return (BaseButton::somethingHappened_(since) &&
                 BaseButton::isUp() &&
                 // Current long enough not to potentially belong to the next one.
-                (DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
                 // Second short button press.
                 (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
-                // Intermediate not tooShort, but short enough to fit DurationCombineMaxMs_.
-                (DurationShortMs_ <= ButtonTimedMultiple::previousDuration_(2)) &&
-                (DurationCombineMaxMs_ >= ButtonTimedMultiple::previousDuration_(2)) &&
+                // Intermediate not tooShort, but short enough to fit durationCombineMax_.
+                (BaseButton::getDurationShort_() <= ButtonTimedMultiple::previousDuration_(2)) &&
+                (durationCombineMax_ >= ButtonTimedMultiple::previousDuration_(2)) &&
                 // First short button press.
                 (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(3)) &&
                 // Rule out more than double press.
-                ((DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(4)) ||
+                ((durationCombineMax_ < ButtonTimedMultiple::previousDuration_(4)) ||
                  (0 == ButtonTimedMultiple::previousDuration_(4)))
                );
     }
@@ -364,16 +383,18 @@ public:
         return (BaseButton::somethingHappened_(since) &&
                 BaseButton::isUp() &&
                 // Current long enough not to potentially belong to the next one.
-                (DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
                 // First short button press.
                 (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
                 // Rule out more than single press.
-                ((DurationCombineMaxMs_ < ButtonTimedMultiple::previousDuration_(2)) ||
+                ((durationCombineMax_ < ButtonTimedMultiple::previousDuration_(2)) ||
                  (0 == ButtonTimedMultiple::previousDuration_(2)))
                );
     }
 
 private:
+
+    ButtonTimedProperties::Duration_t const durationCombineMax_;
 
 };
 
