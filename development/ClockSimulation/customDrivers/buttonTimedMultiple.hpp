@@ -82,12 +82,12 @@ public:
     }
 
 
-    bool isDown()
+    bool isDown() const
     {
         return ButtonState::Down == state_;
     }
 
-    bool isUp()
+    bool isUp() const
     {
         return ButtonState::Up == state_;
     }
@@ -115,7 +115,7 @@ public:
 
     ButtonTimedProperties::Duration currentState(Timestamp_t const timestamp = now()) const
     {
-        return durationToState_(timestamp - *currentTimestamp_);
+        return durationToState_(std::chrono::duration_cast<ButtonTimedProperties::Duration_t>(timestamp - *currentTimestamp_));
     }
 
     // With an offset of 0 you will have to specify now() as timestamp. Otherwise timestamp is of no relevance.
@@ -126,28 +126,28 @@ public:
 
     // convenience access methods
 
-    bool isDownShort()
+    bool isDownShort(Timestamp_t const timestamp = now())
     {
         return (isDown() &&
-                (ButtonTimedProperties::Duration::Short == currentState()));
+                (ButtonTimedProperties::Duration::Short == currentState(timestamp)));
     }
 
-    bool isDownLong()
+    bool isDownLong(Timestamp_t const timestamp = now())
     {
         return (isDown() &&
-                (ButtonTimedProperties::Duration::Long == currentState()));
+                (ButtonTimedProperties::Duration::Long == currentState(timestamp)));
     }
 
-    bool isUpShort()
+    bool isUpShort(Timestamp_t const timestamp = now())
     {
         return (isUp() &&
-                (ButtonTimedProperties::Duration::Short == currentState()));
+                (ButtonTimedProperties::Duration::Short == currentState(timestamp)));
     }
 
-    bool isUpLong()
+    bool isUpLong(Timestamp_t const timestamp = now())
     {
         return (isUp() &&
-                (ButtonTimedProperties::Duration::Long == currentState()));
+                (ButtonTimedProperties::Duration::Long == currentState(timestamp)));
     }
 
     bool pressedAfterShort(Timestamp_t const & since)
@@ -265,7 +265,7 @@ protected:
         return state;
     }
 
-    constexpr bool somethingHappened_(Timestamp_t const & since)
+    constexpr bool somethingHappened_(Timestamp_t const & since) const
     {
         return (since < *currentTimestamp_);
     }
