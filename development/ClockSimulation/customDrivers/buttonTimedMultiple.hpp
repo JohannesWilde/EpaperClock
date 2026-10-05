@@ -265,8 +265,6 @@ protected:
         return state;
     }
 
-protected:
-
     constexpr bool somethingHappened_(Timestamp_t const & since)
     {
         return (since < *currentTimestamp_);
