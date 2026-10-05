@@ -202,7 +202,7 @@ protected:
 
     ButtonTimedProperties::Duration_t previousDuration_(size_t const offset, Timestamp_t const * const timestamp = nullptr) const
     {
-        ButtonTimedProperties::Duration_t duration = 0;
+        ButtonTimedProperties::Duration_t duration{0};
         if (HistoryLength_ > offset)
         {
             // Determine time at offset.
@@ -233,7 +233,7 @@ protected:
             // If I am correct, previous being valid implies nextTimestamp to be valid. So only check previous.
             if ((timestampInvalid != *previous) /*&& (timestampInvalid != nextTimestamp)*/)
             {
-                duration = nextTimestamp - *previous;
+                duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextTimestamp - *previous);
             }
             else
             {
@@ -247,7 +247,7 @@ protected:
         return duration;
     }
 
-    static ButtonTimedProperties::Duration durationToState_(ButtonTimedProperties::Duration_t const & duration)
+    ButtonTimedProperties::Duration durationToState_(ButtonTimedProperties::Duration_t const & duration) const
     {
         ButtonTimedProperties::Duration state = ButtonTimedProperties::Duration::TooShort;
         if (duration >= durationLong_)
@@ -294,7 +294,7 @@ private:
     std::array<Timestamp_t, HistoryLength_> history_;
     Timestamp_t * currentTimestamp_;
 
-    ButtonTimedProperties::Duration_t * otherTimestamp_(
+    Timestamp_t * otherTimestamp_(
         Timestamp_t * const currentTimestamp,
         bool const forward,
         size_t const offset) const
@@ -304,13 +304,13 @@ private:
 
         size_t const circularlyReducedOffset = offset % HistoryLength_;
 
-        ButtonTimedProperties::Duration_t * otherDuration = nullptr;
+        Timestamp_t * otherTimestamp = nullptr;
         if (forward)
         {
-            otherDuration = currentTimestamp + circularlyReducedOffset;
-            if ((history_ + HistoryLength_) <= otherDuration)
+            otherTimestamp = currentTimestamp + circularlyReducedOffset;
+            if (((&*history_.cbegin()) + history_.size()) <= otherTimestamp)
             {
-                otherDuration -= HistoryLength_;
+                otherTimestamp -= HistoryLength_;
             }
             else
             {
@@ -319,17 +319,17 @@ private:
         }
         else
         {
-            otherDuration = currentTimestamp - circularlyReducedOffset;
-            if (history_ > otherDuration)
+            otherTimestamp = currentTimestamp - circularlyReducedOffset;
+            if ((&*history_.cbegin()) > otherTimestamp)
             {
-                otherDuration += HistoryLength_;
+                otherTimestamp += HistoryLength_;
             }
             else
             {
                 // no overflow possible
             }
         }
-        return otherDuration;
+        return otherTimestamp;
     }
 
 };
