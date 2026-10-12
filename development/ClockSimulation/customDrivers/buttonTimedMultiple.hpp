@@ -65,7 +65,8 @@ public:
 
     void update(ButtonState const state, Timestamp_t const timestamp = now())
     {
-        if (state != state_)
+        assert(static_cast<bool>(currentTimestamp_)); // Assert the pointer is valid.
+        if ((not static_cast<bool>(*currentTimestamp_)) || (state != state_))
         {
             currentTimestamp_ = otherTimestamp_(currentTimestamp_, true, 1);
             *currentTimestamp_ = timestamp;
