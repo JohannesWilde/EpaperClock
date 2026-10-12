@@ -8,6 +8,7 @@
 #include <array>
 #include <cassert>
 #include <chrono>
+#include <optional>
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -37,12 +38,6 @@ public:
         return std::chrono::steady_clock::now();
     }
 
-private:
-
-    static constexpr Timestamp_t timestampInvalid = Timestamp_t{};
-
-public:
-
 
     ButtonTimed(ButtonTimedProperties::Duration_t const durationShort,
                 ButtonTimedProperties::Duration_t const durationLong,
@@ -60,8 +55,10 @@ public:
 
     void clearHistory(ButtonState const state = ButtonState::Up)
     {
-        history_.fill(timestampInvalid);
-        *currentTimestamp_ = now();
+        for (TimestampOptional_t & value : history_)
+        {
+            value.reset();
+        }
 
         state_ = state;
     }
@@ -115,7 +112,17 @@ public:
 
     ButtonTimedProperties::Duration currentState(Timestamp_t const timestamp = now()) const
     {
-        return durationToState_(std::chrono::duration_cast<ButtonTimedProperties::Duration_t>(timestamp - *currentTimestamp_));
+        ButtonTimedProperties::Duration duration = ButtonTimedProperties::Duration::TooShort;
+        assert(static_cast<bool>(currentTimestamp_)); // Assert the pointer is valid.
+        if (static_cast<bool>(*currentTimestamp_)) // Check optional to contain a value.
+        {
+            duration = durationToState_(std::chrono::duration_cast<ButtonTimedProperties::Duration_t>(timestamp - currentTimestamp_->value()));
+        }
+        else
+        {
+            // intentionally empty
+        }
+        return duration;
     }
 
     // With an offset of 0 you will have to specify now() as timestamp. Otherwise timestamp is of no relevance.
@@ -206,13 +213,13 @@ protected:
         if (HistoryLength_ > offset)
         {
             // Determine time at offset.
-            // An offset of 0 corresponds to "now() - *currentTimestamp_".
-            // An offset of 1 to "*currentTimestamp_ - *(currentTimestamp_ - 1)" [taking into account circular memory].
+            // An offset of 0 corresponds to "now() - currentTimestamp_->value()".
+            // An offset of 1 to "currentTimestamp_->value() - (currentTimestamp_ - 1)->value()" [taking into account circular memory].
             // ...
-            Timestamp_t const * const previous = otherTimestamp_(currentTimestamp_, false, offset);
+            TimestampOptional_t const * const previous = otherTimestamp_(currentTimestamp_, false, offset);
 
             // Determine next timestamp.
-            Timestamp_t nextTimestamp;
+            TimestampOptional_t nextTimestamp;
             if (0 == offset)
             {
                 if (nullptr != timestamp)
@@ -231,9 +238,9 @@ protected:
 
             // Ignore "uninitialized" timestamps and keep 0, i.e. too short, instead.
             // If I am correct, previous being valid implies nextTimestamp to be valid. So only check previous.
-            if ((timestampInvalid != *previous) /*&& (timestampInvalid != nextTimestamp)*/)
+            if (static_cast<bool>(*previous) /*&& static_cast<bool>(nextTimestamp)*/)
             {
-                duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextTimestamp - *previous);
+                duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextTimestamp.value() - previous->value());
             }
             else
             {
@@ -267,7 +274,9 @@ protected:
 
     constexpr bool somethingHappened_(Timestamp_t const & since) const
     {
-        return (since < *currentTimestamp_);
+        assert(static_cast<bool>(currentTimestamp_)); // Assert the pointer is valid.
+        return static_cast<bool>(*currentTimestamp_) /* Check optional to contain a value. */
+                && (since < currentTimestamp_->value());
     }
 
 
@@ -289,11 +298,13 @@ private:
 
     ButtonState state_;
 
-    std::array<Timestamp_t, HistoryLength_> history_;
-    Timestamp_t * currentTimestamp_;
+    typedef std::optional<Timestamp_t> TimestampOptional_t;
 
-    Timestamp_t * otherTimestamp_(
-        Timestamp_t * const currentTimestamp,
+    std::array<TimestampOptional_t, HistoryLength_> history_;
+    TimestampOptional_t * currentTimestamp_;
+
+    TimestampOptional_t * otherTimestamp_(
+        TimestampOptional_t * const currentTimestamp,
         bool const forward,
         size_t const offset) const
     {
@@ -302,7 +313,7 @@ private:
 
         size_t const circularlyReducedOffset = offset % HistoryLength_;
 
-        Timestamp_t * otherTimestamp = nullptr;
+        TimestampOptional_t * otherTimestamp = nullptr;
         if (forward)
         {
             otherTimestamp = currentTimestamp + circularlyReducedOffset;
