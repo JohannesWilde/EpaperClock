@@ -266,3 +266,69 @@ TEST(ButtonTimedMultiple, clearHistory)
         EXPECT_FALSE(button.wasUpLong());
     }
 }
+
+TEST(ButtonTimedMultiple, currentDuration)
+{
+    std::chrono::duration const durationLongLater = std::chrono::milliseconds(2000);
+    std::chrono::duration const durationEndEarlier = std::chrono::milliseconds(1);
+
+    assert((durationLong - durationShort) > durationEndEarlier);
+    assert(durationShort > durationEndEarlier);
+
+    Button::Timestamp_t const timestampLongBegin = timestampStart + durationLong;
+    Button::Timestamp_t const timestampLongLater = timestampLongBegin + durationLongLater;
+    Button::Timestamp_t const timestampShortBegin = timestampStart + durationShort;
+    Button::Timestamp_t const timestampShortEnd = timestampLongBegin - durationEndEarlier;
+    Button::Timestamp_t const timestampTooShortBegin = timestampStart;
+    Button::Timestamp_t const timestampTooShortEnd = timestampShortBegin - durationEndEarlier;
+
+    Button button{durationShort, durationLong, durationCombineMax, ButtonState::Up};
+
+    {
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampTooShortBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampTooShortEnd));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampShortBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampShortEnd));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampLongBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampLongLater));
+
+        EXPECT_FALSE(button.isDownShort(timestampShortBegin));
+        EXPECT_FALSE(button.isDownLong(timestampLongBegin));
+        EXPECT_FALSE(button.isUpShort(timestampShortBegin));
+        EXPECT_FALSE(button.isUpLong(timestampLongBegin));
+    }
+
+    // First update.
+    button.update(ButtonState::Up, timestampStart);
+
+    {
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampTooShortBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampTooShortEnd));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Short, button.currentState(timestampShortBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Short, button.currentState(timestampShortEnd));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Long, button.currentState(timestampLongBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Long, button.currentState(timestampLongLater));
+
+        EXPECT_FALSE(button.isDownShort(timestampShortBegin));
+        EXPECT_FALSE(button.isDownLong(timestampLongBegin));
+        EXPECT_TRUE(button.isUpShort(timestampShortBegin));
+        EXPECT_TRUE(button.isUpLong(timestampLongBegin));
+    }
+
+    // First update.
+    button.update(ButtonState::Down, timestampStart);
+
+    {
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampTooShortBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(timestampTooShortEnd));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Short, button.currentState(timestampShortBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Short, button.currentState(timestampShortEnd));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Long, button.currentState(timestampLongBegin));
+        EXPECT_EQ(ButtonTimedProperties::Duration::Long, button.currentState(timestampLongLater));
+
+        EXPECT_TRUE(button.isDownShort(timestampShortBegin));
+        EXPECT_TRUE(button.isDownLong(timestampLongBegin));
+        EXPECT_FALSE(button.isUpShort(timestampShortBegin));
+        EXPECT_FALSE(button.isUpLong(timestampLongBegin));
+    }
+}
