@@ -11,26 +11,19 @@ static ButtonTimedProperties::Duration_t const durationCombineMax = std::chrono:
 
 static Button::Timestamp_t const timestampStart; // Use default constructor for base timestamp.
 
-TEST(ButtonTimedMultiple, nominal)
+TEST(ButtonTimedMultiple, wasDownShort)
 {
     Button::Timestamp_t timestamp = timestampStart;
 
-    Button button{durationShort,
-                durationLong,
-                durationCombineMax,
-                ButtonState::Up};
-
-    // initialized
-
-
+    Button button{durationShort, durationLong, durationCombineMax, ButtonState::Up};
 
     // short press
     button.update(ButtonState::Up, timestamp);
-
     timestamp += durationShort;
+
     button.update(ButtonState::Down, timestamp);
-
     timestamp += durationShort;
+
     button.update(ButtonState::Up, timestamp);
 
     {
@@ -62,6 +55,50 @@ TEST(ButtonTimedMultiple, nominal)
     }
 }
 
+TEST(ButtonTimedMultiple, wasDownLong)
+{
+    Button::Timestamp_t timestamp = timestampStart;
+
+    Button button{durationShort, durationLong, durationCombineMax, ButtonState::Up};
+
+    // long press
+    button.update(ButtonState::Up, timestamp);
+    timestamp += durationShort;
+
+    button.update(ButtonState::Down, timestamp);
+    timestamp += durationLong;
+
+    button.update(ButtonState::Up, timestamp);
+
+    {
+        EXPECT_FALSE(button.isDown());
+        EXPECT_TRUE(button.isUp());
+
+        Button::Timestamp_t const since = timestampStart;
+        EXPECT_FALSE(button.pressed(since));
+        EXPECT_TRUE(button.released(since));
+        EXPECT_TRUE(button.toggled(since));
+
+        Button::Timestamp_t const now = timestamp;
+        EXPECT_EQ(ButtonTimedProperties::Duration::TooShort, button.currentState(now));
+
+        EXPECT_FALSE(button.isDownShort(now));
+        EXPECT_FALSE(button.isDownLong(now));
+        EXPECT_FALSE(button.isUpShort(now));
+        EXPECT_FALSE(button.isUpLong(now));
+
+        EXPECT_FALSE(button.pressedAfterShort(since));
+        EXPECT_FALSE(button.pressedAfterLong(since));
+        EXPECT_FALSE(button.releasedAfterShort(since));
+        EXPECT_TRUE(button.releasedAfterLong(since));
+
+        EXPECT_FALSE(button.wasDownShort());
+        EXPECT_TRUE(button.wasDownLong());
+        EXPECT_FALSE(button.wasUpShort());
+        EXPECT_FALSE(button.wasUpLong());
+    }
+}
+
 TEST(ButtonTimedMultiple, clearHistory)
 {
     Button::Timestamp_t timestamp = timestampStart;
@@ -70,12 +107,16 @@ TEST(ButtonTimedMultiple, clearHistory)
 
     timestamp += durationLong;
     button.update(ButtonState::Down, timestamp);
+
     timestamp += durationShort;
     button.update(ButtonState::Up, timestamp);
+
     timestamp += durationLong;
     button.update(ButtonState::Down, timestamp);
+
     timestamp += durationShort;
     button.update(ButtonState::Up, timestamp);
+
     timestamp += 2 * durationLong;
     button.update(ButtonState::Down, timestamp);
 
@@ -106,7 +147,6 @@ TEST(ButtonTimedMultiple, clearHistory)
         EXPECT_FALSE(button.wasUpShort());
         EXPECT_TRUE(button.wasUpLong());
     }
-
 
     button.clearHistory(ButtonState::Up);
 
