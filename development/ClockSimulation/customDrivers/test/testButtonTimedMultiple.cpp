@@ -332,3 +332,23 @@ TEST(ButtonTimedMultiple, currentDuration)
         EXPECT_FALSE(button.isUpLong(timestampLongBegin));
     }
 }
+
+TEST(ButtonTimedMultiple, doubleDown)
+{
+    Button::Timestamp_t timestamp = timestampStart;
+
+    Button button{durationShort, durationLong, durationCombineMax, ButtonState::Up};
+
+    // short down
+    button.update(ButtonState::Down, timestamp);
+    timestamp += durationShort;
+
+    button.update(ButtonState::Up, timestamp);
+
+    Button::Timestamp_t const now = timestamp + durationLong;
+
+    {
+        EXPECT_FALSE(button.isDoubleDownShortFinished(now));
+        EXPECT_TRUE(button.isSingleDownShortFinished(now));
+    }
+}

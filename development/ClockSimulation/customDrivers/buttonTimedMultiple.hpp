@@ -66,7 +66,7 @@ public:
     void update(ButtonState const state, Timestamp_t const timestamp = now())
     {
         assert(static_cast<bool>(currentTimestamp_)); // Assert the pointer is valid.
-        if ((not static_cast<bool>(*currentTimestamp_)) || (state != state_))
+        if ((not currentTimestamp_->has_value()) || (state != state_))
         {
             currentTimestamp_ = otherTimestamp_(currentTimestamp_, true, 1);
             *currentTimestamp_ = timestamp;
@@ -115,7 +115,7 @@ public:
     {
         ButtonTimedProperties::Duration duration = ButtonTimedProperties::Duration::TooShort;
         assert(static_cast<bool>(currentTimestamp_)); // Assert the pointer is valid.
-        if (static_cast<bool>(*currentTimestamp_)) // Check optional to contain a value.
+        if (currentTimestamp_->has_value()) // Check optional to contain a value.
         {
             duration = durationToState_(std::chrono::duration_cast<ButtonTimedProperties::Duration_t>(timestamp - currentTimestamp_->value()));
         }
@@ -217,7 +217,7 @@ protected:
             // An offset of 0 corresponds to "now() - currentTimestamp_->value()".
             // An offset of 1 to "currentTimestamp_->value() - (currentTimestamp_ - 1)->value()" [taking into account circular memory].
             // ...
-            TimestampOptional_t const * const previous = otherTimestamp_(currentTimestamp_, false, offset);
+            TimestampOptional_t const * const previous = previousTimestamp_(offset);
 
             // Determine next timestamp.
             TimestampOptional_t nextTimestamp;
@@ -234,12 +234,12 @@ protected:
             }
             else
             {
-                nextTimestamp = *otherTimestamp_(currentTimestamp_, false, offset - 1);
+                nextTimestamp = *previousTimestamp_(offset - 1);
             }
 
             // Ignore "uninitialized" timestamps and keep 0, i.e. too short, instead.
             // If I am correct, previous being valid implies nextTimestamp to be valid. So only check previous.
-            if (static_cast<bool>(*previous) /*&& static_cast<bool>(nextTimestamp)*/)
+            if (previous->has_value() /*&& nextTimestamp->has_value()*/)
             {
                 duration = std::chrono::duration_cast<std::chrono::milliseconds>(nextTimestamp.value() - previous->value());
             }
@@ -276,7 +276,7 @@ protected:
     constexpr bool somethingHappened_(Timestamp_t const & since) const
     {
         assert(static_cast<bool>(currentTimestamp_)); // Assert the pointer is valid.
-        return static_cast<bool>(*currentTimestamp_) /* Check optional to contain a value. */
+        return currentTimestamp_->has_value() /* Check optional to contain a value. */
                 && (since < currentTimestamp_->value());
     }
 
@@ -292,6 +292,15 @@ protected:
     };
 
 
+    typedef std::optional<Timestamp_t> TimestampOptional_t;
+
+    TimestampOptional_t const * previousTimestamp_(size_t const offset) const
+    {
+        assert(HistoryLength_ > offset);
+
+        return otherTimestamp_(currentTimestamp_, /*forward*/ false, offset);
+    }
+
 private:
 
     ButtonTimedProperties::Duration_t const durationShort_;
@@ -299,11 +308,15 @@ private:
 
     ButtonState state_;
 
-    typedef std::optional<Timestamp_t> TimestampOptional_t;
-
     std::array<TimestampOptional_t, HistoryLength_> history_;
     TimestampOptional_t * currentTimestamp_;
 
+    /**
+     * @brief otherTimestamp_ Finds a timestamp in history_ in the direction and at the offset as desired.
+     * @param currentTimestamp pointer into history_
+     * @param forward to the future: true, to the past: false
+     * @param offset [0, HistoryLength_)
+     */
     TimestampOptional_t * otherTimestamp_(
         TimestampOptional_t * const currentTimestamp,
         bool const forward,
@@ -369,42 +382,94 @@ public:
 
     // convenience access methods
 
-    bool isDoubleDownShortFinished(BaseButton::Timestamp_t const & since)
+    bool isDoubleDownShortFinished(BaseButton::Timestamp_t const & now)
     {
-        return (BaseButton::somethingHappened_(since) &&
-                BaseButton::isUp() &&
-                // Current long enough not to potentially belong to the next one.
-                (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
-                // Second short button press.
-                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
-                // Intermediate not tooShort, but short enough to fit durationCombineMax_.
-                (BaseButton::getDurationShort_() <= ButtonTimedMultiple::previousDuration_(2)) &&
-                (durationCombineMax_ >= ButtonTimedMultiple::previousDuration_(2)) &&
-                // First short button press.
-                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(3)) &&
-                // Rule out more than double press.
-                ((durationCombineMax_ < ButtonTimedMultiple::previousDuration_(4)) ||
-                 (0 == ButtonTimedMultiple::previousDuration_(4)))
-               );
+        bool const detected = (detectionAllowed_(3, now) &&
+                               BaseButton::isUp() &&
+                               // Current long enough not to potentially belong to the next one.
+                               (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                               // Second short button press.
+                               (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
+                               // Intermediate not tooShort, but short enough to fit durationCombineMax_.
+                               (BaseButton::getDurationShort_() <= ButtonTimedMultiple::previousDuration_(2)) &&
+                               (durationCombineMax_ >= ButtonTimedMultiple::previousDuration_(2)) &&
+                               // First short button press.
+                               (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(3)) &&
+                               // Rule out more than double press.
+                               ((durationCombineMax_ < ButtonTimedMultiple::previousDuration_(4)) ||
+                                         (not BaseButton::previousTimestamp_(4)->has_value()))
+                               );
+
+        if (detected)
+        {
+            timestampLastDetection_ = now;
+        }
+        else
+        {
+            // intentionally empty
+        }
+
+        return detected;
     }
 
-    bool isSingleDownShortFinished(BaseButton::Timestamp_t const & since)
+    bool isSingleDownShortFinished(BaseButton::Timestamp_t const & now)
     {
-        return (BaseButton::somethingHappened_(since) &&
-                BaseButton::isUp() &&
-                // Current long enough not to potentially belong to the next one.
-                (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
-                // First short button press.
-                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
-                // Rule out more than single press.
-                ((durationCombineMax_ < ButtonTimedMultiple::previousDuration_(2)) ||
-                 (0 == ButtonTimedMultiple::previousDuration_(2)))
-               );
+        bool const detected = (detectionAllowed_(1, now) &&
+                               BaseButton::isUp() &&
+                               // Current long enough not to potentially belong to the next one.
+                               (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                               // First short button press.
+                               (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
+                               // Rule out more than single press.
+                               ((durationCombineMax_ < ButtonTimedMultiple::previousDuration_(2)) ||
+                                (not BaseButton::previousTimestamp_(2)->has_value()))
+                               );
+
+        if (detected)
+        {
+            timestampLastDetection_ = now;
+        }
+        else
+        {
+            // intentionally empty
+        }
+
+        return detected;
     }
 
 private:
 
     ButtonTimedProperties::Duration_t const durationCombineMax_;
+    BaseButton::TimestampOptional_t timestampLastDetection_;
+
+    bool detectionAllowed_(size_t const lookback, BaseButton::Timestamp_t const & now) const
+    {
+        bool allowed = false;
+        if (not timestampLastDetection_.has_value()) /* No detection recorded as of yet -> allowed. */
+        {
+            allowed = true;
+        }
+        else
+        {
+            /* Ensure the current action began after the last detection. */
+            std::optional<BaseButton::Timestamp_t> const * const timestampBeginOfAction = BaseButton::previousTimestamp_(lookback);
+
+            if (timestampBeginOfAction->has_value() && (timestampBeginOfAction->value() > timestampLastDetection_.value()))
+            {
+                allowed = true;
+            }
+            else if (timestampLastDetection_.value() == now) /* Allow querying at the same time multiple times. */
+            {
+                allowed = true;
+            }
+            else
+            {
+                // intentionally empty
+            }
+        }
+
+        return allowed;
+    }
 
 };
 
