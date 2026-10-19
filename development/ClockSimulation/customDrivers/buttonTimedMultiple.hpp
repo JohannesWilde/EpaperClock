@@ -24,6 +24,16 @@ enum class ButtonState
  * Intrinsically it has support for determining whether the last press was tooShort,
  * short or long.
  * For more info see ButtonTimedMultiple.
+ *
+ *
+ * This class is supposed to be used by:
+ *  - Calling update() each time the actual button changes state.
+ *  - Querying the member methods in an application loop as to detect intermediate button presses there.
+ *
+ * Please note:
+ *  - This requires querying this instance with at least half the frequency that update() is called, or else button
+ *    presses will be lost.
+ *
  */
 template <size_t HistoryLength_ = 2>
 class ButtonTimed
@@ -359,6 +369,38 @@ private:
 
 // ----------------------------------------------------------------------------------------------------
 
+/**
+ * @brief The ButtonTimedMultiple class is supposed to provide an interface to a button.
+ *
+ * Please note:
+ *  - As to prevent multiple detections of the same single-/double-button-press this class requires both:
+ *      - A grace period of at least durationCombineMax after the last button release.
+ *      - And that the start of the current sequence began after the timestamp of the last detection.
+ *      - It does however report a detection multiple times if checked at the same time as the last detection.
+ *
+ *
+ *  - For a single click to be finished it requires the following sequence:
+ *
+ *    Up  _____________________________________      __________________
+ *                                            |      |
+ *    Down                                    |______|
+ *
+ *            ^                               ^      ^             ^
+ *            |                               |      |             |
+ *      lastDetection                        [1]    [0]           now
+ *
+ *
+ *  - For a doulbe click to be finished it requires the following sequence:
+ *
+ *    Up  __________________________     _______      __________________
+ *                                 |     |     |      |
+ *    Down                         |_____|     |______|
+ *
+ *            ^                    ^     ^     ^      ^             ^
+ *            |                    |     |     |      |             |
+ *      lastDetection             [3]   [2]   [1]    [0]           now
+ *
+ */
 template <size_t HistoryLength_ = 5>
 class ButtonTimedMultiple : public ButtonTimed<HistoryLength_>
 {
