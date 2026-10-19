@@ -28,9 +28,9 @@ Helper::Helper()
     , reducedDisplaySymbols_(false)
     , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
-    , button_(std::chrono::milliseconds(100),
-              std::chrono::milliseconds(500),
-              std::chrono::milliseconds(100))
+    , buttonSettings_(/*short*/ std::chrono::milliseconds(50),
+                      /*long*/ std::chrono::milliseconds(500),
+                      /*combineMax*/ std::chrono::milliseconds(400))
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -47,9 +47,22 @@ Helper::Helper()
 
 void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp)
 {
+    ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
+    if (buttonSettings_.isDoubleDownShortFinished(now))
+    {
+        std::cout << "buttonSettings_ double." << std::endl;
+    }
+    else if (buttonSettings_.isSingleDownShortFinished(now))
+    {
+        std::cout << "buttonSettings_ single." << std::endl;
+    }
+    else
+    {
+        // intentionally empty
+    }
+
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
-
 
 
     std::chrono::steady_clock::time_point const steadyNow = std::chrono::steady_clock::now();
@@ -216,11 +229,60 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
 void Helper::mousePress(const QPoint & point)
 {
-    std::cout << "press: " << point.x() << ", " << point.y() << " ["
-              << toString(positionToButton(Coordinates2d::Position{point.x(), point.y()})) << "]" << std::endl;
+    switch (positionToButton(Coordinates2d::Position{point.x(), point.y()}))
+    {
+    case ClockGuiButton::None:
+    {
+        break;
+    }
+    case ClockGuiButton::Settings:
+    {
+        ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
+        buttonSettings_.update(ButtonState::Down, now);
+        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ down." << std::endl;
+        break;
+    }
+    case ClockGuiButton::Right:
+    {
+        break;
+    }
+    case ClockGuiButton::Up:
+    {
+        break;
+    }
+    case ClockGuiButton::OnOffOrDown:
+    {
+        break;
+    }
+    }
 }
 
 void Helper::mouseRelease(const QPoint & point)
 {
-    std::cout << "release: " << point.x() << ", " << point.y() << std::endl;
+    switch (positionToButton(Coordinates2d::Position{point.x(), point.y()}))
+    {
+    case ClockGuiButton::None:
+    {
+        break;
+    }
+    case ClockGuiButton::Settings:
+    {
+        ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
+        buttonSettings_.update(ButtonState::Up, now);
+        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ up." << std::endl;
+        break;
+    }
+    case ClockGuiButton::Right:
+    {
+        break;
+    }
+    case ClockGuiButton::Up:
+    {
+        break;
+    }
+    case ClockGuiButton::OnOffOrDown:
+    {
+        break;
+    }
+    }
 }
