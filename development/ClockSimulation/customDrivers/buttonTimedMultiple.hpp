@@ -387,7 +387,7 @@ public:
         bool const detected = (detectionAllowed_(3, now) &&
                                BaseButton::isUp() &&
                                // Current long enough not to potentially belong to the next one.
-                               (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                               (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0, &now)) &&
                                // Second short button press.
                                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
                                // Intermediate not tooShort, but short enough to fit durationCombineMax_.
@@ -417,7 +417,7 @@ public:
         bool const detected = (detectionAllowed_(1, now) &&
                                BaseButton::isUp() &&
                                // Current long enough not to potentially belong to the next one.
-                               (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0)) &&
+                               (durationCombineMax_ < ButtonTimedMultiple::previousDuration_(0, &now)) &&
                                // First short button press.
                                (ButtonTimedProperties::Duration::Short == ButtonTimedMultiple::previousState(1)) &&
                                // Rule out more than single press.
