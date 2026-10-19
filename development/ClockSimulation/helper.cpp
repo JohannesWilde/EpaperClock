@@ -28,9 +28,9 @@ Helper::Helper()
     , reducedDisplaySymbols_(false)
     , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
-    , buttonSettings_(/*short*/ std::chrono::milliseconds(50),
-                      /*long*/ std::chrono::milliseconds(500),
-                      /*combineMax*/ std::chrono::milliseconds(400))
+    // , buttonSettings_(/*short*/ std::chrono::milliseconds(50),
+    //                   /*long*/ std::chrono::milliseconds(500),
+    //                   /*combineMax*/ std::chrono::milliseconds(400))
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -47,19 +47,19 @@ Helper::Helper()
 
 void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp)
 {
-    ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-    if (buttonSettings_.isDoubleDownShortFinished(now))
-    {
-        std::cout << "buttonSettings_ double." << std::endl;
-    }
-    else if (buttonSettings_.isSingleDownShortFinished(now))
-    {
-        std::cout << "buttonSettings_ single." << std::endl;
-    }
-    else
-    {
-        // intentionally empty
-    }
+    // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
+    // if (buttonSettings_.isDoubleDownShortFinished(now))
+    // {
+    //     std::cout << "buttonSettings_ double." << std::endl;
+    // }
+    // else if (buttonSettings_.isSingleDownShortFinished(now))
+    // {
+    //     std::cout << "buttonSettings_ single." << std::endl;
+    // }
+    // else
+    // {
+    //     // intentionally empty
+    // }
 
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
@@ -82,7 +82,7 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
     {
         // Show all symbols for the first second.
     }
-    else if (std::chrono::seconds(1) >= steadyNow - std::get<std::chrono::steady_clock::time_point>(firstRender_))
+    else if (std::chrono::seconds(5) >= steadyNow - std::get<std::chrono::steady_clock::time_point>(firstRender_))
     {
         // But render only once.
         updateRender = false;
@@ -153,7 +153,7 @@ void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::syste
 
     if (updateRender & (0 < imageWidth_) & (0 < imageHeight_))
     {
-        // todo: render in chunks of 1 kB a 4 Pixels per byte
+        // todo: render only updated section? -> check RAM/flash requirements for tracking bounding rect
         // todo: fix dimensions [width - 1]
 
         std::chrono::steady_clock::time_point const startFill = std::chrono::steady_clock::now();
@@ -237,9 +237,9 @@ void Helper::mousePress(const QPoint & point)
     }
     case ClockGuiButton::Settings:
     {
-        ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-        buttonSettings_.update(ButtonState::Down, now);
-        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ down." << std::endl;
+        // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
+        // buttonSettings_.update(ButtonState::Down, now);
+        // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ down." << std::endl;
         break;
     }
     case ClockGuiButton::Right:
@@ -267,9 +267,9 @@ void Helper::mouseRelease(const QPoint & point)
     }
     case ClockGuiButton::Settings:
     {
-        ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-        buttonSettings_.update(ButtonState::Up, now);
-        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ up." << std::endl;
+        // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
+        // buttonSettings_.update(ButtonState::Up, now);
+        // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ up." << std::endl;
         break;
     }
     case ClockGuiButton::Right:

@@ -4,7 +4,7 @@
 #ifndef HELPER_H
 #define HELPER_H
 
-#include <customDrivers/buttonTimedMultiple.hpp>
+// #include <customDrivers/buttonTimedMultiple.hpp>
 
 #include <QBrush>
 #include <QFont>
@@ -52,7 +52,7 @@ private:
 
     std::shared_ptr<Renderer2dClockGui> clockGui_;
 
-    ButtonTimedMultiple<> buttonSettings_;
+    // ButtonTimedMultiple<> buttonSettings_;
 
 };
 //! [0]
