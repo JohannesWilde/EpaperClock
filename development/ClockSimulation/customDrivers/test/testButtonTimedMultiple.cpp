@@ -9,6 +9,8 @@ static ButtonTimedProperties::Duration_t const durationShort = std::chrono::mill
 static ButtonTimedProperties::Duration_t const durationLong = std::chrono::milliseconds{300};
 static ButtonTimedProperties::Duration_t const durationCombineMax = std::chrono::milliseconds{100};
 
+static ButtonTimedProperties::Duration_t const durationEpsilon = std::chrono::milliseconds{1};
+
 static Button::Timestamp_t const timestampStart; // Use default constructor for base timestamp.
 
 TEST(ButtonTimedMultiple, wasDownShort)
@@ -270,17 +272,16 @@ TEST(ButtonTimedMultiple, clearHistory)
 TEST(ButtonTimedMultiple, currentDuration)
 {
     std::chrono::duration const durationLongLater = std::chrono::milliseconds(2000);
-    std::chrono::duration const durationEndEarlier = std::chrono::milliseconds(1);
 
-    assert((durationLong - durationShort) > durationEndEarlier);
-    assert(durationShort > durationEndEarlier);
+    assert((durationLong - durationShort) > durationEpsilon);
+    assert(durationShort > durationEpsilon);
 
     Button::Timestamp_t const timestampLongBegin = timestampStart + durationLong;
     Button::Timestamp_t const timestampLongLater = timestampLongBegin + durationLongLater;
     Button::Timestamp_t const timestampShortBegin = timestampStart + durationShort;
-    Button::Timestamp_t const timestampShortEnd = timestampLongBegin - durationEndEarlier;
+    Button::Timestamp_t const timestampShortEnd = timestampLongBegin - durationEpsilon;
     Button::Timestamp_t const timestampTooShortBegin = timestampStart;
-    Button::Timestamp_t const timestampTooShortEnd = timestampShortBegin - durationEndEarlier;
+    Button::Timestamp_t const timestampTooShortEnd = timestampShortBegin - durationEpsilon;
 
     Button button{durationShort, durationLong, durationCombineMax, ButtonState::Up};
 
@@ -333,22 +334,70 @@ TEST(ButtonTimedMultiple, currentDuration)
     }
 }
 
-TEST(ButtonTimedMultiple, doubleDown)
+TEST(ButtonTimedMultiple, shortDown)
 {
     Button::Timestamp_t timestamp = timestampStart;
 
     Button button{durationShort, durationLong, durationCombineMax, ButtonState::Up};
 
-    // short down
-    button.update(ButtonState::Down, timestamp);
-    timestamp += durationShort;
-
-    button.update(ButtonState::Up, timestamp);
-
-    Button::Timestamp_t const now = timestamp + durationLong;
-
+    for (size_t index = 0; 2 > index; ++index)
     {
-        EXPECT_FALSE(button.isDoubleDownShortFinished(now));
-        EXPECT_TRUE(button.isSingleDownShortFinished(now));
+        // short down
+        button.update(ButtonState::Down, timestamp);
+        timestamp += durationShort;
+
+        button.update(ButtonState::Up, timestamp);
+
+        Button::Timestamp_t now = timestamp;
+
+        {
+            EXPECT_FALSE(button.isDoubleDownShortFinished(now));
+            EXPECT_FALSE(button.isSingleDownShortFinished(now));
+        }
+
+        now += durationCombineMax;
+
+        {
+            EXPECT_FALSE(button.isDoubleDownShortFinished(now));
+            EXPECT_FALSE(button.isSingleDownShortFinished(now));
+        }
+
+        now += durationEpsilon;
+
+        Button::Timestamp_t const timestampDetection = now;
+        {
+            EXPECT_FALSE(button.isDoubleDownShortFinished(timestampDetection));
+            EXPECT_TRUE(button.isSingleDownShortFinished(timestampDetection)) << "At index " << index << ".";
+
+            // If I query at the same time again, expect it to yield the same results again.
+            EXPECT_FALSE(button.isDoubleDownShortFinished(timestampDetection));
+            EXPECT_TRUE(button.isSingleDownShortFinished(timestampDetection));
+        }
+
+        {
+            // At a later point do not report the same click again.
+            Button::Timestamp_t const later = now + durationEpsilon;
+            EXPECT_FALSE(button.isDoubleDownShortFinished(later));
+            EXPECT_FALSE(button.isSingleDownShortFinished(later));
+        }
+
+        {
+            // At a later point do not report the same click again.
+            Button::Timestamp_t const later = now + durationShort;
+            EXPECT_FALSE(button.isDoubleDownShortFinished(later));
+            EXPECT_FALSE(button.isSingleDownShortFinished(later));
+        }
+
+        {
+            // At a later point do not report the same click again.
+            Button::Timestamp_t const later = now + durationLong;
+            EXPECT_FALSE(button.isDoubleDownShortFinished(later));
+            EXPECT_FALSE(button.isSingleDownShortFinished(later));
+        }
+
+
+        // Next press.
+        timestamp = timestampDetection + durationEpsilon;
     }
+
 }
