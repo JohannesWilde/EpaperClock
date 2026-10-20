@@ -240,8 +240,6 @@ void Helper::mousePress(const QPoint & point)
     case ClockGuiButton::Settings:
     {
         pinAndButtonSettings_.pin.set(SimplePin::State::Zero);
-        // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-        // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ down." << std::endl;
         break;
     }
     case ClockGuiButton::Right:
@@ -270,8 +268,6 @@ void Helper::mouseRelease(const QPoint & point)
     case ClockGuiButton::Settings:
     {
         pinAndButtonSettings_.pin.set(SimplePin::State::One);
-        // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-        // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ up." << std::endl;
         break;
     }
     case ClockGuiButton::Right:
