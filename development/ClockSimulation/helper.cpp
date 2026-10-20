@@ -46,6 +46,10 @@ Helper::Helper(PinAndButton settings)
 void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp)
 {
     pinAndButtonSettings_.button.update();
+    if (pinAndButtonSettings_.button.isDownLong())
+    {
+        std::cout << "buttonSettings_ long." << std::endl;
+    }
     if (pinAndButtonSettings_.button.isDoubleDownShortFinished())
     {
         std::cout << "buttonSettings_ double." << std::endl;
