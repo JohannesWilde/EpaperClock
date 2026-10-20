@@ -14,8 +14,14 @@
 
 
 //! [0]
-Window::Window(PinAndButton settings)
-    : helper(settings)
+Window::Window(PinAndButton buttonSettings,
+               PinAndButton buttonRight,
+               PinAndButton buttonUp,
+               PinAndButton buttonOnOffOrDown)
+    : helper(buttonSettings,
+             buttonRight,
+             buttonUp,
+             buttonOnOffOrDown)
 {
     setWindowTitle(tr("Simulating Clock"));
 

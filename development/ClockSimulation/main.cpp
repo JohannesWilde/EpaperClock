@@ -15,7 +15,10 @@ int main(int argc, char *argv[])
     fmt.setSamples(4);
     QSurfaceFormat::setDefaultFormat(fmt);
 
-    Window window(PinAndButton{pin0, buttonTimedMultiple0});
+    Window window(PinAndButton{pin0, buttonTimedMultiple0},
+                  PinAndButton{pin1, buttonTimedMultiple1},
+                  PinAndButton{pin2, buttonTimedMultiple2},
+                  PinAndButton{pin3, buttonTimedMultiple3});
     window.show();
     return app.exec();
 }

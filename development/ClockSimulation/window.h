@@ -18,7 +18,10 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window(PinAndButton settings);
+    Window(PinAndButton buttonSettings,
+           PinAndButton buttonRight,
+           PinAndButton buttonUp,
+           PinAndButton buttonOnOffOrDown);
 
 protected:
 

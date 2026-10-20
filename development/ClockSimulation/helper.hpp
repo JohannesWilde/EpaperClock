@@ -24,7 +24,10 @@ class Renderer2dClockGui;
 class Helper
 {
 public:
-    Helper(PinAndButton settings);
+    Helper(PinAndButton buttonSettings,
+           PinAndButton buttonRight,
+           PinAndButton buttonUp,
+           PinAndButton buttonOnOffOrDown);
 
 public:
     void paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp);
@@ -52,6 +55,9 @@ private:
     std::shared_ptr<Renderer2dClockGui> clockGui_;
 
     PinAndButton pinAndButtonSettings_;
+    PinAndButton pinAndButtonRight_;
+    PinAndButton pinAndButtonUp_;
+    PinAndButton pinAndButtonOnOffOrDown_;
 
 };
 //! [0]

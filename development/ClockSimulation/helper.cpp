@@ -19,7 +19,10 @@
 
 
 
-Helper::Helper(PinAndButton settings)
+Helper::Helper(PinAndButton buttonSettings,
+               PinAndButton buttonRight,
+               PinAndButton buttonUp,
+               PinAndButton buttonOnOffOrDown)
     : imageWidth_(GuiFixtures::displayWidth)
     , imageHeight_(GuiFixtures::displayHeight)
     , renderData_(imageWidth_ * imageHeight_)
@@ -28,7 +31,10 @@ Helper::Helper(PinAndButton settings)
     , reducedDisplaySymbols_(false)
     , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
-    , pinAndButtonSettings_(settings)
+    , pinAndButtonSettings_(buttonSettings)
+    , pinAndButtonRight_(buttonRight)
+    , pinAndButtonUp_(buttonUp)
+    , pinAndButtonOnOffOrDown_(buttonOnOffOrDown)
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -244,14 +250,17 @@ void Helper::mousePress(const QPoint & point)
     }
     case ClockGuiButton::Right:
     {
+        pinAndButtonRight_.pin.set(SimplePin::State::Zero);
         break;
     }
     case ClockGuiButton::Up:
     {
+        pinAndButtonUp_.pin.set(SimplePin::State::Zero);
         break;
     }
     case ClockGuiButton::OnOffOrDown:
     {
+        pinAndButtonOnOffOrDown_.pin.set(SimplePin::State::Zero);
         break;
     }
     }
@@ -272,14 +281,17 @@ void Helper::mouseRelease(const QPoint & point)
     }
     case ClockGuiButton::Right:
     {
+        pinAndButtonRight_.pin.set(SimplePin::State::One);
         break;
     }
     case ClockGuiButton::Up:
     {
+        pinAndButtonUp_.pin.set(SimplePin::State::One);
         break;
     }
     case ClockGuiButton::OnOffOrDown:
     {
+        pinAndButtonOnOffOrDown_.pin.set(SimplePin::State::One);
         break;
     }
     }
