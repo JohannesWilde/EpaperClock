@@ -19,7 +19,7 @@
 
 
 
-Helper::Helper()
+Helper::Helper(PinAndButton settings)
     : imageWidth_(GuiFixtures::displayWidth)
     , imageHeight_(GuiFixtures::displayHeight)
     , renderData_(imageWidth_ * imageHeight_)
@@ -28,9 +28,7 @@ Helper::Helper()
     , reducedDisplaySymbols_(false)
     , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
-    // , buttonSettings_(/*short*/ std::chrono::milliseconds(50),
-    //                   /*long*/ std::chrono::milliseconds(500),
-    //                   /*combineMax*/ std::chrono::milliseconds(400))
+    , pinAndButtonSettings_(settings)
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -47,19 +45,19 @@ Helper::Helper()
 
 void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp)
 {
-    // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-    // if (buttonSettings_.isDoubleDownShortFinished(now))
-    // {
-    //     std::cout << "buttonSettings_ double." << std::endl;
-    // }
-    // else if (buttonSettings_.isSingleDownShortFinished(now))
-    // {
-    //     std::cout << "buttonSettings_ single." << std::endl;
-    // }
-    // else
-    // {
-    //     // intentionally empty
-    // }
+    pinAndButtonSettings_.button.update();
+    if (pinAndButtonSettings_.button.isDoubleDownShortFinished())
+    {
+        std::cout << "buttonSettings_ double." << std::endl;
+    }
+    else if (pinAndButtonSettings_.button.isSingleDownShortFinished())
+    {
+        std::cout << "buttonSettings_ single." << std::endl;
+    }
+    else
+    {
+        // intentionally empty
+    }
 
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
@@ -237,8 +235,8 @@ void Helper::mousePress(const QPoint & point)
     }
     case ClockGuiButton::Settings:
     {
+        pinAndButtonSettings_.pin.set(SimplePin::State::Zero);
         // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-        // buttonSettings_.update(ButtonState::Down, now);
         // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ down." << std::endl;
         break;
     }
@@ -267,8 +265,8 @@ void Helper::mouseRelease(const QPoint & point)
     }
     case ClockGuiButton::Settings:
     {
+        pinAndButtonSettings_.pin.set(SimplePin::State::One);
         // ButtonTimedMultiple<>::Timestamp_t const now = ButtonTimedMultiple<>::now();
-        // buttonSettings_.update(ButtonState::Up, now);
         // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() << " - buttonSettings_ up." << std::endl;
         break;
     }

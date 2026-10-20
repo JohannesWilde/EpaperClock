@@ -14,7 +14,8 @@
 
 
 //! [0]
-Window::Window()
+Window::Window(PinAndButton settings)
+    : helper(settings)
 {
     setWindowTitle(tr("Simulating Clock"));
 
