@@ -11,7 +11,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL OpenGLWidgets Widgets)
 qt_standard_project_setup()
 
 add_subdirectory(third_party)
-add_subdirectory(customDrivers)
+add_subdirectory(../../EpaperClock/ArduinoDrivers
+    ${CMAKE_CURRENT_BINARY_DIR}/ArduinoDrivers)
 
 qt_add_executable(${PROJECT_NAME}
     coordinates2d.cpp coordinates2d.hpp
@@ -24,6 +25,7 @@ qt_add_executable(${PROJECT_NAME}
     constexprAbs.hpp
     renderer2dclockgui.hpp
     renderer2dclockgui.cpp
+    dummybuttons.hpp dummybuttons.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -37,7 +39,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::OpenGL
     Qt6::OpenGLWidgets
     Qt6::Widgets
-    customDrivers
+    arduinoDrivers
 )
 
 install(TARGETS ${PROJECT_NAME}

@@ -4,6 +4,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "dummybuttons.hpp"
 #include "helper.hpp"
 
 #include <QWidget>
@@ -17,7 +18,10 @@ class Window : public QWidget
     Q_OBJECT
 
 public:
-    Window();
+    Window(PinAndButton buttonSettings,
+           PinAndButton buttonRight,
+           PinAndButton buttonUp,
+           PinAndButton buttonOnOffOrDown);
 
 protected:
 

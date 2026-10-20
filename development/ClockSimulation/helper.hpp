@@ -4,7 +4,7 @@
 #ifndef HELPER_H
 #define HELPER_H
 
-#include <customDrivers/buttonTimedMultiple.hpp>
+#include "dummybuttons.hpp"
 
 #include <QBrush>
 #include <QFont>
@@ -20,12 +20,14 @@
 class Renderer2dClockGui;
 
 
-
 //! [0]
 class Helper
 {
 public:
-    Helper();
+    Helper(PinAndButton buttonSettings,
+           PinAndButton buttonRight,
+           PinAndButton buttonUp,
+           PinAndButton buttonOnOffOrDown);
 
 public:
     void paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp);
@@ -52,7 +54,10 @@ private:
 
     std::shared_ptr<Renderer2dClockGui> clockGui_;
 
-    ButtonTimedMultiple<> buttonSettings_;
+    PinAndButton pinAndButtonSettings_;
+    PinAndButton pinAndButtonRight_;
+    PinAndButton pinAndButtonUp_;
+    PinAndButton pinAndButtonOnOffOrDown_;
 
 };
 //! [0]

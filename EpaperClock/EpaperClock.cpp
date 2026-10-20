@@ -13,7 +13,7 @@
 
 #include "ArduinoDrivers/arduinoUno.hpp"
 #include "ArduinoDrivers/button.hpp"
-#include "ArduinoDrivers/buttonTimed.hpp"
+#include "ArduinoDrivers/deprecated/buttonTimed.hpp"
 #include "ArduinoDrivers/driverHelper.hpp"
 #include "ArduinoDrivers/powerbankKeepAlive.hpp"
 #include "ArduinoDrivers/simplePinAvr.hpp"
@@ -69,16 +69,16 @@ ButtonTimedProperties::Duration_t constexpr keyPressDurationLong = 20;
 
 typedef PowerbankKeepAlive</*AvrPin*/ ArduinoUno::D2, /*DurationActive*/ 1, /*DurationInactive*/ 19> PowerbankKeepAlive0;
 
-typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+typedef TMP::ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D5, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
                            /*DownState*/ SimplePin::State::Zero>,
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key1;
-typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+typedef TMP::ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D6, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
                            /*DownState*/ SimplePin::State::Zero>,
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key2;
-typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+typedef TMP::ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D4, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
                            /*DownState*/ SimplePin::State::Zero>,
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key3;
-typedef ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
+typedef TMP::ButtonTimed<Button<SimplePinAvrRead</*AvrPin*/ ArduinoUno::D3, /*PinDownState*/ AvrInputOutput::PinType::InputPullup>,
                            /*DownState*/ SimplePin::State::Zero>,
                     /*DurationShort*/ keyPressDurationShort, /*DurationLong*/ keyPressDurationLong> Key4;
 
