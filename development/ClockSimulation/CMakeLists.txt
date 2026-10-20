@@ -11,7 +11,6 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui OpenGL OpenGLWidgets Widgets)
 qt_standard_project_setup()
 
 add_subdirectory(third_party)
-add_subdirectory(customDrivers)
 add_subdirectory(../../EpaperClock/ArduinoDrivers
     ${CMAKE_CURRENT_BINARY_DIR}/ArduinoDrivers)
 
