@@ -13,6 +13,8 @@ qt_standard_project_setup()
 add_subdirectory(third_party)
 add_subdirectory(../../EpaperClock/ArduinoDrivers
     ${CMAKE_CURRENT_BINARY_DIR}/ArduinoDrivers)
+add_subdirectory(../../EpaperClock/helpers
+    ${CMAKE_CURRENT_BINARY_DIR}/helpers)
 
 qt_add_executable(${PROJECT_NAME}
     coordinates2d.cpp coordinates2d.hpp
@@ -40,6 +42,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::OpenGLWidgets
     Qt6::Widgets
     arduinoDrivers
+    helpers
 )
 
 install(TARGETS ${PROJECT_NAME}
