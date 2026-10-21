@@ -7,3 +7,6 @@
 [submodule "development/ClockSimulation/third_party/googletest"]
 	path = development/ClockSimulation/third_party/googletest
 	url = https://github.com/google/googletest.git
+[submodule "EpaperClock/helpers"]
+	path = EpaperClock/helpers
+	url = ../helpers.git
