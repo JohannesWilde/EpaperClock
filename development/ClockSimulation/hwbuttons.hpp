@@ -2,8 +2,6 @@
 #include <ArduinoDrivers/buttonTimedProperties.hpp>
 #include <ArduinoDrivers/simplePinBit.hpp>
 
-#include <cassert>
-
 
 static constexpr SimplePin::State downState = SimplePin::State::Zero;
 static constexpr SimplePin::State upState = SimplePin::State::One;
