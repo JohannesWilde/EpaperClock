@@ -28,6 +28,7 @@ qt_add_executable(${PROJECT_NAME}
     renderer2dclockgui.hpp
     renderer2dclockgui.cpp
     dummybuttons.hpp dummybuttons.cpp
+    dummyStatemachine.cpp dummyStatemachine.hpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
