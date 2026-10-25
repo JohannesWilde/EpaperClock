@@ -13,6 +13,94 @@ StateSettings const stateSettings;
 
 Helpers::Statemachine<DataType> statemachine(stateOff);
 
+constexpr int splashDelay = 20;
+constexpr int settingsTimeout = 200;
+
+
+static bool timesChangedPerceptibly(std::chrono::system_clock::time_point const from,
+                                    std::chrono::system_clock::time_point const to)
+{
+    bool perceptibleDifference = (std::chrono::minutes(1) <= std::chrono::abs(to - from));
+
+    if (not perceptibleDifference)
+    {
+        // Check for difference in minutes if to was not aligned with a change of a minute [i.e. seconds = 0].
+
+        struct tm tmFrom{0};
+        {
+            std::time_t const time = std::chrono::system_clock::to_time_t(from);
+            errno_t const success = localtime_s(&tmFrom, &time);
+
+            if (0 != success)
+            {
+                return true;
+            }
+            else
+            {
+                // intentionally empty
+            }
+        }
+
+        struct tm tmTo{0};
+        {
+            std::time_t const time = std::chrono::system_clock::to_time_t(to);
+            errno_t const success = localtime_s(&tmTo, &time);
+
+            if (0 != success)
+            {
+                return true;
+            }
+            else
+            {
+                // intentionally empty
+            }
+        }
+
+        perceptibleDifference = (tmFrom.tm_min != tmTo.tm_min);
+    }
+    else
+    {
+        // intentionally empty
+    }
+
+    return perceptibleDifference;
+}
+
+static bool applyTimestampToClockGui(std::chrono::system_clock::time_point const timestamp, Renderer2dClockGui & clockGui)
+{
+    std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
+
+    struct tm nowLocal{0};
+    errno_t const success = localtime_s(&nowLocal, &nowTime);
+
+    bool const successfull = (0 == success);
+    if (successfull)
+    {
+        int const hours = nowLocal.tm_hour;
+        int const minutes = nowLocal.tm_min;
+
+        int const hoursLow = hours % 10;
+        int const hoursHigh = hours / 10;
+
+        int const minutesLow = minutes % 10;
+        int const minutesHigh = minutes / 10;
+
+        clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+        clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+        clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+        clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+    }
+    else
+    {
+        clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+    }
+
+    return successfull;
+}
+
 
 void StateOff::init(DataType & data) const
 {
@@ -72,16 +160,14 @@ void StateOff::deinit(DataType & data) const
 }
 
 
-constexpr int splashDelay = 20;
-
 void StateSplashScreen::init(DataType & data) const
 {
     data.delay = splashDelay;
 
     data.clockGui.buttonSettings.set(true);
-    data.clockGui.buttonSettingsRight.set(false);
+    data.clockGui.buttonSettingsRight.set(true);
     data.clockGui.buttonUp.set(true);
-    data.clockGui.buttonDown.set(true);
+    data.clockGui.buttonDown.set(false);
     data.clockGui.buttonOnOff.set(true);
 
     data.clockGui.selection0.set(true);
@@ -151,7 +237,7 @@ void StateClock::init(DataType & data) const
     data.clockGui.dotUpper.set(true);
     data.clockGui.dotLower.set(true);
 
-    data.previousMinutesLow = -1;
+    data.timestamp = std::chrono::system_clock::now() - std::chrono::minutes(1);
 }
 
 Helpers::AbstractState<DataType> const & StateClock::process(DataType & data) const
@@ -167,48 +253,26 @@ Helpers::AbstractState<DataType> const & StateClock::process(DataType & data) co
     }
     else
     {
-        // update clock [only if changed]
-        bool updateDisplay = true;
-
         std::chrono::system_clock::time_point const timestamp = std::chrono::system_clock::now();
-        std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
 
-        struct tm nowLocal{0};
-        errno_t const success = localtime_s(&nowLocal, &nowTime);
-        if (0 == success)
+        data.updateDisplay = timesChangedPerceptibly(data.timestamp, timestamp);
+
+        if (data.updateDisplay)
         {
-            int const hours = nowLocal.tm_hour;
-            int const minutes = nowLocal.tm_min;
-
-            int const hoursLow = hours % 10;
-            int const hoursHigh = hours / 10;
-
-            int const minutesLow = minutes % 10;
-            int const minutesHigh = minutes / 10;
-
-            if (data.previousMinutesLow != minutesLow)
+            bool const successfull = applyTimestampToClockGui(timestamp + data.timeOffset, data.clockGui);
+            if (successfull)
             {
-                data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
-                data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
-                data.clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
-                data.clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
-
-                data.previousMinutesLow = minutesLow;
+                data.timestamp = timestamp;
             }
             else
             {
-                updateDisplay = false;
+                // intentionally empty
             }
         }
         else
         {
-            data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-            data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-            data.clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-            data.clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            // intentionally empty
         }
-
-        data.updateDisplay = updateDisplay;
     }
     return *nextState;
 }
@@ -223,12 +287,23 @@ void StateClock::deinit(DataType & data) const
 
 void StateSettings::init(DataType & data) const
 {
-    data.delay = 200;
+    data.clockGui.buttonSettings.set(true);
+    data.clockGui.buttonSettingsRight.set(true);
+    data.clockGui.buttonUp.set(true);
+    data.clockGui.buttonDown.set(true);
+    data.clockGui.buttonOnOff.set(false);
 
-    // todo: display clock and settings selection
-    data.updateDisplay = true;
+    data.clockGui.selection0.set(true);
+    data.clockGui.selection1.set(false);
+    data.clockGui.selection2.set(false);
+    data.clockGui.selection3.set(false);
 
-    // todo: readout current time to data
+    data.clockGui.dotUpper.set(true);
+    data.clockGui.dotLower.set(true);
+
+    data.timestamp = std::chrono::system_clock::now() - std::chrono::minutes(1);
+
+    data.delay = settingsTimeout;
 }
 
 Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data) const
@@ -258,6 +333,11 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
 
     if (interacted)
     {
+        // Reset timeout.
+        data.delay = settingsTimeout;
+    }
+    else
+    {
         if (0 < data.delay)
         {
             --data.delay;
@@ -267,10 +347,9 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
             nextState = &stateClock;
         }
     }
-    else
-    {
-        data.delay = 200;
-    }
+
+    // todo: display clock and settings selection
+    data.updateDisplay = true;
 
     return *nextState;
 }

@@ -6,6 +6,8 @@
 
 #include <helpers/statemachine.hpp>
 
+#include <chrono>
+
 
 namespace EpaperClock
 {
@@ -19,9 +21,34 @@ struct DataType
 
     Renderer2dClockGui & clockGui;
 
-    int previousMinutesLow;
+    std::chrono::system_clock::time_point timestamp;
+    std::chrono::system_clock::duration timeOffset;
     int delay;
+
     bool updateDisplay;
+
+    DataType(CustomButtomTimedMultiple const & buttonSettings,
+             CustomButtomTimedMultiple const & buttonRight,
+             CustomButtomTimedMultiple const & buttonUp,
+             CustomButtomTimedMultiple const & buttonOnOffOrDown,
+             Renderer2dClockGui & clockGui)
+        : buttonSettings(buttonSettings)
+        , buttonRight(buttonRight)
+        , buttonUp(buttonUp)
+        , buttonOnOffOrDown(buttonOnOffOrDown)
+        , clockGui(clockGui)
+        , timeOffset(std::chrono::minutes(0))
+        , delay(-1)
+        , updateDisplay(false)
+    {
+        // intentionally empty
+    }
+
+    DataType(DataType const &) = default;
+    DataType(DataType &&) = default;
+    DataType & operator=(DataType const &) = default;
+    DataType & operator=(DataType &&) = default;
+
 };
 
 class StateOff : public Helpers::AbstractState<DataType>

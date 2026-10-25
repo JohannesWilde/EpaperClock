@@ -38,10 +38,7 @@ Helper::Helper(PinAndButton buttonSettings,
                         pinAndButtonRight_.button,
                         pinAndButtonUp_.button,
                         pinAndButtonOnOffOrDown_.button,
-                        static_cast<bool>(clockGui_) ? *clockGui_ : throw std::exception("Invalid clockGui."),
-                        /*previousMinutesLow*/ -1,
-                        /*delay*/ 0,
-                        /*updateDisplay*/ false)
+                        static_cast<bool>(clockGui_) ? *clockGui_ : throw std::exception("Invalid clockGui."))
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
