@@ -19,9 +19,8 @@ GLWidget::GLWidget(Helper *helper, QWidget *parent)
 //! [0]
 
 //! [1]
-void GLWidget::animate(std::chrono::system_clock::time_point const now)
+void GLWidget::animate()
 {
-    timestamp_ = now;
     update();
 }
 //! [1]
@@ -34,7 +33,7 @@ void GLWidget::paintEvent(QPaintEvent *event)
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    helper->paint(&painter, widgetSize, timestamp_);
+    helper->paint(&painter, widgetSize);
     painter.end();
 }
 

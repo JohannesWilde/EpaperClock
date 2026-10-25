@@ -2,6 +2,7 @@
 #define EPAPER_CLOCK_DUMMY_STATEMACHINE_HPP
 
 #include "dummybuttons.hpp"
+#include "renderer2dclockgui.hpp"
 
 #include <helpers/statemachine.hpp>
 
@@ -16,6 +17,9 @@ struct DataType
     CustomButtomTimedMultiple const & buttonUp;
     CustomButtomTimedMultiple const & buttonOnOffOrDown;
 
+    Renderer2dClockGui & clockGui;
+
+    int previousMinutesLow;
     int delay;
     bool updateDisplay;
 };

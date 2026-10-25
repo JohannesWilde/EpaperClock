@@ -28,13 +28,20 @@ Helper::Helper(PinAndButton buttonSettings,
     , renderData_(imageWidth_ * imageHeight_)
     , imageData_(imageWidth_ * imageHeight_)
     , image_(reinterpret_cast<uchar const *>(imageData_.data()), imageWidth_, imageHeight_, QImage::Format::Format_RGB32)
-    , reducedDisplaySymbols_(false)
-    , previousMinutesLow_(-1)
     , clockGui_(std::make_shared<Renderer2dClockGui>())
     , pinAndButtonSettings_(buttonSettings)
     , pinAndButtonRight_(buttonRight)
     , pinAndButtonUp_(buttonUp)
     , pinAndButtonOnOffOrDown_(buttonOnOffOrDown)
+    , statemachine_(EpaperClock::stateSplashScreen)
+    , statemachineData_(pinAndButtonSettings_.button,
+                        pinAndButtonRight_.button,
+                        pinAndButtonUp_.button,
+                        pinAndButtonOnOffOrDown_.button,
+                        static_cast<bool>(clockGui_) ? *clockGui_ : throw std::exception("Invalid clockGui."),
+                        /*previousMinutesLow*/ -1,
+                        /*delay*/ 0,
+                        /*updateDisplay*/ false)
 {
     QLinearGradient gradient(QPointF(50, -20), QPointF(80, 20));
     gradient.setColorAt(0.0, Qt::white);
@@ -49,117 +56,19 @@ Helper::Helper(PinAndButton buttonSettings,
 }
 
 
-void Helper::paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp)
+void Helper::paint(QPainter *painter, QSize const & viewport)
 {
     pinAndButtonSettings_.button.update();
-    if (pinAndButtonSettings_.button.isDownLong())
-    {
-        std::cout << "buttonSettings_ long." << std::endl;
-    }
-    if (pinAndButtonSettings_.button.isDoubleDownShortFinished())
-    {
-        std::cout << "buttonSettings_ double." << std::endl;
-    }
-    else if (pinAndButtonSettings_.button.isSingleDownShortFinished())
-    {
-        std::cout << "buttonSettings_ single." << std::endl;
-    }
-    else
-    {
-        // intentionally empty
-    }
+    pinAndButtonRight_.button.update();
+    pinAndButtonUp_.button.update();
+    pinAndButtonOnOffOrDown_.button.update();
+
+    statemachine_.process(statemachineData_);
 
     int const textSize = std::min(std::min(viewport.width(), viewport.height()), 50);
     textFont.setPixelSize(textSize);
 
-
-    std::chrono::steady_clock::time_point const steadyNow = std::chrono::steady_clock::now();
-    if (std::holds_alternative<std::monostate>(firstRender_))
-    {
-        firstRender_ = steadyNow;
-    }
-    else
-    {
-        // intentionally empty
-    }
-
-
-    bool updateRender = true;
-
-    if (steadyNow == std::get<std::chrono::steady_clock::time_point>(firstRender_))
-    {
-        // Show all symbols for the first second.
-    }
-    else if (std::chrono::seconds(5) >= steadyNow - std::get<std::chrono::steady_clock::time_point>(firstRender_))
-    {
-        // But render only once.
-        updateRender = false;
-    }
-    else
-    {
-        if (not reducedDisplaySymbols_)
-        {
-            clockGui_->buttonUp.set(false);
-            // clockGui_->buttonDown.set(false);
-            clockGui_->buttonSettingsRight.set(false);
-            clockGui_->selection0.set(false);
-            clockGui_->selection1.set(false);
-            clockGui_->selection2.set(false);
-            clockGui_->selection3.set(false);
-
-            reducedDisplaySymbols_ = true;
-        }
-        else
-        {
-            // intentionally empty
-        }
-
-
-        std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
-
-        // MSVC
-        // static __inline errno_t __CRTDECL localtime_s(
-        //     _Out_ struct tm*    const _Tm,
-        //     _In_  time_t const* const _Time
-        //     )
-
-        struct tm nowLocal{0};
-        errno_t const success = localtime_s(&nowLocal, &nowTime);
-        if (0 == success)
-        {
-            int const hours = nowLocal.tm_hour;
-            int const minutes = nowLocal.tm_min;
-
-            int const hoursLow = hours % 10;
-            int const hoursHigh = hours / 10;
-
-            int const minutesLow = minutes % 10;
-            int const minutesHigh = minutes / 10;
-
-            if (previousMinutesLow_ != minutesLow)
-            {
-                clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
-                clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
-                clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
-                clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
-
-                previousMinutesLow_ = minutesLow;
-            }
-            else
-            {
-                updateRender = false;
-            }
-        }
-        else
-        {
-            clockGui_->sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-            clockGui_->sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-            clockGui_->sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-            clockGui_->sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
-        }
-    }
-
-    if (updateRender & (0 < imageWidth_) & (0 < imageHeight_))
+    if (statemachineData_.updateDisplay & (0 < imageWidth_) & (0 < imageHeight_))
     {
         // todo: render only updated section? -> check RAM/flash requirements for tracking bounding rect
         // todo: fix dimensions [width - 1]

@@ -21,7 +21,7 @@ public:
     GLWidget(Helper *helper, QWidget *parent);
 
 public slots:
-    void animate(std::chrono::system_clock::time_point const timestamp);
+    void animate();
 
 protected:
     void paintEvent(QPaintEvent *event) override;

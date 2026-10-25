@@ -5,6 +5,7 @@
 #define HELPER_H
 
 #include "dummybuttons.hpp"
+#include "dummyStatemachine.hpp"
 
 #include <QBrush>
 #include <QFont>
@@ -30,7 +31,7 @@ public:
            PinAndButton buttonOnOffOrDown);
 
 public:
-    void paint(QPainter *painter, QSize const & viewport, std::chrono::system_clock::time_point const timestamp);
+    void paint(QPainter *painter, QSize const & viewport);
 
     void mousePress(QPoint const & point);
     void mouseRelease(QPoint const & point);
@@ -48,16 +49,15 @@ private:
     std::vector<QRgb> imageData_;
     QImage image_;
 
-    std::variant<std::monostate, std::chrono::steady_clock::time_point> firstRender_;
-    bool reducedDisplaySymbols_;
-    int previousMinutesLow_;
-
     std::shared_ptr<Renderer2dClockGui> clockGui_;
 
     PinAndButton pinAndButtonSettings_;
     PinAndButton pinAndButtonRight_;
     PinAndButton pinAndButtonUp_;
     PinAndButton pinAndButtonOnOffOrDown_;
+
+    EpaperClock::Statemachine_t statemachine_;
+    EpaperClock::DataType statemachineData_;
 
 };
 //! [0]

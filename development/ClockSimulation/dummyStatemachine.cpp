@@ -1,5 +1,7 @@
 #include "dummyStatemachine.hpp"
 
+#include <chrono>
+
 
 namespace EpaperClock
 {
@@ -38,19 +40,35 @@ void StateOff::deinit(DataType & data) const
 }
 
 
-
+constexpr int splashDelay = 20;
 
 void StateSplashScreen::init(DataType & data) const
 {
-    data.delay = 20;
+    data.delay = splashDelay;
 
-    // todo: display splash image
-    data.updateDisplay = true;
+    data.clockGui.buttonSettings.set(true);
+    data.clockGui.buttonSettingsRight.set(false);
+    data.clockGui.buttonUp.set(true);
+    data.clockGui.buttonDown.set(true);
+    data.clockGui.buttonOnOff.set(true);
+
+    data.clockGui.selection0.set(true);
+    data.clockGui.selection1.set(true);
+    data.clockGui.selection2.set(true);
+    data.clockGui.selection3.set(true);
+
+    data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+    data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+    data.clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+    data.clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
 }
 
 Helpers::AbstractState<DataType> const & StateSplashScreen::process(DataType & data) const
 {
     Helpers::AbstractState<DataType> const * nextState = this;
+
+    // render only once
+    data.updateDisplay = (splashDelay == data.delay);
 
     bool advance = false;
     if (0 < data.delay)
@@ -70,6 +88,7 @@ Helpers::AbstractState<DataType> const & StateSplashScreen::process(DataType & d
     {
         // intentionally empty
     }
+
     return *nextState;
 }
 
@@ -83,8 +102,18 @@ void StateSplashScreen::deinit(DataType & data) const
 
 void StateClock::init(DataType & data) const
 {
-    // todo: display clock
-    data.updateDisplay = true;
+    data.clockGui.buttonSettings.set(true);
+    data.clockGui.buttonSettingsRight.set(false);
+    data.clockGui.buttonUp.set(false);
+    data.clockGui.buttonDown.set(false);
+    data.clockGui.buttonOnOff.set(true);
+
+    data.clockGui.selection0.set(false);
+    data.clockGui.selection1.set(false);
+    data.clockGui.selection2.set(false);
+    data.clockGui.selection3.set(false);
+
+    data.previousMinutesLow = -1;
 }
 
 Helpers::AbstractState<DataType> const & StateClock::process(DataType & data) const
@@ -101,7 +130,47 @@ Helpers::AbstractState<DataType> const & StateClock::process(DataType & data) co
     else
     {
         // todo: update clock [only if changed]
-        data.updateDisplay = /*changed ?*/ true;
+        bool updateDisplay = /*changed ?*/ true;
+
+        std::chrono::system_clock::time_point const timestamp = std::chrono::system_clock::now();
+        std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
+
+        struct tm nowLocal{0};
+        errno_t const success = localtime_s(&nowLocal, &nowTime);
+        if (0 == success)
+        {
+            int const hours = nowLocal.tm_hour;
+            int const minutes = nowLocal.tm_min;
+
+            int const hoursLow = hours % 10;
+            int const hoursHigh = hours / 10;
+
+            int const minutesLow = minutes % 10;
+            int const minutesHigh = minutes / 10;
+
+            if (data.previousMinutesLow != minutesLow)
+            {
+                data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursHigh));
+                data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(hoursLow));
+                data.clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesHigh));
+                data.clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::singleDigitToDisplay(minutesLow));
+
+                data.previousMinutesLow = minutesLow;
+            }
+            else
+            {
+                updateDisplay = false;
+            }
+        }
+        else
+        {
+            data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            data.clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+            data.clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
+        }
+
+        data.updateDisplay = updateDisplay;
     }
     return *nextState;
 }

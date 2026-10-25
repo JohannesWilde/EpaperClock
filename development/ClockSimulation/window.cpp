@@ -44,10 +44,9 @@ Window::Window(PinAndButton buttonSettings,
 
 void Window::update()
 {
+    guiWidget_->animate();
+
     std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
-
-    guiWidget_->animate(now);
-
 
     using namespace std::chrono_literals;
     std::string const s = std::format("{:L%F %T}", now); // As of now this does not print local time using MSVC - even though it should.
