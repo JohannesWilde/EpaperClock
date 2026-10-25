@@ -16,8 +16,27 @@ Helpers::Statemachine<DataType> statemachine(stateOff);
 
 void StateOff::init(DataType & data) const
 {
-    // todo: blank display
-    data.updateDisplay = true;
+    data.clockGui.buttonSettings.set(false);
+    data.clockGui.buttonSettingsRight.set(false);
+    data.clockGui.buttonUp.set(false);
+    data.clockGui.buttonDown.set(false);
+    data.clockGui.buttonOnOff.set(true);
+
+    data.clockGui.selection0.set(false);
+    data.clockGui.selection1.set(false);
+    data.clockGui.selection2.set(false);
+    data.clockGui.selection3.set(false);
+
+    data.clockGui.dotUpper.set(false);
+    data.clockGui.dotLower.set(false);
+
+    data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::none);
+    data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::none);
+    data.clockGui.sevenSegments2.set(GuiFixtures::Renderer2dSevenSegments::Display::none);
+    data.clockGui.sevenSegments3.set(GuiFixtures::Renderer2dSevenSegments::Display::none);
+
+    // Use delay to determine first render below.
+    data.delay = 0;
 }
 
 Helpers::AbstractState<DataType> const & StateOff::process(DataType & data) const
@@ -31,6 +50,19 @@ Helpers::AbstractState<DataType> const & StateOff::process(DataType & data) cons
     {
         // intentionally empty
     }
+
+    // blank display
+    data.updateDisplay = (0 == data.delay);
+
+    if (std::numeric_limits<int>::max() > data.delay)
+    {
+        ++data.delay;
+    }
+    else
+    {
+        // intentionally empty
+    }
+
     return *nextState;
 }
 
@@ -56,6 +88,9 @@ void StateSplashScreen::init(DataType & data) const
     data.clockGui.selection1.set(true);
     data.clockGui.selection2.set(true);
     data.clockGui.selection3.set(true);
+
+    data.clockGui.dotUpper.set(true);
+    data.clockGui.dotLower.set(true);
 
     data.clockGui.sevenSegments0.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
     data.clockGui.sevenSegments1.set(GuiFixtures::Renderer2dSevenSegments::Display::number8);
@@ -113,6 +148,9 @@ void StateClock::init(DataType & data) const
     data.clockGui.selection2.set(false);
     data.clockGui.selection3.set(false);
 
+    data.clockGui.dotUpper.set(true);
+    data.clockGui.dotLower.set(true);
+
     data.previousMinutesLow = -1;
 }
 
@@ -129,8 +167,8 @@ Helpers::AbstractState<DataType> const & StateClock::process(DataType & data) co
     }
     else
     {
-        // todo: update clock [only if changed]
-        bool updateDisplay = /*changed ?*/ true;
+        // update clock [only if changed]
+        bool updateDisplay = true;
 
         std::chrono::system_clock::time_point const timestamp = std::chrono::system_clock::now();
         std::time_t const nowTime = std::chrono::system_clock::to_time_t(timestamp);
