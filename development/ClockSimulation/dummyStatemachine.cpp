@@ -402,8 +402,10 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
 
 void StateSettings::deinit(DataType & data) const
 {
-    // todo: Recalc offset to match current time.
-
+    // Recalc offset to match current time.
+    std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point const set = data.timestamp + data.timeOffset;
+    data.timeOffset = set - now;
 }
 
 
