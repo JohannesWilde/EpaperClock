@@ -360,6 +360,8 @@ void StateSettings::init(DataType & data) const
     data.selection = SettingsSelection::hours10;
 
     data.delay = settingsTimeout;
+
+    data.forceInitialDisplayUpdate = true;
 }
 
 Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data) const
@@ -445,7 +447,7 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
     }
 
     // display clock and settings selection [on interaction or at first pass].
-    data.updateDisplay = interacted || (settingsTimeout == data.delay);
+    data.updateDisplay = interacted || data.forceInitialDisplayUpdate;
 
     if (data.updateDisplay)
     {
@@ -455,6 +457,8 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
         data.clockGui.selection1.set(SettingsSelection::hours1 == data.selection);
         data.clockGui.selection2.set(SettingsSelection::minutes10 == data.selection);
         data.clockGui.selection3.set(SettingsSelection::minutes1 == data.selection);
+
+        data.forceInitialDisplayUpdate = false;
     }
     else
     {

@@ -57,6 +57,7 @@ struct DataType
 
     std::chrono::system_clock::time_point timestamp;
     std::chrono::system_clock::duration timeOffset;
+    bool forceInitialDisplayUpdate;
     int delay;
     SettingsSelection selection;
 
@@ -73,6 +74,7 @@ struct DataType
         , buttonOnOffOrDown(buttonOnOffOrDown)
         , clockGui(clockGui)
         , timeOffset(std::chrono::minutes(0))
+        , forceInitialDisplayUpdate(false)
         , delay(-1)
         , selection(SettingsSelection::hours10)
         , updateDisplay(false)
