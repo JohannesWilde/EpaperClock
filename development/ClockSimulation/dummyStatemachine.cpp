@@ -356,6 +356,7 @@ void StateSettings::init(DataType & data) const
     data.clockGui.dotLower.set(true);
 
     data.timestamp = std::chrono::system_clock::now() + data.timeOffset;
+    data.timeOffset = std::chrono::minutes(0);
     data.selection = SettingsSelection::hours10;
 
     data.delay = settingsTimeout;
