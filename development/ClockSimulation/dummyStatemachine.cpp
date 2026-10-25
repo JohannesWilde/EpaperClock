@@ -432,7 +432,6 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
             }
 
             data.timestamp = timeFromTm(tmData);
-
         }
         catch (std::exception const &)
         {
