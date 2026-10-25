@@ -293,15 +293,11 @@ void StateSettings::init(DataType & data) const
     data.clockGui.buttonDown.set(true);
     data.clockGui.buttonOnOff.set(false);
 
-    data.clockGui.selection0.set(true);
-    data.clockGui.selection1.set(false);
-    data.clockGui.selection2.set(false);
-    data.clockGui.selection3.set(false);
-
     data.clockGui.dotUpper.set(true);
     data.clockGui.dotLower.set(true);
 
     data.timestamp = std::chrono::system_clock::now() - std::chrono::minutes(1);
+    data.selection = SettingsSelection::hours10;
 
     data.delay = settingsTimeout;
 }
@@ -309,10 +305,12 @@ void StateSettings::init(DataType & data) const
 Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data) const
 {
     Helpers::AbstractState<DataType> const * nextState = this;
+
     bool interacted = true;
+    int modificationMultiplier = 0;
     if (data.buttonOnOffOrDown.isSingleDownShortFinished())
     {
-        // down
+        modificationMultiplier = -1;
     }
     else if (data.buttonSettings.isSingleDownShortFinished())
     {
@@ -320,15 +318,66 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
     }
     else if (data.buttonRight.isSingleDownShortFinished())
     {
-        // right
+        data.selection = EpaperClock::next(data.selection);
     }
     else if (data.buttonUp.isSingleDownShortFinished())
     {
-        // up
+        modificationMultiplier = 1;
     }
     else
     {
         interacted = false;
+    }
+
+    if (0 != modificationMultiplier)
+    {
+        std::chrono::minutes modificationDuration;
+        switch (data.selection)
+        {
+        case SettingsSelection::hours10:
+        {
+            modificationDuration = std::chrono::minutes(600);
+            break;
+        }
+        case SettingsSelection::hours1:
+        {
+            modificationDuration = std::chrono::minutes(60);
+            break;
+        }
+        case SettingsSelection::minutes10:
+        {
+            modificationDuration = std::chrono::minutes(10);
+            break;
+        }
+        case SettingsSelection::minutes1:
+        {
+            modificationDuration = std::chrono::minutes(1);
+            break;
+        }
+        }
+
+        data.timeOffset += modificationMultiplier * modificationDuration;
+    }
+    else
+    {
+        // intentionally empty
+    }
+
+    // display clock and settings selection [on interaction or at first pass].
+    data.updateDisplay = interacted || (settingsTimeout == data.delay);
+
+    if (data.updateDisplay)
+    {
+        /*bool const successfull =*/ applyTimestampToClockGui(data.timestamp + data.timeOffset, data.clockGui);
+
+        data.clockGui.selection0.set(SettingsSelection::hours10 == data.selection);
+        data.clockGui.selection1.set(SettingsSelection::hours1 == data.selection);
+        data.clockGui.selection2.set(SettingsSelection::minutes10 == data.selection);
+        data.clockGui.selection3.set(SettingsSelection::minutes1 == data.selection);
+    }
+    else
+    {
+        // intentionally empty
     }
 
     if (interacted)
@@ -348,15 +397,13 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
         }
     }
 
-    // todo: display clock and settings selection
-    data.updateDisplay = true;
-
     return *nextState;
 }
 
 void StateSettings::deinit(DataType & data) const
 {
-    // apply new time from data
+    // todo: Recalc offset to match current time.
+
 }
 
 

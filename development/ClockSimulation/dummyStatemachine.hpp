@@ -12,6 +12,40 @@
 namespace EpaperClock
 {
 
+enum class SettingsSelection
+{
+    hours10,
+    hours1,
+    minutes10,
+    minutes1,
+};
+
+constexpr SettingsSelection next(SettingsSelection const selection)
+{
+    switch (selection)
+    {
+    case SettingsSelection::hours10     : return SettingsSelection::hours1;
+    case SettingsSelection::hours1      : return SettingsSelection::minutes10;
+    case SettingsSelection::minutes10   : return SettingsSelection::minutes1;
+    case SettingsSelection::minutes1    : return SettingsSelection::hours10;
+    }
+    assert(false);
+    return SettingsSelection::hours10;
+}
+
+constexpr SettingsSelection previous(SettingsSelection const selection)
+{
+    switch (selection)
+    {
+    case SettingsSelection::hours10     : return SettingsSelection::minutes1;
+    case SettingsSelection::hours1      : return SettingsSelection::hours10;
+    case SettingsSelection::minutes10   : return SettingsSelection::hours1;
+    case SettingsSelection::minutes1    : return SettingsSelection::minutes10;
+    }
+    assert(false);
+    return SettingsSelection::hours10;
+}
+
 struct DataType
 {
     CustomButtomTimedMultiple const & buttonSettings;
@@ -24,6 +58,7 @@ struct DataType
     std::chrono::system_clock::time_point timestamp;
     std::chrono::system_clock::duration timeOffset;
     int delay;
+    SettingsSelection selection;
 
     bool updateDisplay;
 
@@ -39,6 +74,7 @@ struct DataType
         , clockGui(clockGui)
         , timeOffset(std::chrono::minutes(0))
         , delay(-1)
+        , selection(SettingsSelection::hours10)
         , updateDisplay(false)
     {
         // intentionally empty
