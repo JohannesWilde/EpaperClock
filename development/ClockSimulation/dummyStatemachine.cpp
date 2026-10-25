@@ -16,6 +16,50 @@ Helpers::Statemachine<DataType> statemachine(stateOff);
 constexpr int splashDelay = 20;
 constexpr int settingsTimeout = 200;
 
+enum class ValueModification
+{
+    none,
+    up,
+    down,
+};
+
+
+static struct tm tmFromTime(std::chrono::system_clock::time_point const clockTime)
+{
+    std::time_t const time = std::chrono::system_clock::to_time_t(clockTime);
+
+    struct tm tmData{0};
+    errno_t const success = localtime_s(&tmData, &time);
+
+    if (0 != success)
+    {
+        throw std::exception("Failed to convert tmFromTime.");
+    }
+    else
+    {
+        // intentionally empty
+    }
+
+    return tmData;
+}
+
+static std::chrono::system_clock::time_point timeFromTm(struct tm & tmData)
+{
+    time_t const time = mktime(&tmData);
+
+    if (static_cast<time_t>(-1) == time)
+    {
+        throw std::exception("Failed to convert timeFromTm.");
+    }
+    else
+    {
+        // intentionally empty
+    }
+
+    std::chrono::system_clock::time_point const clockTime = std::chrono::system_clock::from_time_t(time);
+
+    return clockTime;
+}
 
 static bool timesChangedPerceptibly(std::chrono::system_clock::time_point const from,
                                     std::chrono::system_clock::time_point const to)
@@ -25,38 +69,18 @@ static bool timesChangedPerceptibly(std::chrono::system_clock::time_point const 
     if (not perceptibleDifference)
     {
         // Check for difference in minutes if to was not aligned with a change of a minute [i.e. seconds = 0].
-
-        struct tm tmFrom{0};
+        try
         {
-            std::time_t const time = std::chrono::system_clock::to_time_t(from);
-            errno_t const success = localtime_s(&tmFrom, &time);
+            struct tm const tmFrom = tmFromTime(from);
 
-            if (0 != success)
-            {
-                return true;
-            }
-            else
-            {
-                // intentionally empty
-            }
+            struct tm tmTo = tmFromTime(from);
+
+            perceptibleDifference = (tmFrom.tm_min != tmTo.tm_min);
         }
-
-        struct tm tmTo{0};
+        catch (std::exception const &)
         {
-            std::time_t const time = std::chrono::system_clock::to_time_t(to);
-            errno_t const success = localtime_s(&tmTo, &time);
-
-            if (0 != success)
-            {
-                return true;
-            }
-            else
-            {
-                // intentionally empty
-            }
+            // intentionally empty
         }
-
-        perceptibleDifference = (tmFrom.tm_min != tmTo.tm_min);
     }
     else
     {
@@ -64,6 +88,41 @@ static bool timesChangedPerceptibly(std::chrono::system_clock::time_point const 
     }
 
     return perceptibleDifference;
+}
+
+static void applyModificationToValue(int & value, int const min, int const max, ValueModification const modification)
+{
+    switch (modification)
+    {
+    case ValueModification::up:
+    {
+        if (max <= value)
+        {
+            value = min;
+        }
+        else
+        {
+            ++value;
+        }
+        break;
+    }
+    case ValueModification::down:
+    {
+        if (min >= value)
+        {
+            value = max;
+        }
+        else
+        {
+            --value;
+        }
+        break;
+    }
+    case ValueModification::none:
+    {
+        break;
+    }
+    }
 }
 
 static bool applyTimestampToClockGui(std::chrono::system_clock::time_point const timestamp, Renderer2dClockGui & clockGui)
@@ -296,7 +355,7 @@ void StateSettings::init(DataType & data) const
     data.clockGui.dotUpper.set(true);
     data.clockGui.dotLower.set(true);
 
-    data.timestamp = std::chrono::system_clock::now() - std::chrono::minutes(1);
+    data.timestamp = std::chrono::system_clock::now() + data.timeOffset;
     data.selection = SettingsSelection::hours10;
 
     data.delay = settingsTimeout;
@@ -307,10 +366,10 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
     Helpers::AbstractState<DataType> const * nextState = this;
 
     bool interacted = true;
-    int modificationMultiplier = 0;
+    ValueModification modification = ValueModification::none;
     if (data.buttonOnOffOrDown.isSingleDownShortFinished())
     {
-        modificationMultiplier = -1;
+        modification = ValueModification::down;
     }
     else if (data.buttonSettings.isSingleDownShortFinished())
     {
@@ -322,41 +381,63 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
     }
     else if (data.buttonUp.isSingleDownShortFinished())
     {
-        modificationMultiplier = 1;
+        modification = ValueModification::up;
     }
     else
     {
         interacted = false;
     }
 
-    if (0 != modificationMultiplier)
+    if (ValueModification::none != modification)
     {
-        std::chrono::minutes modificationDuration;
-        switch (data.selection)
+        try
         {
-        case SettingsSelection::hours10:
-        {
-            modificationDuration = std::chrono::minutes(600);
-            break;
-        }
-        case SettingsSelection::hours1:
-        {
-            modificationDuration = std::chrono::minutes(60);
-            break;
-        }
-        case SettingsSelection::minutes10:
-        {
-            modificationDuration = std::chrono::minutes(10);
-            break;
-        }
-        case SettingsSelection::minutes1:
-        {
-            modificationDuration = std::chrono::minutes(1);
-            break;
-        }
-        }
+            struct tm tmData = tmFromTime(data.timestamp);
 
-        data.timeOffset += modificationMultiplier * modificationDuration;
+            switch (data.selection)
+            {
+            case SettingsSelection::hours10:
+            {
+                int const digit0 = tmData.tm_hour % 10;
+                int digit1 = tmData.tm_hour / 10;
+                applyModificationToValue(digit1, 0, 2, modification);
+                tmData.tm_hour = 10 * digit1 + digit0;
+                break;
+            }
+            case SettingsSelection::hours1:
+            {
+                int digit0 = tmData.tm_hour % 10;
+                int const digit1 = tmData.tm_hour / 10;
+                int const digit0Max = (2 == digit1) ? 3 : 9;
+                applyModificationToValue(digit0, 0, digit0Max, modification);
+                tmData.tm_hour = 10 * digit1 + digit0;
+                break;
+            }
+            case SettingsSelection::minutes10:
+            {
+                int const digit0 = tmData.tm_min % 10;
+                int digit1 = tmData.tm_min / 10;
+                applyModificationToValue(digit1, 0, 5, modification);
+                tmData.tm_min = 10 * digit1 + digit0;
+                break;
+            }
+            case SettingsSelection::minutes1:
+            {
+                int digit0 = tmData.tm_min % 10;
+                int const digit1 = tmData.tm_min / 10;
+                applyModificationToValue(digit0, 0, 9, modification);
+                tmData.tm_min = 10 * digit1 + digit0;
+                break;
+            }
+            }
+
+            data.timestamp = timeFromTm(tmData);
+
+        }
+        catch (std::exception const &)
+        {
+            // intentionally empty
+        }
     }
     else
     {
@@ -368,7 +449,7 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
 
     if (data.updateDisplay)
     {
-        /*bool const successfull =*/ applyTimestampToClockGui(data.timestamp + data.timeOffset, data.clockGui);
+        /*bool const successfull =*/ applyTimestampToClockGui(data.timestamp, data.clockGui);
 
         data.clockGui.selection0.set(SettingsSelection::hours10 == data.selection);
         data.clockGui.selection1.set(SettingsSelection::hours1 == data.selection);
@@ -404,7 +485,7 @@ void StateSettings::deinit(DataType & data) const
 {
     // Recalc offset to match current time.
     std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point const set = data.timestamp + data.timeOffset;
+    std::chrono::system_clock::time_point const set = data.timestamp;
     data.timeOffset = set - now;
 }
 
