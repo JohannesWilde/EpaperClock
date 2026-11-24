@@ -306,7 +306,7 @@ Helpers::AbstractState<DataType> const & StateClock::process(DataType & data) co
     {
         nextState = &stateOff;
     }
-    else if (data.buttonSettings.isSingleDownShortFinished())
+    else if (data.buttonSettings.isDownLong())
     {
         nextState = &stateSettings;
     }
@@ -362,6 +362,7 @@ void StateSettings::init(DataType & data) const
     data.delay = settingsTimeout;
 
     data.forceInitialDisplayUpdate = true;
+    data.initialDownLongReleased = false;
 }
 
 Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data) const
@@ -370,7 +371,20 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
 
     bool interacted = true;
     ValueModification modification = ValueModification::none;
-    if (data.buttonOnOffOrDown.isSingleDownShortFinished())
+    if (not data.initialDownLongReleased)
+    {
+        if (data.buttonSettings.isUp())
+        {
+            data.initialDownLongReleased = true;
+        }
+        else
+        {
+            // intentionally empty
+        }
+
+        interacted = false;
+    }
+    else if (data.buttonOnOffOrDown.isSingleDownShortFinished())
     {
         modification = ValueModification::down;
     }
@@ -465,7 +479,7 @@ Helpers::AbstractState<DataType> const & StateSettings::process(DataType & data)
         // intentionally empty
     }
 
-    if (interacted)
+    if (interacted || data.initialDownLongReleased)
     {
         // Reset timeout.
         data.delay = settingsTimeout;
